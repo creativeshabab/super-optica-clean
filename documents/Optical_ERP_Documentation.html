@@ -1,0 +1,771 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Optical ERP - Complete System Flow</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 20px;
+      }
+      h1 {
+        color: #2c3e50;
+        border-bottom: 3px solid #3498db;
+        padding-bottom: 10px;
+      }
+      h2 {
+        color: #34495e;
+        margin-top: 30px;
+        border-bottom: 2px solid #95a5a6;
+        padding-bottom: 5px;
+      }
+      h3 {
+        color: #7f8c8d;
+        margin-top: 20px;
+      }
+      code {
+        background: #ecf0f1;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-family: "Courier New", monospace;
+      }
+      pre {
+        background: #2c3e50;
+        color: #ecf0f1;
+        padding: 15px;
+        border-radius: 5px;
+        overflow-x: auto;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 20px 0;
+      }
+      th,
+      td {
+        border: 1px solid #bdc3c7;
+        padding: 12px;
+        text-align: left;
+      }
+      th {
+        background: #3498db;
+        color: white;
+      }
+      tr:nth-child(even) {
+        background: #ecf0f1;
+      }
+      .step {
+        background: #e8f5e9;
+        padding: 15px;
+        margin: 15px 0;
+        border-left: 4px solid #4caf50;
+      }
+      .database {
+        background: #fff3e0;
+        padding: 15px;
+        margin: 15px 0;
+        border-left: 4px solid #ff9800;
+      }
+      .result {
+        background: #e3f2fd;
+        padding: 10px;
+        margin: 10px 0;
+        border-left: 4px solid #2196f3;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🏥 Optical ERP - Complete System Documentation</h1>
+
+    <p><strong>Generated:</strong> February 3, 2026</p>
+
+    <h2>📋 Table of Contents</h2>
+    <ol>
+      <li><a href="#flow1">Procurement to Warehouse</a></li>
+      <li><a href="#flow2">Warehouse to Store Distribution</a></li>
+      <li><a href="#flow3">POS Sales & Doctor Commission</a></li>
+      <li><a href="#flow4">B2B Wholesale Portal</a></li>
+      <li><a href="#connections">System Connections</a></li>
+      <li><a href="#automation">Automation Points</a></li>
+      <li><a href="#example">Real-World Example</a></li>
+    </ol>
+
+    <hr />
+
+    <h2 id="flow1">📦 FLOW 1: Procurement to Warehouse</h2>
+
+    <h3>Step 1: Create Purchase Order</h3>
+    <div class="step">
+      <p>
+        <strong>Who:</strong> Warehouse Manager<br />
+        <strong>Path:</strong> Procurement → Purchase Orders → Create PO
+      </p>
+
+      <p><strong>Actions:</strong></p>
+      <ol>
+        <li>Select Vendor</li>
+        <li>Add Products with quantities and prices</li>
+        <li>System calculates total</li>
+        <li>Status set to "pending"</li>
+      </ol>
+    </div>
+
+    <div class="database">
+      <p><strong>Database Operations:</strong></p>
+      <pre>
+INSERT INTO purchase_orders (vendor_id, total_amount, status)
+INSERT INTO po_items (po_id, product_id, quantity, unit_price)</pre
+      >
+    </div>
+
+    <h3>Step 2: Receive Stock (GRN - Goods Receipt Note)</h3>
+    <div class="step">
+      <p>
+        <strong>Who:</strong> Warehouse Manager<br />
+        <strong>Path:</strong> Procurement → GRN → Create GRN
+      </p>
+
+      <p><strong>Actions:</strong></p>
+      <ol>
+        <li>Select pending Purchase Order</li>
+        <li>Enter received quantities</li>
+        <li>Add batch numbers and expiry dates</li>
+        <li>Submit GRN</li>
+      </ol>
+    </div>
+
+    <div class="database">
+      <p><strong>Automated Backend Process:</strong></p>
+      <pre>
+-- Create GRN
+INSERT INTO grn (po_id, received_by, status)
+INSERT INTO grn_items (grn_id, product_id, quantity, batch_number)
+
+-- Add stock to warehouse
+INSERT INTO stock_movements (
+    product_id, 
+    store_id = 1,  -- Warehouse
+    quantity,
+    type = 'in',
+    reference_type = 'grn'
+)
+
+-- Update PO status
+UPDATE purchase_orders SET status = 'received'</pre
+      >
+    </div>
+
+    <div class="result">
+      ✅ Result: Products added to warehouse inventory automatically
+    </div>
+
+    <hr />
+
+    <h2 id="flow2">🏪 FLOW 2: Warehouse to Store Distribution</h2>
+
+    <h3>Step 3: Store Requests Stock</h3>
+    <div class="step">
+      <p>
+        <strong>Who:</strong> Store Manager<br />
+        <strong>Path:</strong> Store Mgmt → Request Stock
+      </p>
+
+      <p><strong>Actions:</strong></p>
+      <ol>
+        <li>Select products needed</li>
+        <li>Enter quantities</li>
+        <li>Submit request (Status: Pending)</li>
+      </ol>
+    </div>
+
+    <h3>Step 4: Warehouse Approves Transfer</h3>
+    <div class="step">
+      <p>
+        <strong>Who:</strong> Warehouse Manager<br />
+        <strong>Path:</strong> Warehouse → Stock Transfers → Approve
+      </p>
+    </div>
+
+    <div class="database">
+      <p><strong>Automated Backend Process:</strong></p>
+      <pre>
+-- Deduct from warehouse
+INSERT INTO stock_movements (
+    product_id,
+    store_id = 1,  -- Warehouse
+    quantity = -10,  -- Negative (outgoing)
+    type = 'out'
+)
+
+-- Add to destination store
+INSERT INTO stock_movements (
+    product_id,
+    store_id = 3,  -- Destination store
+    quantity = 10,  -- Positive (incoming)
+    type = 'in'
+)
+
+-- Update transfer status
+UPDATE stock_transfers SET status = 'completed'</pre
+      >
+    </div>
+
+    <div class="result">
+      ✅ Result: Stock automatically transferred from warehouse to store
+    </div>
+
+    <hr />
+
+    <h2 id="flow3">💰 FLOW 3: POS Sales & Doctor Commission (THE CORE)</h2>
+
+    <h3>Step 5: Create Customer with Doctor Referral</h3>
+    <div class="step">
+      <p>
+        <strong>Who:</strong> Sales Associate<br />
+        <strong>Path:</strong> POS / Sales → Click "+" button
+      </p>
+
+      <p><strong>Actions:</strong></p>
+      <ol>
+        <li>Click "+" next to customer dropdown</li>
+        <li>Enter customer name and phone</li>
+        <li><strong>Select "Referred by Doctor" from dropdown</strong></li>
+        <li>Save customer</li>
+      </ol>
+    </div>
+
+    <div class="database">
+      <p><strong>Database:</strong></p>
+      <pre>
+INSERT INTO customers (
+    name = 'Rajesh Kumar',
+    phone = '9876543210',
+    referred_by_doctor = 5  -- Dr. Sharma's ID
+)</pre
+      >
+    </div>
+
+    <div class="result">✅ Result: Customer linked to referring doctor</div>
+
+    <h3>Step 6-7: Add Products & Prescription</h3>
+    <div class="step">
+      <p><strong>Actions:</strong></p>
+      <ol>
+        <li>Search and add products to cart</li>
+        <li>Click "Add Rx" to enter prescription (if lens order)</li>
+        <li>Enter SPH, CYL, AXIS, ADD, PD values</li>
+      </ol>
+    </div>
+
+    <h3>Step 8: Complete Sale</h3>
+    <div class="step">
+      <p><strong>Actions:</strong></p>
+      <ol>
+        <li>Click "Complete Sale"</li>
+        <li>Select payment method (Cash/Card/UPI)</li>
+        <li>Enter amount tendered</li>
+        <li>Confirm payment</li>
+      </ol>
+    </div>
+
+    <div class="database">
+      <p><strong>Backend Process:</strong></p>
+      <pre>
+-- Create order
+INSERT INTO orders (
+    customer_id = 123,
+    store_id = 3,
+    total_amount = 6500,
+    payment_method = 'cash',
+    status = 'completed'
+)
+
+-- Create order items
+INSERT INTO order_items (order_id, product_id, quantity, price)
+
+-- Save prescription
+INSERT INTO prescriptions (order_id, customer_id, od_sph, od_cyl, ...)
+
+-- Deduct stock
+INSERT INTO stock_movements (
+    product_id,
+    store_id = 3,
+    quantity = -1,
+    type = 'out',
+    reference_type = 'sale'
+)</pre
+      >
+    </div>
+
+    <h3>Step 9: 🤖 AUTOMATIC Commission Calculation</h3>
+    <div class="step" style="background: #fff9c4; border-left-color: #fbc02d">
+      <p><strong>⚡ TRIGGER:</strong> Order status = 'completed'</p>
+      <p><strong>THIS HAPPENS AUTOMATICALLY - NO MANUAL WORK!</strong></p>
+    </div>
+
+    <div class="database">
+      <p><strong>Automated Backend Process:</strong></p>
+      <pre>
+-- 1. Check if customer has referring doctor
+SELECT referred_by_doctor FROM customers WHERE id = 123
+-- Returns: doctor_id = 5 (Dr. Sharma)
+
+-- 2. Get doctor's commission rate
+SELECT commission_rate FROM doctors WHERE id = 5
+-- Returns: 10%
+
+-- 3. Calculate commission
+commission_amount = 6500 × 10% = ₹650
+
+-- 4. Insert commission record
+INSERT INTO doctor_commissions (
+    doctor_id = 5,
+    order_id = 456,
+    order_amount = 6500,
+    commission_rate = 10,
+    commission_amount = 650,
+    status = 'pending'
+)
+
+-- 5. Get current balance
+SELECT balance_after FROM doctor_ledger 
+WHERE doctor_id = 5 
+ORDER BY id DESC LIMIT 1
+-- Returns: ₹5,000
+
+-- 6. Add ledger entry
+INSERT INTO doctor_ledger (
+    doctor_id = 5,
+    type = 'commission',
+    amount = 650,
+    balance_after = 5650,
+    description = 'Commission from Order #456'
+)
+
+-- 7. Update doctor total
+UPDATE doctors 
+SET total_earned = total_earned + 650 
+WHERE id = 5</pre
+      >
+    </div>
+
+    <div class="result" style="background: #c8e6c9; border-left-color: #4caf50">
+      ✅ Result: Dr. Sharma automatically earns ₹650 commission!
+    </div>
+
+    <hr />
+
+    <h2 id="flow4">🏢 FLOW 4: B2B Wholesale Portal</h2>
+
+    <h3>Step 10: Retailer Places Order</h3>
+    <div class="step">
+      <p>
+        <strong>Who:</strong> Retailer (logged in)<br />
+        <strong>Path:</strong> B2B Wholesale → Catalog
+      </p>
+
+      <p><strong>Actions:</strong></p>
+      <ol>
+        <li>Browse wholesale catalog</li>
+        <li>Add products to cart (sees wholesale prices)</li>
+        <li>Check credit limit</li>
+        <li>Place order</li>
+      </ol>
+    </div>
+
+    <div class="database">
+      <p><strong>Credit Check:</strong></p>
+      <pre>
+SELECT credit_limit, current_balance FROM stores WHERE id = 8
+-- credit_limit = 50000, current_balance = 15000
+-- available_credit = 35000
+
+IF order_total <= available_credit THEN allow order</pre
+      >
+    </div>
+
+    <h3>Step 11: Admin Dispatches Order</h3>
+    <div class="step">
+      <p>
+        <strong>Who:</strong> Admin/Warehouse<br />
+        <strong>Path:</strong> B2B Wholesale → Manage Orders → Dispatch
+      </p>
+    </div>
+
+    <div class="database">
+      <p><strong>Automated Process:</strong></p>
+      <pre>
+-- Deduct stock
+INSERT INTO stock_movements (
+    product_id,
+    store_id = 1,
+    quantity = -50,
+    type = 'out',
+    reference_type = 'b2b_order'
+)
+
+-- DEBIT retailer ledger
+UPDATE stores 
+SET current_balance = current_balance + 25000 
+WHERE id = 8
+
+INSERT INTO store_ledger (
+    store_id = 8,
+    type = 'debit',
+    amount = 25000,
+    balance_after = 40000,
+    description = 'Order #789 dispatched'
+)</pre
+      >
+    </div>
+
+    <div class="result">✅ Result: Stock dispatched, retailer owes ₹40,000</div>
+
+    <h3>Step 12: Payment Received</h3>
+    <div class="database">
+      <p><strong>Automated Process:</strong></p>
+      <pre>
+-- CREDIT retailer ledger
+UPDATE stores 
+SET current_balance = current_balance - 20000 
+WHERE id = 8
+
+INSERT INTO store_ledger (
+    store_id = 8,
+    type = 'credit',
+    amount = 20000,
+    balance_after = 20000,
+    description = 'Payment received'
+)</pre
+      >
+    </div>
+
+    <div class="result">✅ Result: Balance updated to ₹20,000</div>
+
+    <hr />
+
+    <h2 id="connections">🔗 How Everything Connects</h2>
+
+    <h3>Data Flow Diagram</h3>
+    <pre
+      style="
+        background: white;
+        color: #2c3e50;
+        border: 2px solid #3498db;
+        padding: 20px;
+      "
+    >
+VENDORS
+   ↓ (supply)
+PURCHASE ORDERS
+   ↓ (receive)
+GRN (Goods Receipt)
+   ↓ (add stock)
+WAREHOUSE INVENTORY
+   ↓ (transfer)              ↓ (B2B dispatch)
+STORE INVENTORY          B2B RETAILERS
+   ↓ (sell)
+POS ORDERS
+   ↓ (check referral)
+CUSTOMERS ← linked to → DOCTORS
+   ↓ (if doctor exists)
+COMMISSION CALCULATION (automatic)
+   ↓
+DOCTOR LEDGER
+</pre
+    >
+
+    <h3>Database Table Relationships</h3>
+    <table>
+      <tr>
+        <th>Table</th>
+        <th>Links To</th>
+        <th>Purpose</th>
+      </tr>
+      <tr>
+        <td>vendors</td>
+        <td>purchase_orders</td>
+        <td>Track suppliers</td>
+      </tr>
+      <tr>
+        <td>purchase_orders</td>
+        <td>grn</td>
+        <td>Track stock procurement</td>
+      </tr>
+      <tr>
+        <td>grn</td>
+        <td>stock_movements</td>
+        <td>Add stock to warehouse</td>
+      </tr>
+      <tr>
+        <td>stock_movements</td>
+        <td>stores</td>
+        <td>Track all stock changes</td>
+      </tr>
+      <tr>
+        <td>orders</td>
+        <td>customers, stores</td>
+        <td>Track sales</td>
+      </tr>
+      <tr>
+        <td>customers</td>
+        <td>doctors (referred_by_doctor)</td>
+        <td>Link customer to referring doctor</td>
+      </tr>
+      <tr>
+        <td>doctor_commissions</td>
+        <td>doctors, orders</td>
+        <td>Track commission per order</td>
+      </tr>
+      <tr>
+        <td>doctor_ledger</td>
+        <td>doctors</td>
+        <td>Track doctor earnings</td>
+      </tr>
+    </table>
+
+    <hr />
+
+    <h2 id="automation">🎯 Key Automation Points</h2>
+
+    <table>
+      <tr>
+        <th>Feature</th>
+        <th>What Happens Automatically</th>
+        <th>Trigger</th>
+      </tr>
+      <tr>
+        <td><strong>Stock Tracking</strong></td>
+        <td>
+          • GRN → +stock to warehouse<br />
+          • Transfer → -warehouse, +store<br />
+          • Sale → -store<br />
+          • B2B → -warehouse
+        </td>
+        <td>Every stock transaction</td>
+      </tr>
+      <tr>
+        <td><strong>Commission Calculation</strong></td>
+        <td>
+          • Check customer's doctor<br />
+          • Calculate commission<br />
+          • Update ledger<br />
+          • Update total earned
+        </td>
+        <td>Order status = 'completed'</td>
+      </tr>
+      <tr>
+        <td><strong>Credit Management</strong></td>
+        <td>
+          • Check credit before order<br />
+          • Debit on dispatch<br />
+          • Credit on payment<br />
+          • Balance always current
+        </td>
+        <td>B2B order/payment</td>
+      </tr>
+      <tr>
+        <td><strong>Audit Logging</strong></td>
+        <td>
+          • Log every action<br />
+          • Track user, timestamp<br />
+          • Store old/new values
+        </td>
+        <td>All create/update/delete operations</td>
+      </tr>
+    </table>
+
+    <hr />
+
+    <h2 id="example">📊 Real-World Example: 5-Day Journey</h2>
+
+    <table>
+      <tr>
+        <th style="width: 15%">Day</th>
+        <th style="width: 50%">Actions</th>
+        <th style="width: 35%">Automated Results</th>
+      </tr>
+      <tr>
+        <td><strong>Day 1</strong><br />Procurement</td>
+        <td>
+          1. Warehouse Manager creates PO for 100 RayBan frames from Vendor A<br />
+          2. Vendor delivers stock<br />
+          3. Warehouse Manager creates GRN
+        </td>
+        <td>
+          • 100 units added to warehouse<br />
+          • stock_movements updated<br />
+          • PO status = 'received'
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Day 2</strong><br />Distribution</td>
+        <td>
+          4. Downtown Store requests 20 RayBan frames<br />
+          5. Warehouse Manager approves transfer
+        </td>
+        <td>
+          • 20 units moved from warehouse to Downtown Store<br />
+          • stock_movements: -20 warehouse, +20 store
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Day 3</strong><br />Retail Sale</td>
+        <td>
+          6. Customer walks into Downtown Store<br />
+          7. Sales Associate creates customer, selects "Dr. Sharma"<br />
+          8. Adds RayBan frame (₹4,500) to cart<br />
+          9. Completes sale
+        </td>
+        <td>
+          • Order created<br />
+          • Stock deducted from store<br />
+          • <strong>Dr. Sharma earns ₹450 commission (10%)</strong><br />
+          • doctor_ledger updated<br />
+          • Audit log created
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Day 4</strong><br />B2B Order</td>
+        <td>
+          10. Retailer XYZ logs into B2B portal<br />
+          11. Orders 50 units at ₹3,000 each (total: ₹1,50,000)<br />
+          12. Admin dispatches order
+        </td>
+        <td>
+          • Credit check passed<br />
+          • Stock deducted from warehouse<br />
+          • Retailer ledger debited ₹1,50,000<br />
+          • current_balance updated
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Day 5</strong><br />Payment</td>
+        <td>13. Retailer pays ₹1,00,000</td>
+        <td>
+          • Ledger credited ₹1,00,000<br />
+          • Balance = ₹50,000<br />
+          • Payment recorded in store_ledger
+        </td>
+      </tr>
+    </table>
+
+    <hr />
+
+    <h2>🔐 Security & Access Control</h2>
+
+    <table>
+      <tr>
+        <th>Role</th>
+        <th>Permissions</th>
+        <th>Can Access</th>
+      </tr>
+      <tr>
+        <td><strong>Admin</strong></td>
+        <td>All permissions</td>
+        <td>Complete system access</td>
+      </tr>
+      <tr>
+        <td><strong>Warehouse Manager</strong></td>
+        <td>inventory_manage, procurement_manage</td>
+        <td>Procurement, GRN, Stock Transfers, B2B Dispatch</td>
+      </tr>
+      <tr>
+        <td><strong>Store Manager</strong></td>
+        <td>store_view</td>
+        <td>Request Stock, View Store Inventory</td>
+      </tr>
+      <tr>
+        <td><strong>Sales Associate</strong></td>
+        <td>pos_access</td>
+        <td>POS only (restricted to assigned store)</td>
+      </tr>
+      <tr>
+        <td><strong>Retailer</strong></td>
+        <td>b2b_view</td>
+        <td>B2B Catalog, Orders, Ledger (own store only)</td>
+      </tr>
+      <tr>
+        <td><strong>Account Manager</strong></td>
+        <td>b2b_manage_assigned</td>
+        <td>Assigned retailers only (can shop on their behalf)</td>
+      </tr>
+    </table>
+
+    <hr />
+
+    <div
+      style="
+        background: #e8f5e9;
+        padding: 25px;
+        border-radius: 8px;
+        margin-top: 40px;
+        border: 2px solid #4caf50;
+      "
+    >
+      <h2 style="color: #2e7d32; margin-top: 0">
+        ✅ SUMMARY: How to Use Doctor Commission System
+      </h2>
+
+      <h3 style="color: #388e3c">One-Time Setup (Admin):</h3>
+      <ol style="font-size: 16px">
+        <li>Go to <strong>Doctor Management</strong></li>
+        <li>Click <strong>"Add Doctor"</strong></li>
+        <li>Enter: Doctor Name, Clinic Name, Phone, Email</li>
+        <li>Set <strong>Commission Rate</strong> (e.g., 10%)</li>
+        <li>Save</li>
+      </ol>
+
+      <h3 style="color: #388e3c">Daily Operations (POS User):</h3>
+      <ol style="font-size: 16px">
+        <li>When customer arrives, click <strong>"+"</strong> button in POS</li>
+        <li>Enter customer name and phone</li>
+        <li>
+          Select doctor from <strong>"Referred by Doctor"</strong> dropdown
+        </li>
+        <li>Save customer</li>
+        <li>Complete sale normally</li>
+      </ol>
+
+      <h3 style="color: #388e3c">What Happens Automatically:</h3>
+      <ul style="font-size: 16px">
+        <li>✅ Commission calculated when sale completes</li>
+        <li>✅ Doctor ledger updated with commission amount</li>
+        <li>✅ Doctor's total earnings increased</li>
+        <li>✅ All transactions logged for audit</li>
+      </ul>
+
+      <p
+        style="
+          font-size: 20px;
+          font-weight: bold;
+          color: #1b5e20;
+          margin-top: 20px;
+          text-align: center;
+        "
+      >
+        🎯 YOU JUST SELECT THE DOCTOR - EVERYTHING ELSE IS AUTOMATIC!
+      </p>
+    </div>
+
+    <hr />
+
+    <div
+      style="
+        background: #f5f5f5;
+        padding: 20px;
+        margin-top: 30px;
+        border-radius: 5px;
+      "
+    >
+      <p style="text-align: center; color: #666; margin: 0">
+        <strong>Optical ERP System</strong> | Complete Documentation<br />
+        Generated: February 3, 2026
+      </p>
+    </div>
+  </body>
+</html>

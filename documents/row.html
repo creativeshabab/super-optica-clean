@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Auto Supplier Portal Header</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root {
+      --primary-bg: #3a0058;
+      --primary-bg-dark: #220038;
+      --accent: #ffc857;
+      --text-light: #ffffff;
+      --text-muted: #e5e7eb;
+      --avatar-bg: #ff8fa3;
+      --avatar-inner: #ffdac4;
+      --header-height: 110px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+      sans-serif;
+      /* background: #111827; */
+      color: var(--text-light);
+    }
+
+    /* ===== HEADER WRAPPER ===== */
+
+    .portal-header {
+      position: relative;
+      min-height: var(--header-height);
+      width: 100%;
+      overflow: hidden;
+      color: var(--text-light);
+      height: auto;
+      display: flex;
+    }
+
+    /* background image + gradient overlay */
+    .portal-header::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: 
+        url("bg.png") center/cover no-repeat;
+      z-index: -2;
+    }
+
+    .portal-header::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 55%);
+      opacity: 0.6;
+      z-index: -1;
+    }
+
+    .portal-header__inner {
+      max-width: 1470px;
+      margin: 0 auto;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      WIDTH: 100%;
+    }
+
+    /* ===== LEFT: TITLE + SUBTEXT ===== */
+
+    .portal-header__left {
+      min-width: 0;
+    }
+
+    .portal-title {
+      font-size: clamp(20px, 2vw, 26px);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .portal-subtitle {
+      margin-top: 4px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* ===== MIDDLE: DETAILS ===== */
+
+    .portal-header__middle {
+      display: flex;
+      gap: 32px;
+      flex: 1;
+      justify-content: center;
+      flex-wrap: wrap;
+      min-width: 0;
+      width: 60%;
+    }
+
+    .info-block {
+      min-width: 150px;
+    }
+
+    .info-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: none;
+    }
+
+    .info-value {
+      margin-top: 2px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-light);
+      white-space: nowrap;
+    }
+
+    /* ===== RIGHT: HOME ICON + AVATAR + GREETING ===== */
+
+    .portal-header__right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .home-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+    }
+
+    .home-icon span {
+      transform: translateY(-1px);
+    }
+
+    .avatar-wrapper {
+      width: 46px;
+      height: 46px;
+      border-radius: 999px;
+      background: url("Profile.png");
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background-size: cover;
+      background-position: center;
+    }
+
+   
+
+    .greeting-text {
+      font-size: 13px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    /* ===== RESPONSIVE BEHAVIOUR ===== */
+
+    @media (max-width: 960px) {
+      .portal-header__inner {
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      .portal-header__left {
+        flex: 1 1 100%;
+      }
+
+      .portal-header__middle {
+        justify-content: flex-start;
+      }
+
+      .portal-header__right {
+        margin-left: auto;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .portal-header__inner {
+        padding-inline: 14px;
+      }
+
+      .portal-header__middle {
+        order: 3;
+        width: 100%;
+        justify-content: flex-start;
+        gap: 18px;
+      }
+
+      .portal-header__right {
+        order: 2;
+      }
+
+      .info-block {
+        min-width: 120px;
+      }
+
+      .info-value {
+        font-size: 12px;
+      }
+
+      .greeting-text {
+        font-size: 12px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .portal-title {
+        font-size: 18px;
+      }
+      .portal-subtitle {
+        font-size: 12px;
+      }
+      .portal-header__middle {
+        gap: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header class="portal-header">
+  <div class="portal-header__inner">
+
+    <!-- LEFT -->
+    <div class="portal-header__left">
+      <div class="portal-title">Auto Supplier Portal</div>
+      <div class="portal-subtitle">Only a few more requests to get your car</div>
+    </div>
+
+    <!-- MIDDLE -->
+    <div class="portal-header__middle">
+      <div class="info-block">
+        <div class="info-label">Application number</div>
+        <div class="info-value" id="appNumber">LOS-00000000003212-AR</div>
+      </div>
+      <div class="info-block">
+        <div class="info-label">Region</div>
+        <div class="info-value" id="regionValue">XX</div>
+      </div>
+      <div class="info-block">
+        <div class="info-label">Application Status</div>
+        <div class="info-value" id="appStatus">Data Entry in progress</div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="portal-header__right">
+      <button class="home-icon" aria-label="Home">
+        <img src="home.png">
+      </button>
+
+      <div class="avatar-wrapper" aria-hidden="true">
+        <div class="avatar-inner"></div>
+      </div>
+
+      <div class="greeting-text" id="greetingText">Hi Dareen,</div>
+    </div>
+
+  </div>
+</header>
+
+
+
+</body>
+</html>

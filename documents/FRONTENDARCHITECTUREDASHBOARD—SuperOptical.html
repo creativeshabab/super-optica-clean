@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ULTRA-DETAILED FRONTEND ARCHITECTURE — Super Optical</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=Outfit:wght@400;700;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #e31e24;
+            --secondary: #0f172a;
+            --accent: #ef4444;
+            --bg: #fdfdfd;
+            --nav-bg: #0f172a;
+            --text: #1e293b;
+            --code-bg: #1a1b26;
+        }
+
+        * { box-sizing: border-box; }
+        body { font-family: 'Space Grotesk', sans-serif; margin: 0; display: flex; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
+
+        /* Navigation */
+        nav { width: 340px; background: var(--nav-bg); color: white; display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 10px 0 30px rgba(0,0,0,0.1); }
+        .nav-head { padding: 3rem 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .nav-head h1 { font-family: 'Outfit', sans-serif; font-size: 1.5rem; font-weight: 900; margin: 0; color: var(--primary); letter-spacing: -1px; }
+        .nav-links { flex: 1; overflow-y: auto; padding: 1.5rem; }
+        .nav-link { display: flex; align-items: center; gap: 15px; padding: 1rem; color: #94a3b8; text-decoration: none; border-radius: 12px; font-weight: 600; margin-bottom: 8px; transition: 0.3s; font-size: 0.95rem; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.05); color: white; }
+        .nav-link.active { border-left: 5px solid var(--primary); background: rgba(227, 30, 36, 0.1); }
+
+        /* Content */
+        main { flex: 1; overflow-y: auto; padding: 5rem; scroll-behavior: smooth; }
+        .doc-section { max-width: 1000px; margin: 0 auto 8rem auto; }
+        
+        .section-num { font-family: 'Fira Code', monospace; color: var(--primary); font-size: 0.9rem; font-weight: bold; margin-bottom: 1rem; display: block; }
+        h2 { font-family: 'Outfit', sans-serif; font-size: 3rem; font-weight: 900; margin-bottom: 2rem; color: var(--secondary); letter-spacing: -2px; }
+        h3 { font-family: 'Outfit', sans-serif; font-size: 1.5rem; margin-top: 3rem; color: var(--secondary); }
+        
+        p { font-size: 1.1rem; line-height: 1.8; color: #475569; margin-bottom: 2rem; }
+
+        /* Cards & Grids */
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin: 3rem 0; }
+        .detail-card { background: white; padding: 2.5rem; border-radius: 24px; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.04); }
+        .detail-card i { font-size: 2.5rem; color: var(--primary); margin-bottom: 1.5rem; display: block; }
+        .detail-card b { display: block; font-size: 1.2rem; margin-bottom: 0.5rem; }
+        .detail-card span { font-size: 0.9rem; color: #64748b; }
+
+        /* Code Stacks */
+        .code-title { background: #334155; color: white; padding: 0.6rem 1.2rem; border-radius: 12px 12px 0 0; font-family: 'Fira Code', monospace; font-size: 0.8rem; display: inline-block; margin-bottom: -1px; }
+        .code-block { background: var(--code-bg); color: #9cdcfe; padding: 2.5rem; border-radius: 0 16px 16px 16px; font-family: 'Fira Code', monospace; font-size: 0.9rem; line-height: 1.7; overflow-x: auto; border: 1px solid #2d2e3b; margin-bottom: 3rem; }
+
+        /* Integration Table */
+        .table-container { background: white; border-radius: 20px; overflow: hidden; border: 1px solid #e2e8f0; margin: 3rem 0; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f8fafc; padding: 1.2rem; text-align: left; font-size: 0.85rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
+        td { padding: 1.2rem; border-top: 1px solid #f1f5f9; font-size: 0.95rem; }
+        .badge { padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; }
+        .badge.get { background: #dcfce7; color: #166534; }
+        .badge.post { background: #dbeafe; color: #1e40af; }
+
+        /* Flow Visualizer */
+        .flow-viz { display: flex; align-items: start; gap: 1rem; background: #fff; padding: 3rem; border-radius: 32px; border: 1px dashed #cbd5e1; margin: 3rem 0; }
+        .flow-node { text-align: center; flex: 1; }
+        .flow-node i { font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem; display: block; }
+        .flow-node div { font-weight: 700; font-size: 0.9rem; }
+        .flow-arrow { margin-top: 1rem; color: #cbd5e1; }
+
+        footer { margin-top: 10rem; padding: 5rem 0; border-top: 1px solid #e2e8f0; text-align: center; color: #94a3b8; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="nav-head">
+        <h1>INTEGRATION ENGINE</h1>
+        <div style="font-size: 0.7rem; color: white; opacity: 0.5; font-weight: bold; margin-top: 5px;">FRONTEND SPECIFICATION v2.5</div>
+    </div>
+    <div class="nav-links">
+        <a href="#section1" class="nav-link active"><i class="fa-solid fa-cube"></i> Architecture Overview</a>
+        <a href="#section2" class="nav-link"><i class="fa-solid fa-file-invoice"></i> Page-wise Logic</a>
+        <a href="#section3" class="nav-link"><i class="fa-solid fa-link"></i> API Action Matrix</a>
+        <a href="#section4" class="nav-link"><i class="fa-solid fa-list-check"></i> Form Handling</a>
+        <a href="#section5" class="nav-link"><i class="fa-solid fa-cloud-arrow-down"></i> Data Fetching</a>
+        <a href="#section6" class="nav-link"><i class="fa-solid fa-fingerprint"></i> Authentication Flow</a>
+        <a href="#section7" class="nav-link"><i class="fa-solid fa-database"></i> State Management</a>
+        <a href="#section8" class="nav-link"><i class="fa-solid fa-triangle-exclamation"></i> Error Mitigation</a>
+        <a href="#section9" class="nav-link"><i class="fa-solid fa-network-wired"></i> System Relationship</a>
+        <a href="#section10" class="nav-link"><i class="fa-solid fa-book-sparkles"></i> Future Guidelines</a>
+    </div>
+</nav>
+
+<main>
+    <!-- Section 1 -->
+    <section id="section1" class="doc-section">
+        <span class="section-num">Section 01</span>
+        <h2>Frontend Architecture Overview</h2>
+        <p>This project implements a **Hybrid SSR-Micro-Frontend** architecture. PHP handles the heavy structural lifting and SEO pre-rendering, while Vanilla ES13 handles the reactive transactional layer without the overhead of heavy frameworks like React or Vue.</p>
+        
+        <div class="card-grid">
+            <div class="detail-card">
+                <i class="fa-brands fa-php"></i>
+                <b>PHP 8.2 Engine</b>
+                <span>Handles templating (header/footer) and secure session handshakes.</span>
+            </div>
+            <div class="detail-card">
+                <i class="fa-solid fa-wind"></i>
+                <b>Tailwind Build</b>
+                <span>Utility-first JIT compilation for zero-unused CSS in production.</span>
+            </div>
+            <div class="detail-card">
+                <i class="fa-solid fa-gears"></i>
+                <b>Dynamic Theming</b>
+                <span>Admin settings injected via <code>dynamic_styles.php</code> to <code>:root</code>.</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2 -->
+    <section id="section2" class="doc-section">
+        <span class="section-num">Section 02</span>
+        <h2>Page-wise Runtime Logic</h2>
+        <p>Detailed breakdown of how major views connect to server-side controllers.</p>
+
+        <h3>Checkout Interaction (checkout.php)</h3>
+        <div class="code-title">Integration Strategy: AJAX Fetch</div>
+        <div class="code-block">
+// Triggered on 'Apply' button click
+fetch('api/apply_coupon.php', {
+    method: 'POST',
+    body: JSON.stringify({ code: couponValue })
+})
+.then(data => {
+    // 1. Update Subtotal & Total spans in DOM
+    // 2. Clear previous error messages
+    // 3. Inject "Coupon Applied" toast
+});
+        </div>
+    </section>
+
+    <!-- Section 3 -->
+    <section id="section3" class="doc-section">
+        <span class="section-num">Section 03</span>
+        <h2>Button & Action Matrix</h2>
+        <p>Comprehensive mapping of UI interactions to Backend Endpoints.</p>
+        
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>UI Button</th>
+                        <th>Action Triggered</th>
+                        <th>Endpoint</th>
+                        <th>Method</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><b>Apply Coupon</b></td>
+                        <td>Price Recalculation</td>
+                        <td><code>api/apply_coupon.php</code></td>
+                        <td><span class="badge post">POST</span></td>
+                    </tr>
+                    <tr>
+                        <td><b>Detect Location</b></td>
+                        <td>Reverse Geocoding</td>
+                        <td><code>External API</code></td>
+                        <td><span class="badge get">GET</span></td>
+                    </tr>
+                    <tr>
+                        <td><b>Book Slot</b></td>
+                        <td>DB Entry + Email</td>
+                        <td><code>api/book_appointment.php</code></td>
+                        <td><span class="badge post">POST</span></td>
+                    </tr>
+                    <tr>
+                        <td><b>Verify OTP</b></td>
+                        <td>Session Authorization</td>
+                        <td><code>verify-otp.php</code></td>
+                        <td><span class="badge post">POST</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Section 6 -->
+    <section id="section6" class="doc-section">
+        <span class="section-num">Section 06</span>
+        <h2>Authentication Flow (OTP)</h2>
+        <p>Mapping the passwordless cryptographic handshake between the User and the Database.</p>
+        
+        <div class="flow-viz">
+            <div class="flow-node"><i class="fa-solid fa-keyboard"></i><div>Initiation</div><span>User input Email</span></div>
+            <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="flow-node"><i class="fa-solid fa-paper-plane"></i><div>Dispatch</div><span>SMTP / OTP sent</span></div>
+            <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="flow-node"><i class="fa-solid fa-database"></i><div>Database</div><span>Verifies 6-digit hash</span></div>
+            <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="flow-node"><i class="fa-solid fa-user-check"></i><div>Session</div><span>isLoggedIn() → True</span></div>
+        </div>
+    </section>
+
+    <!-- Section 10 -->
+    <section id="section10" class="doc-section">
+        <span class="section-num">Section 10</span>
+        <h2>Maintenance & Extension</h2>
+        <p>Standards for scaling and extending the platform.</p>
+        
+        <div style="background: white; padding: 3rem; border-radius: 32px; border: 1px solid #e2e8f0; border-left: 10px solid var(--primary);">
+            <h3 style="margin-top:0;">Future Development Rules</h3>
+            <ul style="line-height: 2.2; color: #64748b; font-size: 1.1rem;">
+                <li><b>Sanitization:</b> Never use <code>echo $var</code> in JS script tags; use <code>json_encode($var)</code>.</li>
+                <li><b>Performance:</b> Keep total image payloads under 1.2MB for the index page.</li>
+                <li><b>Hierarchy:</b> New interactive pages MUST follow the <code>.web-wrapper > .section-padding</code> scaffolding.</li>
+                <li><b>API Safety:</b> All new endpoints must verify <code>CSRF_TOKEN</code> if not using public API modes.</li>
+            </ul>
+        </div>
+    </section>
+
+    <footer>
+        &copy; 2026 SUPER OPTICAL ENGINEERING | CONFIDENTIAL TECHNICAL DOCUMENT
+    </footer>
+</main>
+
+<script>
+    // Navigation Scrollspy Logic
+    const main = document.querySelector('main');
+    const links = document.querySelectorAll('.nav-link');
+    const sections = document.querySelectorAll('.doc-section');
+
+    main.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.clientHeight;
+            if (main.scrollTop >= sectionTop - 150) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        links.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href').slice(1) === current) {
+                link.classList.add('active');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ULTRA-DEEP FRONTEND DASHBOARD — Super Optical</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #e31e24;
+            --secondary: #0f172a;
+            --success: #10b981;
+            --code-bg: #1e1e1e;
+            --bg: #f8fafc;
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: #1e293b; margin: 0; display: flex; height: 100vh; overflow: hidden; }
+
+        /* Sidebar Nav */
+        nav { width: 320px; background: var(--secondary); color: white; display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 10px 0 30px rgba(0,0,0,0.1); }
+        .nav-head { padding: 3rem 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .nav-head h1 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.4rem; font-weight: 800; margin: 0; color: var(--primary); }
+        .nav-links { flex: 1; overflow-y: auto; padding: 1.5rem; }
+        .nav-item { display: flex; align-items: center; gap: 15px; padding: 0.9rem 1.2rem; color: #94a3b8; text-decoration: none; border-radius: 12px; font-weight: 600; margin-bottom: 6px; transition: 0.2s; }
+        .nav-item:hover, .nav-item.active { background: #1e293b; color: white; }
+        .nav-item.active { border-left: 4px solid var(--primary); }
+
+        /* Content */
+        main { flex: 1; overflow-y: auto; padding: 5rem; scroll-behavior: smooth; }
+        section { max-width: 950px; margin: 0 auto 6rem auto; }
+        
+        .section-tag { font-family: 'Fira Code', monospace; color: var(--primary); font-size: 0.8rem; font-weight: bold; margin-bottom: 1rem; display: block; text-transform: uppercase; }
+        h2 { font-size: 2.8rem; font-weight: 800; margin-bottom: 2rem; color: var(--secondary); letter-spacing: -1.5px; }
+        h3 { font-size: 1.3rem; font-weight: 700; margin-top: 2.5rem; color: var(--secondary); }
+        p { font-size: 1.05rem; line-height: 1.8; color: #4b5563; }
+
+        /* Detail Blocks */
+        .detail-box { background: white; border-radius: 20px; padding: 2.5rem; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin: 2rem 0; }
+        .flow-path { background: #f1f5f9; padding: 1.5rem; border-radius: 12px; border-left: 5px solid var(--primary); font-size: 0.9rem; margin: 1.5rem 0; }
+        
+        /* State Labeling */
+        .state-table { width: 100%; border-collapse: collapse; margin: 2rem 0; }
+        .state-table th { background: #f8fafc; padding: 1rem; text-align: left; font-size: 0.75rem; text-transform: uppercase; color: #64748b; }
+        .state-table td { padding: 1.2rem; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
+
+        /* Flow Diagram */
+        .viz { display: flex; align-items: center; gap: 1rem; margin: 3rem 0; background: white; padding: 2.5rem; border-radius: 24px; border: 1px dashed #cbd5e1; }
+        .viz-node { flex: 1; text-align: center; }
+        .viz-node i { font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem; display: block; }
+        .viz-node b { font-size: 0.85rem; display: block; color: var(--secondary); }
+        .viz-arrow { color: #cbd5e1; font-size: 1.2rem; }
+
+        .code { background: var(--code-bg); color: #9cdcfe; padding: 1.5rem; border-radius: 12px; font-family: 'Fira Code', monospace; font-size: 0.85rem; margin: 1rem 0; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="nav-head">
+        <h1>DEEP-DIVE PORTAL</h1>
+        <small style="opacity: 0.5;">Frontend Integration Specification</small>
+    </div>
+    <div class="nav-links">
+        <a href="#system" class="nav-item active"><i class="fa-solid fa-network-wired"></i> System Relationship</a>
+        <a href="#error" class="nav-item"><i class="fa-solid fa-triangle-exclamation"></i> Error Mitigation</a>
+        <a href="#state" class="nav-item"><i class="fa-solid fa-database"></i> State Management</a>
+        <a href="#fetching" class="nav-item"><i class="fa-solid fa-cloud-arrow-down"></i> Data Fetching</a>
+        <a href="#form" class="nav-item"><i class="fa-solid fa-list-check"></i> Form Handling</a>
+    </div>
+</nav>
+
+<main>
+    <!-- System Relationship -->
+    <section id="system">
+        <span class="section-tag">Relationship Mapping</span>
+        <h2>Frontend ↔ Backend ↔ Database Loop</h2>
+        <p>The system operates on an asycronous loop that ensures data integrity and high performance.</p>
+        
+        <div class="viz">
+            <div class="viz-node"><i class="fa-solid fa-fingerprint"></i><b>User Action</b><span>(Apply Coupon)</span></div>
+            <div class="viz-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="viz-node"><i class="fa-solid fa-server"></i><b>PHP Controller</b><span>(Validate API)</span></div>
+            <div class="viz-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="viz-node"><i class="fa-solid fa-hdd"></i><b>MySQL Query</b><span>(Check Rules)</span></div>
+            <div class="viz-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="viz-node"><i class="fa-solid fa-wand-magic-sparkles"></i><b>UI Reactivity</b><span>(Price Patch)</span></div>
+        </div>
+
+        <div class="detail-box">
+            <h3>Lifecycle of an Order</h3>
+            <div class="flow-path">
+                <b>1. Entry:</b> <code>checkout.php</code> collects user address and payment intent.<br>
+                <b>2. Handle:</b> <code>api/create_razorpay_order.php</code> creates an 'unpaid' row in <code>orders</code>.<br>
+                <b>3. Commit:</b> On payment success, <code>api/verify_payment.php</code> switches status to 'pending' and commits stock subtraction via PDO Transaction.
+            </div>
+        </div>
+    </section>
+
+    <!-- Error Mitigation -->
+    <section id="error">
+        <span class="section-tag">Reliability Engineering</span>
+        <h2>Error Mitigation Strategy</h2>
+        <p>A fail-safe alerting system that prevents transaction breakage.</p>
+        
+        <div class="detail-box">
+            <h3>1. Fetch Safeguards</h3>
+            <div class="code">
+try {
+    const response = await fetch('api/validate.php');
+    if (!response.ok) throw new Error('Network status: ' + response.status);
+    const data = await response.json();
+} catch (error) {
+    showToast("Operation failed: " + error.message, "error");
+}
+            </div>
+            <h3>2. Session Filtration</h3>
+            <p>Protected routes are guarded by <code>isLoggedIn()</code>. If a session is lost mid-checkout, the frontend captures the missing token error and redirects to login, preserving the cart state in the database for the user's return.</p>
+        </div>
+    </section>
+
+    <!-- State Management -->
+    <section id="state">
+        <span class="section-tag">Data Persistence</span>
+        <h2>Multi-Layer State Management</h2>
+        <p>How we track user progress across the application.</p>
+        
+        <table class="state-table">
+            <thead>
+                <tr>
+                    <th>Storage</th>
+                    <th>Data Managed</th>
+                    <th>Persistence Nature</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><b>PHP Session</b></td>
+                    <td>Auth ID, Cart Array, Active Coupon</td>
+                    <td>Server-side (Secure)</td>
+                </tr>
+                <tr>
+                    <td><b>DOM Attributes</b></td>
+                    <td>Selected SKU, Live Price, Stock Count</td>
+                    <td>Client-Side (Ephemeral)</td>
+                </tr>
+                <tr>
+                    <td><b>Cookies</b></td>
+                    <td>Language Preference (EN/HI)</td>
+                    <td>Client-Side (Persistent)</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Data Fetching -->
+    <section id="fetching">
+        <span class="section-tag">Performance Strategy</span>
+        <h2>Data Fetching & Optimization</h2>
+        <p>Speed is conversion. We use a hybrid pre-rendering and async model.</p>
+        
+        <div class="detail-box">
+            <h3>Smart Loading Logic</h3>
+            <ul style="line-height:2.2; color:#4b5563;">
+                <li><b>Critical Path (SSR)</b>: Headers, Navbars, and Hero content are rendered in the first 200ms by PHP.</li>
+                <li><b>Dynamic Path (AJAX)</b>: Appointment slots and Coupon validations are fetched on-demand to keep the page size below 500KB.</li>
+                <li><b>Image Strategy</b>: All catalog images use <code>loading="lazy"</code> to ensure the DOM is interactive instantly.</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Form Handling -->
+    <section id="form">
+        <span class="section-tag">Validation Protocol</span>
+        <h2>Advanced Form Handling</h2>
+        <p>Preventing dirty data from reaching the core system.</p>
+        
+        <div class="detail-box">
+            <h3>Validation Pipeline</h3>
+            <div class="flow-path">
+                <b>I. Frontend Filter:</b> Regex check for Phone Numbers (10 Digits Only).<br>
+                <b>II. Controller Check:</b> PHP <code>filter_var()</code> for emails and <code>htmlspecialchars()</code> for XSS prevention.<br>
+                <b>III. Schema Lock:</b> MySQL unique constraints on Email/Phone to prevent duplicate account creation.
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        &copy; 2026 SUPER OPTICAL TECHNICAL ARCHITECTURE | CONFIDENTIAL
+    </footer>
+</main>
+
+<script>
+    // Navigation Scrollspy Logic
+    const main = document.querySelector('main');
+    const links = document.querySelectorAll('.nav-item');
+    const sections = document.querySelectorAll('section');
+
+    main.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (main.scrollTop >= sectionTop - 150) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        links.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href').slice(1) === current) {
+                link.classList.add('active');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
+

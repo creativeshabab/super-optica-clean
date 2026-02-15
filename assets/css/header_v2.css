@@ -1,0 +1,717 @@
+/* --- Lenskart-Style Header Redesign (V2) --- */
+
+/* ============================
+   1. TOP BAR (Corporate Specs)
+   ============================ */
+.top-bar {
+    background: var(--color-gray-900, #0f172a); /* Brand Dark */
+    color: #fff;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 6px 0;
+    letter-spacing: 0.5px;
+}
+
+.top-bar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    padding: 0 40px; /* Lenskart-style wide gutters */
+}
+
+.top-links {
+    display: flex;
+    gap: 15px;
+}
+
+.top-links a {
+    color: #cbd5e1;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.top-links a:hover {
+    color: var(--primary, #e31e24);
+}
+
+.top-details a, .top-details {
+    color: #fff;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Social Media Icons in Top Bar */
+.top-social {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: 20px;
+}
+
+.top-social a {
+    color: #cbd5e1;
+    font-size: 14px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+}
+
+.top-social a:hover {
+    color: var(--primary, #e31e24);
+    transform: scale(1.1);
+}
+
+.top-details {
+    margin-left: auto;
+}
+
+
+/* ============================
+   2. MAIN NAVBAR (Layout)
+   ============================ */
+.navbar {
+    background: #fff;
+    height: 80px; /* Initial large height */
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.nav-container {
+    display: flex;
+    align-items: center;
+    max-width: 1400px;
+    height: 100%;
+    grid-gap: 30px;
+    justify-content: space-between; /* Spacing key */
+}
+
+/* LOGO */
+.logo img {
+    height: 50px; /* Increased from 32px */
+    width: auto;
+    transition: all 0.3s;
+}
+
+/* NAVIGATION LINKS */
+.nav-links {
+    display: flex;
+    gap: 24px;
+    margin-left: 20px;
+    margin-right: auto; /* Pushes Search/Actions to right */
+    align-items: center;
+}
+
+.nav-links li {
+    list-style: none;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #000042; /* Lenskart uses a deep dark blue/black */
+    font-size: 13px;
+    font-weight: 700; /* Bold Categories */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: color 0.2s;
+    padding: 25px 0; /* Huge hit area */
+}
+
+.nav-links a:hover {
+    color: var(--primary, #e31e24);
+    border-bottom: 3px solid var(--primary, #e31e24);
+}
+
+/* "Book Eye Test" Button - Styled as "Special" Nav Item */
+.nav-links .btn-nav-booking {
+    background: var(--primary, #e31e24);
+    color: white !important;
+    padding: 10px 15px; /* Adjusted padding */
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    height: auto;
+    line-height: 1.2;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap; /* Force single line */
+    box-shadow: 0 2px 5px rgba(227, 30, 36, 0.3);
+}
+
+.nav-links .btn-nav-booking:hover {
+    background: #c51b20;
+    border-bottom: none; /* Override link style */
+    transform: translateY(-1px);
+}
+
+/* SEARCH BAR */
+.header-search {
+    position: relative;
+    width: 200px; /* Reduced from 280px */
+    margin-right: 20px;
+}
+
+.header-search input {
+    background: #f1f5f9;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 15px 10px 45px;
+    width: 100%;
+    font-size: 13px;
+    font-weight: 500;
+    color: #334155;
+    transition: all 0.3s;
+}
+
+.header-search input:focus {
+    background: #fff;
+    box-shadow: 0 0 0 2px var(--color-gray-200, #e2e8f0);
+    outline: none;
+}
+
+.header-search input::placeholder {
+    color: #94a3b8;
+    font-size: 13px;
+    font-weight: 400;
+    opacity: 1;
+    padding-left: 0;
+    text-indent: 0;
+}
+
+.header-search i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+/* NAV ACTIONS (Icons) */
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.nav-action-icon {
+    font-size: 18px;
+    color: #000042;
+    position: relative;
+    transition: transform 0.2s;
+}
+
+.nav-action-icon:hover {
+    color: var(--primary, #e31e24);
+    transform: scale(1.1);
+}
+
+/* Cart Badge */
+.cart-badge {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    background: var(--primary, #e31e24);
+    color: white;
+    font-size: 9px;
+    height: 15px;
+    width: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-weight: bold;
+}
+
+/* ============================
+   3. SCROLL BEHAVIOR (Sticky)
+   ============================ */
+.header-scrolled {
+    height: 60px; /* Shrink height */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.header-scrolled .logo img {
+    height: 35px; /* Shrink logo */
+}
+
+/* Compact Nav links on scroll */
+.header-scrolled .nav-links a {
+    font-size: 12px;
+    padding: 15px 0;
+}
+
+/* Compact specific button */
+.header-scrolled .nav-links .btn-nav-booking {
+    padding: 6px 12px;
+    font-size: 11px;
+}
+
+.header-scrolled .header-search {
+    width: 240px; /* Slight shrink */
+}
+.header-scrolled .header-search input {
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+/* ============================
+   4. MOBILE RESPONSIVE
+   ============================ */
+@media (max-width: 1100px) {
+    .nav-links, .header-search, .top-bar {
+        display: none !important;
+    }
+    .navbar {
+        padding: 0 20px;
+        height: 60px;
+    }
+    .logo img {
+        height: 28px;
+    }
+}
+
+/* ============================
+   5. USER DROPDOWN (Lenskart Style)
+   ============================ */
+
+.user-dropdown-container {
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.user-avatar-circle {
+    width: 32px;
+    height: 32px;
+    background: #000042;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.user-dropdown-menu {
+    position: absolute;
+    top: 50px; /* Below avatar */
+    right: 0;
+    width: 280px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    padding: 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+    z-index: 1000;
+    border: 1px solid #f1f5f9;
+    overflow: hidden;
+}
+
+.user-dropdown-menu.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-header {
+    padding: 20px;
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.user-avatar-circle.large {
+    width: 48px;
+    height: 48px;
+    font-size: 20px;
+    background: var(--primary, #e31e24);
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    font-weight: 700;
+    color: #0f172a;
+    font-size: 16px;
+}
+
+.user-subtext {
+    font-size: 11px;
+    color: #64748b;
+}
+
+.dropdown-list {
+    list-style: none;
+    padding: 10px 0;
+    margin: 0;
+}
+
+.dropdown-list li a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    color: #334155;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.2s;
+    text-transform: none;
+}
+
+.dropdown-list li a:hover {
+    background: #f1f5f9;
+    color: var(--primary, #e31e24);
+    border-bottom: none;
+}
+
+.dropdown-list li.logout-item {
+    border-top: 1px solid #e2e8f0;
+    margin-top: 5px;
+    padding-top: 5px;
+}
+
+.dropdown-list li.logout-item a {
+    color: #ef4444;
+}
+
+.dropdown-list li.logout-item a:hover {
+    background: #fef2f2;
+}
+
+
+/* ============================
+   6. MOBILE HEADER SPECIFIC (Lenskart Redesign)
+   ============================ */
+
+/* Default State: Hidden on Desktop */
+.mobile-header-container {
+    display: none;
+    background: #fff;
+    padding: 10px 15px;
+    border-bottom: 1px solid #e2e8f0;
+    flex-direction: column;
+    gap: 15px;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+}
+
+.desktop-only {
+    display: block;
+}
+
+/* MOBILE MEDIA QUERY */
+@media (max-width: 1100px) {
+    .desktop-only {
+        display: none !important;
+    }
+
+    .mobile-header-container {
+        display: flex;
+    }
+
+    /* --- TOP ROW --- */
+    .mobile-top-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .mobile-left-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .mobile-user-avatar {
+        width: 32px;
+        height: 32px;
+        background: #f1f5f9;
+        color: #000042;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .mobile-location-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .fast-delivery-tag {
+        font-size: 9px;
+        color: #ff6b00;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .location-text {
+        font-size: 12px;
+        color: #000042;
+        font-weight: 700;
+    }
+
+    .mobile-right-actions {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    /* Gold Pill */
+    .gold-pill {
+        background: linear-gradient(135deg, #3d002e 0%, #1a0014 100%);
+        color: #ffd700;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 9px;
+        font-weight: 800;
+        border: 1px solid #ffd700;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .mobile-action-icon {
+        font-size: 18px;
+        color: #000042;
+    }
+
+    .mobile-cart-badge {
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        background: #e31e24;
+        color: white;
+        font-size: 8px;
+        width: 14px;
+        height: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+
+    .mobile-menu-toggle {
+        background: none;
+        border: none;
+        font-size: 20px;
+        color: #000042;
+        cursor: pointer;
+    }
+
+    /* --- BOTTOM ROW --- */
+    .mobile-bottom-row {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .mobile-search-wrapper {
+        flex: 1;
+        position: relative;
+    }
+
+    .mobile-search-wrapper input {
+        width: 100%;
+        padding: 10px 35px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 13px;
+        color: #334155;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+
+    .camera-icon {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 16px;
+    }
+
+    /* AI Stylist Button */
+    .ai-stylist-btn {
+        background: #ff5722;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 5px 10px;
+        border-radius: 8px;
+        text-decoration: none;
+        line-height: 1;
+        height: 40px;
+        min-width: 50px;
+    }
+
+    .ai-text {
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .stylist-text {
+        font-size: 9px;
+        font-weight: 500;
+    }
+}
+
+/* ============================
+   7. STICKY BOTTOM MENU (Mobile Only)
+   ============================ */
+.mobile-bottom-nav {
+    display: none; /* Hidden by default */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+    justify-content: space-around;
+    padding: 8px 0 5px 0;
+    border-top: 1px solid #f1f5f9;
+}
+
+.bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #475569;
+    font-size: 10px;
+    font-weight: 500;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    flex: 1;
+}
+
+.bottom-nav-item i {
+    font-size: 18px;
+    margin-bottom: 2px;
+}
+
+.bottom-nav-item.active {
+    color: var(--primary, #e31e24);
+}
+
+.bottom-nav-item.active i {
+    color: var(--primary, #e31e24);
+}
+
+.bottom-nav-badge {
+    position: absolute;
+    top: -5px;
+    right: -8px;
+    background: var(--primary, #e31e24);
+    color: white;
+    font-size: 9px;
+    width: 15px;
+    height: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-weight: bold;
+    border: 1px solid #fff;
+}
+
+/* Visibility Rules */
+@media (max-width: 768px) {
+    /* Show Bottom Nav */
+    .mobile-bottom-nav {
+        display: flex;
+    }
+    
+    /* Hide Top Toggle (Hamburger) since we have bottom menu */
+    .mobile-menu-toggle, #lenskartMobileToggle {
+        display: none !important;
+    }
+
+    /* Add padding to body/footer so content isn't hidden behind nav */
+    body {
+        padding-bottom: 60px;
+    }
+}
+
+/* Mobile Sidebar Social Media Icons */
+.mobile-social-section {
+    padding: 0 20px 20px 20px;
+}
+
+.mobile-social-section h6 {
+    font-size: 11px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.mobile-social-icons {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.mobile-social-icons a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1e293b;
+    font-size: 20px;
+    transition: all 0.2s;
+}
+
+.mobile-social-icons a:hover {
+    color: var(--primary, #e31e24);
+    transform: scale(1.1);
+}
+
+.divider {
+    height: 1px;
+    background: #e2e8f0;
+    margin: 16px 20px;
+}

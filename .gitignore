@@ -1,0 +1,15 @@
+/config/database.local.php
+/config/database.production.php
+/vendor/
+/node_modules/
+/uploads/
+/logs/
+/.env
+*.log
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.zip
+backup/
+_archive/

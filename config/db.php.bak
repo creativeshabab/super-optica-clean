@@ -1,0 +1,37 @@
+<?php
+$host = '127.0.0.1';
+$port = '3306';
+$db_name = 'superopt1_ecommerce_db';
+$username = 'superopt1_ecommerce_user';
+$password = '#6UoN!Prt%x9pzeH';
+
+// Production Mode Toggle
+define('IS_PRODUCTION', false); // SET TO TRUE FOR LIVE SERVER
+
+if (IS_PRODUCTION) {
+    error_reporting(0);
+    ini_set('display_errors', 0);
+}
+
+try {
+    // Added charset to connection string as per best practice
+    $pdo = new PDO("mysql:host=$host;port=$port;dbname=$db_name;charset=utf8mb4", $username, $password);
+    
+    // Set Error Mode
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, IS_PRODUCTION ? PDO::ERRMODE_SILENT : PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    
+    // Set timezone to Indian Standard Time (IST)
+    date_default_timezone_set('Asia/Kolkata');
+    $pdo->exec("SET time_zone = '+05:30'");
+    
+    // echo "DB Connected Successfully"; // Verified
+    
+} catch(PDOException $e) {
+    if (IS_PRODUCTION) {
+        die("Site is undergoing maintenance. Please try again later.");
+    } else {
+        die("Connection failed: " . $e->getMessage());
+    }
+}
+?>

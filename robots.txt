@@ -1,0 +1,22 @@
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://superoptical.in/sitemap.php
+
+# Block Admin and sensitive areas
+Disallow: /admin/
+Disallow: /config/
+Disallow: /includes/
+Disallow: /assets/uploads/
+Disallow: /cart.php
+Disallow: /checkout.php
+Disallow: /checkout_payment.php
+Disallow: /order_status.php
+Disallow: /my-orders.php
+Disallow: /view-order.php
+Disallow: /login.php
+Disallow: /register.php
+Disallow: /forgot-password.php
+Disallow: /reset-password.php
+Disallow: /verify-otp.php

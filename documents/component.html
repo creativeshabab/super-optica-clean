@@ -1,0 +1,40 @@
+<?php require_once 'includes/header.php'; ?>
+<!-- Page Hero -->
+<section class="page-hero">
+   <div class="container">
+      <span class="hero-badge"><?= __('testimonials') ?></span>
+      <h1 class="page-hero-title"><?= __('customer_reviews') ?></h1>
+      <?php renderBreadcrumbs([__('reviews') => null]); ?>
+   </div>
+</section>
+<section class="web-wrapper">
+    <div class="container">
+   <?php 
+      $reviews = $pdo->query("SELECT * FROM reviews ORDER BY created_at DESC")->fetchAll();
+      ?>
+   <div class="grid grid-cols-3" style="margin-top: 3rem; gap: 3rem;">
+      <?php foreach ($reviews as $r): ?>
+      <div class="card" style="border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.03); padding: 2.5rem; position: relative;">
+         <div style="margin-bottom: 1.5rem; color: #fbbf24; font-size: 0.8rem;">
+            <?php for($i=0; $i<$r['rating']; $i++) echo '<i class="fa-solid fa-star"></i>'; ?>
+         </div>
+         <p style="color: #475569; font-size: 1.1rem; line-height: 1.8; margin-bottom: 2.5rem; font-style: italic;">"<?= htmlspecialchars($r['comment']) ?>"</p>
+         <div class="flex items-center gap-1" style="border-top: 1px solid #f1f5f9; pt: 1.5rem; padding-top: 1.5rem;">
+            <?php if ($r['image']): ?>
+            <img src="assets/uploads/<?= $r['image'] ?>" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+            <?php else: ?>
+            <div style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; color: white; border: 3px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+               <?= strtoupper(substr($r['name'], 0, 1)) ?>
+            </div>
+            <?php endif; ?>
+            <div style="margin-left: 0.5rem;">
+               <h4 style="margin: 0; font-weight: 700; color: var(--text);"><?= htmlspecialchars($r['name']) ?></h4>
+               <span style="font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;"><?= __('verified_customer') ?></span>
+            </div>
+         </div>
+      </div>
+      <?php endforeach; ?>
+   </div>
+</div>
+</section>
+<?php require_once 'includes/footer.php'; ?>

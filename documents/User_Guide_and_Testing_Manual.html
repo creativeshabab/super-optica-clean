@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optical ERP - User Guide & Testing Manual</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --light-bg: #f8f9fa;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .header-banner {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .guide-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-left: 5px solid var(--accent-color);
+        }
+        .step-number {
+            background: var(--accent-color);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .scenario-badge {
+            font-size: 0.9em;
+            padding: 0.5em 1em;
+            border-radius: 20px;
+            background: #e3f2fd;
+            color: #0d47a1;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+        .info-card {
+            background: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        table {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        thead {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        @media print {
+            .header-banner {
+                background: none;
+                color: black;
+                padding: 1rem 0;
+                box-shadow: none;
+            }
+            .btn-print { display: none; }
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- Header -->
+    <div class="header-banner text-center">
+        <div class="container">
+            <h1 class="display-5 fw-bold mb-2">Optical ERP</h1>
+            <h2 class="h4 opacity-75">Operational User Guide & Testing Manual</h2>
+            <button onclick="window.print()" class="btn btn-light btn-print mt-3 shadow-sm">
+                <i class="fas fa-print me-2"></i> Print Guide
+            </button>
+        </div>
+    </div>
+    <div class="container">
+        
+        <!-- Intro -->
+        <div class="guide-section border-start-0">
+            <h3 class="fw-bold mb-3"><i class="fas fa-book-open me-2 text-primary"></i>Overview</h3>
+            <p class="lead">This document provides a comprehensive overview of the Optical ERP system's workflows, specifically designed for testing <strong>Multi-Tenancy</strong>, <strong>Inventory Distribution</strong>, and validating <strong>Real-World Use Cases</strong>.</p>
+        </div>
+        <!-- Part 1: Hierarchy -->
+        <div class="guide-section">
+            <h3 class="fw-bold"><i class="fas fa-sitemap me-2"></i>Part 1: System Hierarchy & Concepts</h3>
+            <p>Understanding the layers is crucial for testing:</p>
+            <div class="row g-4 mt-2">
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-user-shield fa-3x text-danger mb-3"></i>
+                            <h5>Super Admin</h5>
+                            <p class="text-muted small">Platform Owner. Can create Tenants (Optical Chains).</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-building fa-3x text-primary mb-3"></i>
+                            <h5>Tenant Admin</h5>
+                            <p class="text-muted small">Business Owner. Manages a specific chain, users, and products.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-users fa-3x text-success mb-3"></i>
+                            <h5>Store User</h5>
+                            <p class="text-muted small">Location Staff. Cashiers, Inventory Managers, Sales.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Scenario 1 -->
+        <div class="guide-section">
+            <span class="scenario-badge"><i class="fas fa-rocket me-2"></i>Scenario 1: Onboarding</span>
+            <h3 class="mt-2 text-primary">Onboarding a New Tenant</h3>
+            <p><strong>Use Case:</strong> A new client, <em>"Vista Vision"</em>, subscribes to your ERP platform.</p>
+            
+            <h5 class="mt-4"><i class="fas fa-list-ol me-2"></i>Step-by-Step Flow</h5>
+            <ol class="list-group list-group-flush list-group-numbered">
+                <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div class="ms-2 me-auto">
+                        <div class="fw-bold">Login as Super Admin</div>
+                        Go to <code>SaaS Management</code> panel.
+                    </div>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div class="ms-2 me-auto">
+                        <div class="fw-bold">Create Tenant</div>
+                        Click "Add New Tenant". Enter Company Name ("Vista Vision"), Domain, and Admin Email.
+                    </div>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div class="ms-2 me-auto">
+                        <div class="fw-bold">Verify Isolation</div>
+                        Logout. Login as the new Tenant Admin. Verify the dashboard is empty (0 sales) even if other tenants have data.
+                    </div>
+                </li>
+            </ol>
+        </div>
+        <!-- Scenario 2 -->
+        <div class="guide-section">
+            <span class="scenario-badge"><i class="fas fa-boxes me-2"></i>Scenario 2: Inventory Setup</span>
+            <h3 class="mt-2 text-primary">Product & Inventory Setup</h3>
+            <p><strong>Use Case:</strong> <em>"Vista Vision"</em> buys 100 units of "Ray-Ban Aviators" for their Central Warehouse.</p>
+            <div class="accordion" id="accordionInventory">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#step1">
+                            Step 1: Define Structure
+                        </button>
+                    </h2>
+                    <div id="step1" class="accordion-collapse collapse show">
+                        <div class="accordion-body">
+                            1. Go to <strong>Inventory > Warehouses</strong> &rarr; Create "Central Warehouse".<br>
+                            2. Go to <strong>Settings > Stores</strong> &rarr; Create "Downtown Branch" and "Mall Branch".
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#step2">
+                            Step 2: Create Master Product
+                        </button>
+                    </h2>
+                    <div id="step2" class="accordion-collapse collapse">
+                        <div class="accordion-body">
+                            Go to <strong>Inventory > Products</strong>. Add "Ray-Ban Aviator" (SKU: RB-AV-001).<br>
+                            <em>Note: Stock starts at 0.</em>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#step3">
+                            Step 3: Receive Goods (GRN)
+                        </button>
+                    </h2>
+                    <div id="step3" class="accordion-collapse collapse">
+                        <div class="accordion-body">
+                            Go to <strong>Inventory > Purchase Orders > New GRN</strong>.<br>
+                            Select "Central Warehouse" as destination. Add 100 Qty.<br>
+                            <strong>Result:</strong> Central Warehouse = 100 units. Stores = 0 units.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Scenario 3 -->
+        <div class="guide-section">
+            <span class="scenario-badge"><i class="fas fa-truck me-2"></i>Scenario 3: Distribution</span>
+            <h3 class="mt-2 text-primary">Inventory Transfer Flow</h3>
+            <p><strong>Use Case:</strong> Move 20 units from Central Warehouse to Downtown Branch.</p>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card bg-light border-0 p-3">
+                        <h5 class="text-secondary">Sender (Warehouse Owner)</h5>
+                        <ul class="mb-0">
+                            <li>Go to <strong>Inventory > New Transfer</strong></li>
+                            <li>From: Central Warehouse</li>
+                            <li>To: Downtown Branch</li>
+                            <li>Qty: 20</li>
+                            <li><strong>Action:</strong> Send</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card bg-primary text-white border-0 p-3">
+                        <h5>Receiver (Store Manager)</h5>
+                        <ul class="mb-0">
+                            <li>Login as Store Manager</li>
+                            <li>Go to <strong>Incoming Transfers</strong></li>
+                            <li>See pending 20 units</li>
+                            <li><strong>Action:</strong> Accept/Receive</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="info-card mt-3">
+                <i class="fas fa-check-circle text-success me-2"></i>
+                <strong>Result:</strong> Warehouse Stock drops to 80. Store Stock rises to 20. Total is still 100.
+            </div>
+        </div>
+        <!-- Scenario 4 -->
+        <div class="guide-section">
+            <span class="scenario-badge"><i class="fas fa-cash-register me-2"></i>Scenario 4: Sales (POS)</span>
+            <h3 class="mt-2 text-primary">The Sales Cycle</h3>
+            <p><strong>Use Case:</strong> Customer buys 1 Ray-Ban at Downtown Branch.</p>
+            <p>
+                1. Navgiate to <strong>POS</strong>.<br>
+                2. Scan <code>RB-AV-001</code>.<br>
+                3. Checkout and Collect Payment.<br>
+                4. <strong>Verification:</strong> Go to Stock View. Downtown Branch should now have <strong>19</strong> units.
+            </p>
+        </div>
+        <!-- Testing Checklist -->
+        <div class="guide-section">
+            <h3 class="fw-bold mb-4">✅ Testing Checklist</h3>
+            <table class="table table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th width="10%">ID</th>
+                        <th width="30%">Action</th>
+                        <th width="40%">Expected Result</th>
+                        <th width="20%">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="fw-bold">T-01</td>
+                        <td>Add Tenant</td>
+                        <td>New database context created.</td>
+                        <td><input type="checkbox" class="form-check-input"> Pass</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">T-02</td>
+                        <td>Create Product</td>
+                        <td>Searchable in system, 0 stock.</td>
+                        <td><input type="checkbox" class="form-check-input"> Pass</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">T-03</td>
+                        <td>Process GRN</td>
+                        <td>Stock added to specific warehouse.</td>
+                        <td><input type="checkbox" class="form-check-input"> Pass</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">T-04</td>
+                        <td>Stock Transfer</td>
+                        <td>Moved correctly between locations.</td>
+                        <td><input type="checkbox" class="form-check-input"> Pass</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">T-05</td>
+                        <td>POS Sale</td>
+                        <td>Stock Deducted, Revenue Added.</td>
+                        <td><input type="checkbox" class="form-check-input"> Pass</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">T-06</td>
+                        <td>Data Isolation</td>
+                        <td>Tenant A cannot see Tenant B data.</td>
+                        <td><input type="checkbox" class="form-check-input"> Pass</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="text-center text-muted mt-5 mb-5 small">
+            <p>Optical ERP System • Operational Manual v1.0 • Generated for Testing & Training</p>
+        </div>
+    </div>
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

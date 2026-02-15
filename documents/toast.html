@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+	<style>
+	#toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+}
+
+.toast {
+  min-width: 260px;
+  max-width: 300px;
+  background: #fff8d6;
+  border-left: 5px solid #ffbf00;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  font-family: sans-serif;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  animation: slideIn 0.3s ease;
+  position: relative;
+}
+
+.toast p {
+  margin: 0;
+  padding-right: 10px;
+}
+
+.toast button {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #444;
+}
+
+.toast .timer-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: #ffbf00;
+  width: 100%;
+  animation: shrinkBar linear forwards;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOut {
+  from { opacity: 1; }
+  to   { opacity: 0; transform: translateX(50%); }
+}
+
+@keyframes shrinkBar {
+  from { width: 100%; }
+  to   { width: 0%; }
+}
+
+	</style>
+</head>
+<body>
+
+	<!-- HTML -->
+<div id="toast-container"></div>
+
+
+<script>
+  // Example check function: replace with an API ping or app-specific condition
+  function checkIfIssueFixed() {
+    // Example: returns a Promise that resolves true/false
+    return fetch('/api/issue-status') // hypothetical endpoint
+      .then(r => r.json())
+      .then(json => json.fixed === true)
+      .catch(()=> false);
+  }
+
+  // Show with polling check
+  showToast("We encountered an issue — trying to resolve. We'll close this when fixed.", {
+    duration: 10000,
+    type: 'warning',
+    checkResolved: checkIfIssueFixed,
+    checkInterval: 3000,
+    onClose: (reason) => console.log("Toast closed:", reason)
+  });
+
+  // Or show simple toast without check
+  showToast("Saved successfully.", { duration: 3000, type: 'success' });
+
+  showToast("Warning: Issue occurred, please try again.");
+
+</script>
+	
+</body>
+</html>

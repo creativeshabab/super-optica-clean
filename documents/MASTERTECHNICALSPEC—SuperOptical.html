@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MASTER TECHNICAL SPEC — Super Optical</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #e31e24;
+            --dark: #0f172a;
+            --slate: #1e293b;
+            --border: #e2e8f0;
+            --code: #0f172a;
+        }
+
+        body { font-family: 'Poppins', sans-serif; background: #f8fafc; color: var(--dark); line-height: 1.6; }
+        .container { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 280px 1fr; gap: 2rem; padding: 2rem; }
+
+        /* Sidebar */
+        aside { background: white; border-radius: 20px; padding: 2rem; border: 1px solid var(--border); height: calc(100vh - 4rem); position: sticky; top: 2rem; }
+        .nav-link { display: block; padding: 0.8rem 1rem; color: #64748b; text-decoration: none; border-radius: 10px; font-weight: 500; margin-bottom: 0.5rem; transition: 0.3s; }
+        .nav-link:hover, .nav-link.active { background: #f1f5f9; color: var(--primary); }
+        .nav-link i { margin-right: 10px; }
+
+        /* Content */
+        main { background: white; border-radius: 20px; padding: 4rem; border: 1px solid var(--border); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+        h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 3rem; }
+        h2 { font-size: 1.8rem; margin: 3rem 0 1.5rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--border); }
+        h3 { font-size: 1.3rem; margin: 2rem 0 1rem; color: var(--primary); }
+
+        .tag { font-size: 0.75rem; background: var(--primary); color: white; padding: 0.2rem 0.8rem; border-radius: 5px; font-weight: 700; margin-bottom: 1rem; display: inline-block; }
+
+        /* Tables */
+        .table-wrapper { overflow-x: auto; margin-bottom: 2rem; border: 1px solid var(--border); border-radius: 12px; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background: #f1f5f9; padding: 1rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+        td { padding: 1rem; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
+        tr:last-child td { border: none; }
+
+        /* Code & Logic */
+        .code-box { background: var(--code); color: #94a3b8; padding: 1.5rem; border-radius: 12px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; margin: 1rem 0; }
+        .code-box span { color: #f87171; } /* Highlight logic steps */
+
+        .integration-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .card { padding: 1.5rem; border: 1px solid var(--border); border-radius: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <aside>
+        <div style="font-weight: 800; font-size: 1.2rem; margin-bottom: 2rem; color: var(--primary);"><i class="fa-solid fa-microchip"></i> MASTER LOG</div>
+        <a href="#db" class="nav-link active"><i class="fa-solid fa-database"></i> Database Index</a>
+        <a href="#api" class="nav-link"><i class="fa-solid fa-plug"></i> API Engine</a>
+        <a href="#logic" class="nav-link"><i class="fa-solid fa-gears"></i> Core Logic</a>
+        <a href="#security" class="nav-link"><i class="fa-solid fa-shield-halved"></i> Security</a>
+    </aside>
+
+    <main>
+        <div class="tag">ENTERPRISE EDITION</div>
+        <h1>Master Technical Specification</h1>
+
+        <section id="db">
+            <h2>1. Complete Database Index</h2>
+            <p>Every table and field in the Super Optical ecosystem.</p>
+
+            <h3>Commerce Engine</h3>
+            <div class="table-wrapper">
+                <table>
+                    <tr><th>Field</th><th>Type</th><th>Index</th><th>Logic</th></tr>
+                    <tr><td><code>products.sku</code></td><td>VARCHAR(100)</td><td>UNIQUE</td><td>Identifier for stock lookups.</td></tr>
+                    <tr><td><code>products.price</code></td><td>DECIMAL(10,2)</td><td>-</td><td>Active selling price for checkout.</td></tr>
+                    <tr><td><code>orders.status</code></td><td>ENUM</td><td>MUL</td><td>Triggers status-change emails.</td></tr>
+                    <tr><td><code>order_items.qty</code></td><td>INT</td><td>-</td><td>Quantity deducted via AJAX trigger.</td></tr>
+                </table>
+            </div>
+
+            <h3>Integration Cluster</h3>
+            <div class="table-wrapper">
+                <table>
+                    <tr><th>Field</th><th>Type</th><th>Logic</th></tr>
+                    <tr><td><code>service_integrations.config_data</code></td><td>TEXT</td><td>AES-256 Encrypted credentials.</td></tr>
+                    <tr><td><code>payment_logs.response_data</code></td><td>TEXT (JSON)</td><td>Persistence for external gateway responses.</td></tr>
+                </table>
+            </div>
+        </section>
+
+        <section id="api">
+            <h2>2. API Engine (Standard v1.0)</h2>
+            <p>Documentation for all asynchronous service bridges.</p>
+
+            <div class="integration-grid">
+                <div class="card">
+                    <h4>Appointment Manager</h4>
+                    <p><code>api/appointment_slots.php</code></p>
+                    <div class="code-box">
+                        [INPUT] date=YYYY-MM-DD<br>
+                        [LOGIC] Verify settings -> Fetch appointments -> <span>Availability Map</span><br>
+                        [OUTPUT] Available slots (JSON)
+                    </div>
+                </div>
+                <div class="card">
+                    <h4>Payment Bridge</h4>
+                    <p><code>api/verify_payment.php</code></p>
+                    <div class="code-box">
+                        [INPUT] razorpay_id, signature<br>
+                        [LOGIC] <span>HMAC Check</span> -> PDO Transaction -> Commit<br>
+                        [OUTPUT] Success/Failure
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="logic">
+            <h2>3. Core Logic Deep-Dive</h2>
+            
+            <h3>Atomic Stock Governance</h3>
+            <p>Prevents "Overselling" during high-traffic sales events.</p>
+            <div class="code-box">
+                <span>STEP 1:</span> Start DB Transaction<br>
+                <span>STEP 2:</span> Check current stock vs order quantity<br>
+                <span>STEP 3:</span> Execute decrement query<br>
+                <span>STEP 4:</span> If (stock < threshold): Dispatch Admin Alert<br>
+                <span>STEP 5:</span> Commit Transaction
+            </div>
+
+            <h3>Dynamic Theming (SASS Substitution)</h3>
+            <p>Translates Admin Dashboard settings into runtime CSS.</p>
+            <div class="code-box">
+                Fetch settings -> Parse --primary-color -> Inject into &lt;style&gt; head block.
+            </div>
+        </section>
+
+        <section id="security">
+            <h2>4. Security Protocols</h2>
+            <div class="integration-grid">
+                <div class="card">
+                    <i class="fa-solid fa-key" style="color:var(--primary)"></i>
+                    <h4>Encryption</h4>
+                    <p>OpenSSL <code>AES-256-CBC</code> is used for all third-party API keys stored in DB. Decryption is restricted to the <code>IntegrationManager</code> singleton.</p>
+                </div>
+                <div class="card">
+                    <i class="fa-solid fa-shield" style="color:var(--primary)"></i>
+                    <h4>XSS/Injection</h4>
+                    <p>Deep sanitization whitelists safe HTML for product specifications while stripping all <code>on*</code> events and <code>&lt;script&gt;</code> tags.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+    // Smooth navigation highlighting
+    window.addEventListener('scroll', () => {
+        let current = "";
+        document.querySelectorAll("section").forEach((section) => {
+            const sectionTop = section.offsetTop;
+            if (pageYOffset >= sectionTop - 100) {
+                current = section.getAttribute("id");
+            }
+        });
+
+        document.querySelectorAll(".nav-link").forEach((a) => {
+            a.classList.remove("active");
+            if (a.getAttribute("href") === "#" + current) {
+                a.classList.add("active");
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
+
+4

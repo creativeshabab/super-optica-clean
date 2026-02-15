@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Super Optical — Project Flow Document</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary: #e31e24;
+        --primary-light: #fff5f5;
+        --secondary: #2d3748;
+        --accent: #1a202c;
+        --bg: #f8fafc;
+        --card-bg: #ffffff;
+        --border: #e2e8f0;
+        --text-main: #4a5568;
+        --text-dark: #1a202c;
+        --success: #38a169;
+        --warning: #d69e2e;
+        --info: #3182ce;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: var(--bg);
+        color: var(--text-main);
+        line-height: 1.6;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: "Montserrat", sans-serif;
+        color: var(--text-dark);
+        font-weight: 800;
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 2rem auto;
+        padding: 0 1.5rem;
+      }
+
+      .doc-header {
+        text-align: center;
+        margin-bottom: 4rem;
+        padding: 3rem;
+        background: linear-gradient(135deg, var(--accent) 0%, #2d3748 100%);
+        color: white;
+        border-radius: 24px;
+        box-shadow:
+          0 20px 25px -5px rgba(0, 0, 0, 0.1),
+          0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+
+      .doc-header h1 {
+        color: white;
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        letter-spacing: -1px;
+      }
+
+      .doc-header p {
+        font-weight: 500;
+        opacity: 0.9;
+        font-style: italic;
+      }
+
+      .section {
+        background: var(--card-bg);
+        padding: 2.5rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        border: 1px solid var(--border);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      }
+
+      .section-title {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--primary-light);
+        font-size: 1.5rem;
+        color: var(--primary);
+      }
+
+      .section-title i {
+        font-size: 1.25rem;
+      }
+
+      .module-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1rem;
+      }
+
+      .module-card {
+        background: var(--bg);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border-left: 4px solid var(--primary);
+      }
+
+      .module-card h4 {
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+        color: var(--text-dark);
+      }
+
+      .flow-list {
+        list-style: none;
+      }
+
+      .flow-item {
+        position: relative;
+        padding-left: 2.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .flow-item::before {
+        content: attr(data-step);
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 28px;
+        height: 28px;
+        background: var(--primary);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 0.75rem;
+      }
+
+      .flow-item h4 {
+        font-size: 1.1rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .table-wrapper {
+        overflow-x: auto;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+      }
+
+      th {
+        background: var(--bg);
+        text-align: left;
+        padding: 1rem;
+        font-weight: 700;
+        color: var(--text-dark);
+      }
+
+      td {
+        padding: 1rem;
+        border-top: 1px solid var(--border);
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 99px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+
+      .badge-pending {
+        background: #fffaf0;
+        color: #975a16;
+        border: 1px solid #fbd38d;
+      }
+      .badge-success {
+        background: #f0fff4;
+        color: #276749;
+        border: 1px solid #9ae6b4;
+      }
+      .badge-info {
+        background: #ebf8ff;
+        color: #2c5282;
+        border: 1px solid #90cdf4;
+      }
+
+      .status-flow {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+      }
+
+      .status-step {
+        padding: 0.5rem 1rem;
+        background: var(--bg);
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.85rem;
+      }
+
+      .status-arrow {
+        color: var(--border);
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          margin: 1rem auto;
+        }
+        .doc-header {
+          padding: 2rem 1.5rem;
+        }
+        .section {
+          padding: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header class="doc-header">
+        <h1>SUPER OPTICAL</h1>
+        <p>Comprehensive End-to-End System Analysis</p>
+      </header>
+
+      <!-- 1. Overview -->
+      <section class="section">
+        <h2 class="section-title">
+          <i class="fa-solid fa-circle-info"></i> 1. Project Overview
+        </h2>
+        <p>
+          <strong>Super Optical</strong> is a premium, multi-purpose Optical
+          Retail & Service platform designed to bridge the gap between eCommerce
+          and clinical eye care services.
+        </p>
+        <div class="module-grid">
+          <div class="module-card">
+            <h4>Platform Type</h4>
+            <p>Hybrid (eCommerce + Service Appointment Booking).</p>
+          </div>
+          <div class="module-card">
+            <h4>Core Purpose</h4>
+            <p>Seamless eyewear purchasing + professional eye test bookings.</p>
+          </div>
+        </div>
+        <div
+          class="module-grid"
+          style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr))"
+        >
+          <div class="module-card">
+            <h4>Key Modules</h4>
+            <ul style="padding-left: 1.2rem; font-size: 0.85rem">
+              <li>eCommerce Catalog</li>
+              <li>Appointment Engine</li>
+              <li>OTP Authentication</li>
+              <li>Inventory Management</li>
+              <li>Content CMS</li>
+              <li>Admin ERP</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Website Flow -->
+      <section class="section">
+        <h2 class="section-title">
+          <i class="fa-solid fa-route"></i> 2. Website Flow (End-to-End)
+        </h2>
+        <div class="flow-list">
+          <div class="flow-item" data-step="1">
+            <h4>Landing</h4>
+            <p>User discovers products and clinic services on the homepage.</p>
+          </div>
+          <div class="flow-item" data-step="2">
+            <h4>Signup/Login</h4>
+            <p>Mandatory Email OTP verification to secure identity.</p>
+          </div>
+          <div class="flow-item" data-step="3">
+            <h4>Browsing & Selection</h4>
+            <p>User chooses eyewear or schedules an eye test slot.</p>
+          </div>
+          <div class="flow-item" data-step="4">
+            <h4>Checkout & Payment</h4>
+            <p>Secure details entry + Razorpay/COD integration.</p>
+          </div>
+          <div class="flow-item" data-step="5">
+            <h4>Confirmation</h4>
+            <p>Success notification and automated email summaries.</p>
+          </div>
+          <div class="flow-item" data-step="6">
+            <h4>Processing & Delivery</h4>
+            <p>Admin fulfillment and final service completion.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. User Journey -->
+      <section class="section">
+        <h2 class="section-title">
+          <i class="fa-solid fa-user-check"></i> 3. User Journey Details
+        </h2>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Step</th>
+                <th>User Action</th>
+                <th>System Action</th>
+                <th>Notification</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>1. Auth</strong></td>
+                <td>Enters Email</td>
+                <td>Generates 6-digit OTP</td>
+                <td><span class="badge badge-info">Email</span> OTP Code</td>
+              </tr>
+              <tr>
+                <td><strong>2. Cart</strong></td>
+                <td>Adds Item</td>
+                <td>Checks stock levels</td>
+                <td>
+                  <span class="badge badge-success">Toast</span> Item Added
+                </td>
+              </tr>
+              <tr>
+                <td><strong>3. Booking</strong></td>
+                <td>Picks Time Slot</td>
+                <td>Reserves temporary slot</td>
+                <td>
+                  <span class="badge badge-info">Email</span> Confirmation
+                </td>
+              </tr>
+              <tr>
+                <td><strong>4. Payment</strong></td>
+                <td>Completes Razorpay</td>
+                <td>Verifies API Signature</td>
+                <td>
+                  <span class="badge badge-info">Email</span> Order Receipt
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 4. Email Flow -->
+      <section class="section">
+        <h2 class="section-title">
+          <i class="fa-solid fa-envelope-open-text"></i> 4. Email & Notification
+          Flow
+        </h2>
+        <div class="module-grid">
+          <div class="module-card" style="border-left-color: var(--info)">
+            <h4>Trigger: Registration</h4>
+            <p style="font-size: 0.85rem">
+              Sends unique OTP to verify email identity instantly.
+            </p>
+          </div>
+          <div class="module-card" style="border-left-color: var(--success)">
+            <h4>Trigger: Order Success</h4>
+            <p style="font-size: 0.85rem">
+              Sends Itemized invoice and confirmation to User & Admin.
+            </p>
+          </div>
+          <div class="module-card" style="border-left-color: var(--warning)">
+            <h4>Trigger: Shipping</h4>
+            <p style="font-size: 0.85rem">
+              Notifies user when Order status changes to "Shipped".
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5 & 6. Panel Areas -->
+      <section class="section">
+        <h2 class="section-title">
+          <i class="fa-solid fa-desktop"></i> 5 & 6. Power Panel Management
+        </h2>
+        <div class="module-grid">
+          <div class="module-card" style="border-left-color: var(--secondary)">
+            <h4 style="color: var(--primary)">
+              <i class="fa-solid fa-user"></i> User Panel
+            </h4>
+            <ul
+              style="padding-left: 1rem; font-size: 0.85rem; margin-top: 0.5rem"
+            >
+              <li>Live Order Tracking</li>
+              <li>Appointment History</li>
+              <li>Profile & Address Book</li>
+              <li>Product Reviews</li>
+            </ul>
+          </div>
+          <div class="module-card" style="border-left-color: var(--accent)">
+            <h4 style="color: var(--primary)">
+              <i class="fa-solid fa-user-shield"></i> Admin Panel
+            </h4>
+            <ul
+              style="padding-left: 1rem; font-size: 0.85rem; margin-top: 0.5rem"
+            >
+              <li>Revenue Analytics Dashboard</li>
+              <li>Inventory & Stock Control</li>
+              <li>Coupon & Promotion Engine</li>
+              <li>Theme & Layout Customization</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. Status Flow -->
+      <section class="section">
+        <h2 class="section-title">
+          <i class="fa-solid fa-bars-progress"></i> 8. Status Workflow
+        </h2>
+        <h4>Order Lifecycle</h4>
+        <div class="status-flow">
+          <div class="status-step">Pending</div>
+          <div class="status-arrow">→</div>
+          <div class="status-step">Processing</div>
+          <div class="status-arrow">→</div>
+          <div class="status-step">Shipped</div>
+          <div class="status-arrow">→</div>
+          <div class="status-step">Delivered</div>
+          <div class="status-arrow">→</div>
+          <div
+            class="status-step"
+            style="background: var(--success); color: white"
+          >
+            Completed
+          </div>
+        </div>
+        <h4 style="margin-top: 2rem">Appointment Lifecycle</h4>
+        <div class="status-flow">
+          <div class="status-step">Upcoming</div>
+          <div class="status-arrow">→</div>
+          <div class="status-step">Confirmed</div>
+          <div class="status-arrow">→</div>
+          <div
+            class="status-step"
+            style="background: var(--info); color: white"
+          >
+            Completed
+          </div>
+        </div>
+      </section>
+
+      <!-- 10. Summary -->
+      <section class="section" style="background: var(--accent); color: white">
+        <h2
+          class="section-title"
+          style="
+            color: white;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+          "
+        >
+          <i class="fa-solid fa-flag-checkered"></i> 10. Operational Summary
+        </h2>
+        <p style="opacity: 0.9">
+          Super Optical operates as a unified hub for eyewear commerce and
+          optical healthcare. It leverages a modern
+          <strong>Passwordless Auth</strong> system to maximize conversion, a
+          <strong>Responsive Design Engine</strong> for cross-device
+          consistency, and a robust <strong>Admin ERP</strong> to handle the
+          complexities of both retail inventory and professional service
+          scheduling.
+        </p>
+      </section>
+
+      <footer
+        style="
+          text-align: center;
+          font-size: 0.8rem;
+          color: #a0aec0;
+          margin-bottom: 3rem;
+        "
+      >
+        &copy; 2026 Super Optical | System Architecture Reference Documentation
+      </footer>
+    </div>
+  </body>
+</html>
+

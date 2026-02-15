@@ -1,0 +1,658 @@
+<html><head>
+    <meta charset="UTF-8">
+    <title>Retailer Guide - How to Place Orders</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            line-height: 1.8; 
+            max-width: 1000px; 
+            margin: 40px auto; 
+            padding: 30px; 
+            background: #f8f9fa;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { 
+            color: #2c3e50; 
+            border-bottom: 4px solid #3498db; 
+            padding-bottom: 15px;
+            font-size: 32px;
+        }
+        h2 { 
+            color: #34495e; 
+            margin-top: 40px; 
+            border-left: 5px solid #3498db;
+            padding-left: 15px;
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        h3 { 
+            color: #7f8c8d; 
+            margin-top: 25px;
+            font-size: 20px;
+        }
+        .step {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .step h3 {
+            color: white;
+            margin-top: 0;
+            font-size: 22px;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+            padding-bottom: 10px;
+        }
+        .step ol, .step ul {
+            margin: 15px 0;
+            padding-left: 25px;
+        }
+        .step li {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        .info-box {
+            background: #e3f2fd;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #2196f3;
+            border-radius: 5px;
+        }
+        .warning-box {
+            background: #fff3e0;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #ff9800;
+            border-radius: 5px;
+        }
+        .success-box {
+            background: #e8f5e9;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #4caf50;
+            border-radius: 5px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 25px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 15px;
+            text-align: left;
+        }
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        tr:hover {
+            background: #e3f2fd;
+        }
+        .example {
+            background: #fff9c4;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 8px;
+            border: 2px dashed #fbc02d;
+        }
+        .example h3 {
+            color: #f57c00;
+            margin-top: 0;
+        }
+        code {
+            background: #263238;
+            color: #aed581;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin: 0 5px;
+        }
+        .badge-pending { background: #fff3e0; color: #f57c00; }
+        .badge-dispatched { background: #e3f2fd; color: #1976d2; }
+        .badge-delivered { background: #e8f5e9; color: #388e3c; }
+        .badge-cancelled { background: #ffebee; color: #d32f2f; }
+        .icon {
+            font-size: 24px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        .toc {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+        .toc h2 {
+            margin-top: 0;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        .toc ol {
+            margin: 15px 0;
+            padding-left: 25px;
+        }
+        .toc li {
+            margin: 10px 0;
+        }
+        .toc a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+<h1>🛒 Retailer Guide: How to Place Orders in B2B Portal</h1>
+
+<p style="font-size: 18px; color: #666; margin: 20px 0;">
+    <strong>For:</strong> Wholesale Retailers<br>
+    <strong>Purpose:</strong> Step-by-step guide to order products from the B2B wholesale portal
+</p>
+
+<div class="toc">
+    <h2>📋 Quick Navigation</h2>
+    <ol>
+        <li><a href="#step1">Login to the System</a></li>
+        <li><a href="#step2">Browse the Wholesale Catalog</a></li>
+        <li><a href="#step3">Check Your Credit Limit</a></li>
+        <li><a href="#step4">Add Products to Cart</a></li>
+        <li><a href="#step5">Review Your Cart</a></li>
+        <li><a href="#step6">Place the Order</a></li>
+        <li><a href="#step7">Track Your Order</a></li>
+        <li><a href="#step8">Check Your Ledger</a></li>
+        <li><a href="#step9">What Happens Next</a></li>
+        <li><a href="#step10">Making Payment</a></li>
+        <li><a href="#reference">Quick Reference Card</a></li>
+        <li><a href="#example">Real-World Example</a></li>
+    </ol>
+</div>
+
+<hr>
+
+<div class="step" id="step1">
+    <h3><span class="icon">🔐</span>Step 1: Login to the System</h3>
+    <ol>
+        <li>Open your web browser (Chrome, Firefox, Edge)</li>
+        <li>Go to your Optical ERP URL: <code>localhost/StartingFromScratch</code></li>
+        <li>Enter your <strong>username</strong> (provided by admin)</li>
+        <li>Enter your <strong>password</strong></li>
+        <li>Click <strong>"Login"</strong> button</li>
+        <li>You'll see the dashboard with "B2B Wholesale" menu in the sidebar</li>
+    </ol>
+</div>
+
+<div class="step" id="step2">
+    <h3><span class="icon">📦</span>Step 2: Browse the Wholesale Catalog</h3>
+    <ol>
+        <li>Click <strong>"B2B Wholesale"</strong> in the left sidebar</li>
+        <li>Click <strong>"Catalog"</strong> from the submenu</li>
+        <li>You'll see all available products displayed as cards</li>
+    </ol>
+    
+    <div class="info-box">
+        <strong>What You'll See for Each Product:</strong>
+        <ul>
+            <li>Product image</li>
+            <li>Product name (e.g., "RayBan Wayfarer")</li>
+            <li>SKU code (e.g., "RAY1958")</li>
+            <li><strong>Wholesale Price</strong> (special price for retailers like you)</li>
+            <li>Available stock quantity</li>
+        </ul>
+    </div>
+</div>
+
+<div class="step" id="step3">
+    <h3><span class="icon">💳</span>Step 3: Check Your Credit Limit</h3>
+    <p>At the top of the catalog page, you'll see your credit information:</p>
+    
+    <div class="info-box" style="background: #d9c7261f;border-left-color: #ff9800;">
+        <strong>Example Credit Display:</strong><br>
+        <div style="font-size: 18px; margin-top: 10px;">
+            <strong>Credit Limit:</strong> ₹50,000<br>
+            <strong>Current Balance:</strong> ₹15,000 (what you owe)<br>
+            <strong>Available Credit:</strong> ₹35,000 (what you can order)
+        </div>
+    </div>
+    
+    <div class="warning-box">
+        <strong>⚠️ Important:</strong> You can only place orders up to your <strong>Available Credit</strong> amount. If you need more credit, contact the admin.
+    </div>
+</div>
+
+<div class="step" id="step4">
+    <h3><span class="icon">➕</span>Step 4: Add Products to Cart</h3>
+    <ol>
+        <li>Browse through the catalog and find products you need</li>
+        <li>For each product:
+            <ul>
+                <li>Enter the <strong>quantity</strong> you want to order</li>
+                <li>Click <strong>"Add to Cart"</strong> button</li>
+            </ul>
+        </li>
+        <li>You'll see a confirmation message: "Product added to cart"</li>
+        <li>Repeat for all products you need</li>
+        <li>The cart icon (top right) shows the number of items</li>
+    </ol>
+</div>
+
+<div class="step" id="step5">
+    <h3><span class="icon">🛍️</span>Step 5: Review Your Cart</h3>
+    <ol>
+        <li>Click the <strong>Cart icon</strong> or <strong>"My Cart"</strong> link</li>
+        <li>Review all items in your cart</li>
+        <li>For each item, you'll see:
+            <ul>
+                <li>Product name</li>
+                <li>Quantity</li>
+                <li>Unit price (wholesale)</li>
+                <li>Total price (quantity × unit price)</li>
+            </ul>
+        </li>
+        <li>At the bottom, see the <strong>Grand Total</strong></li>
+    </ol>
+    
+    <div class="info-box">
+        <strong>You Can:</strong>
+        <ul>
+            <li><strong>Remove items:</strong> Click the trash/delete icon</li>
+            <li><strong>Update quantities:</strong> Change the number and click "Update"</li>
+            <li><strong>Continue shopping:</strong> Click "Browse Catalog" to add more items</li>
+        </ul>
+    </div>
+</div>
+
+<div class="step" id="step6">
+    <h3><span class="icon">✅</span>Step 6: Place the Order</h3>
+    <ol>
+        <li>Make sure your <strong>total amount</strong> is within your <strong>available credit</strong></li>
+        <li>Review all items one final time</li>
+        <li>Click <strong>"Place Order"</strong> button</li>
+    </ol>
+    
+    <div class="info-box">
+        <strong>System Will Automatically:</strong>
+        <ul>
+            <li>✅ Check if total is within your credit limit</li>
+            <li>✅ Verify stock availability</li>
+            <li>✅ Create your order</li>
+            <li>✅ Clear your cart</li>
+        </ul>
+    </div>
+    
+    <div class="success-box">
+        <strong>✅ Success!</strong> You'll see: "Order placed successfully!"<br>
+        Your order status is now: <span class="badge badge-pending">Pending</span> (waiting for admin to dispatch)
+    </div>
+</div>
+
+<div class="step" id="step7">
+    <h3><span class="icon">📊</span>Step 7: Track Your Order</h3>
+    <ol>
+        <li>Click <strong>"B2B Wholesale"</strong> → <strong>"My Orders"</strong></li>
+        <li>You'll see a table with all your orders</li>
+        <li>Click <strong>"View Details"</strong> on any order to see:
+            <ul>
+                <li>All products in that order</li>
+                <li>Quantities ordered</li>
+                <li>Prices</li>
+                <li>Order date and time</li>
+            </ul>
+        </li>
+    </ol>
+    
+    <table>
+        <tbody><tr>
+            <th>Order Status</th>
+            <th>What It Means</th>
+        </tr>
+        <tr>
+            <td><span class="badge badge-pending">Pending</span></td>
+            <td>Order received, waiting for warehouse to prepare and dispatch</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-dispatched">Dispatched</span></td>
+            <td>Order has been sent from warehouse, on the way to you</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-delivered">Delivered</span></td>
+            <td>Order received by you (marked by admin)</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-cancelled">Cancelled</span></td>
+            <td>Order was cancelled (by you or admin)</td>
+        </tr>
+    </tbody></table>
+</div>
+
+<div class="step" id="step8">
+    <h3><span class="icon">📖</span>Step 8: Check Your Ledger (Account Statement)</h3>
+    <ol>
+        <li>Click <strong>"B2B Wholesale"</strong> → <strong>"My Ledger"</strong></li>
+        <li>You'll see your complete account statement</li>
+    </ol>
+    
+    <div class="info-box">
+        <strong>Ledger Shows:</strong>
+        <ul>
+            <li><strong>Current Balance:</strong> Total amount you owe</li>
+            <li><strong>All Transactions:</strong>
+                <ul>
+                    <li><strong>DEBIT (Red):</strong> When order is dispatched → Balance increases (you owe more)</li>
+                    <li><strong>CREDIT (Green):</strong> When you make payment → Balance decreases (you owe less)</li>
+                </ul>
+            </li>
+            <li><strong>Balance After:</strong> Running balance after each transaction</li>
+            <li><strong>Description:</strong> Details of each transaction</li>
+            <li><strong>Date &amp; Time:</strong> When transaction occurred</li>
+        </ul>
+    </div>
+</div>
+
+<div class="step" id="step9">
+    <h3><span class="icon">⚙️</span>Step 9: What Happens Next (Admin Side)</h3>
+    <p><strong>After you place an order, the admin/warehouse will:</strong></p>
+    <ol>
+        <li>See your order in their <strong>"Manage Orders"</strong> section</li>
+        <li>Prepare your products from warehouse stock</li>
+        <li>Pack the items</li>
+        <li>Click <strong>"Dispatch"</strong> button</li>
+    </ol>
+    
+    <div class="info-box">
+        <strong>When Order is Dispatched:</strong>
+        <ul>
+            <li>✅ Your order status changes to <span class="badge badge-dispatched">Dispatched</span></li>
+            <li>✅ Your ledger is <strong>DEBITED</strong> with the order amount</li>
+            <li>✅ Your current balance increases</li>
+            <li>✅ Stock is deducted from warehouse</li>
+        </ul>
+    </div>
+    
+    <div class="example">
+        <h3>Example:</h3>
+        <p><strong>Before Dispatch:</strong></p>
+        <ul>
+            <li>Your current balance: ₹15,000</li>
+            <li>Order amount: ₹25,000</li>
+        </ul>
+        <p><strong>After Dispatch:</strong></p>
+        <ul>
+            <li>Ledger debited: ₹25,000</li>
+            <li>New balance: ₹15,000 + ₹25,000 = <strong>₹40,000</strong> (you owe this amount)</li>
+        </ul>
+    </div>
+</div>
+
+<div class="step" id="step10">
+    <h3><span class="icon">💰</span>Step 10: Making Payment</h3>
+    <p><strong>When you're ready to pay:</strong></p>
+    <ol>
+        <li>Contact the admin (phone/email/in-person)</li>
+        <li>Make payment via:
+            <ul>
+                <li>Cash</li>
+                <li>Bank transfer</li>
+                <li>Cheque</li>
+                <li>UPI/Online payment</li>
+            </ul>
+        </li>
+        <li>Admin will record your payment in the system</li>
+    </ol>
+    
+    <div class="info-box">
+        <strong>Admin Will:</strong>
+        <ul>
+            <li>Go to <strong>"B2B Wholesale → Payments"</strong></li>
+            <li>Select your store</li>
+            <li>Enter payment amount (e.g., ₹20,000)</li>
+            <li>Submit payment</li>
+        </ul>
+    </div>
+    
+    <div class="success-box">
+        <strong>After Payment is Recorded:</strong>
+        <ul>
+            <li>✅ Your ledger is <strong>CREDITED</strong></li>
+            <li>✅ Your balance decreases</li>
+            <li>✅ You can see the payment in "My Ledger"</li>
+        </ul>
+    </div>
+    
+    <div class="example">
+        <h3>Example:</h3>
+        <p><strong>Before Payment:</strong></p>
+        <ul>
+            <li>Current balance: ₹40,000</li>
+        </ul>
+        <p><strong>You Pay: ₹20,000</strong></p>
+        <p><strong>After Payment:</strong></p>
+        <ul>
+            <li>Ledger credited: ₹20,000</li>
+            <li>New balance: ₹40,000 - ₹20,000 = <strong>₹20,000</strong></li>
+            <li>Available credit increases by ₹20,000</li>
+        </ul>
+    </div>
+</div>
+
+<hr>
+
+<h2 id="reference">📱 Quick Reference Card for Retailers</h2>
+
+<table>
+    <tbody><tr>
+        <th style="width: 30%;">What You Want to Do</th>
+        <th style="width: 35%;">Where to Go</th>
+        <th style="width: 35%;">What You'll See</th>
+    </tr>
+    <tr>
+        <td><strong>Browse Products</strong></td>
+        <td>B2B Wholesale → Catalog</td>
+        <td>All products with wholesale prices and stock</td>
+    </tr>
+    <tr>
+        <td><strong>View Your Cart</strong></td>
+        <td>Cart icon (top right)</td>
+        <td>All items you've added, quantities, total</td>
+    </tr>
+    <tr>
+        <td><strong>Place Order</strong></td>
+        <td>Cart → Place Order button</td>
+        <td>Order confirmation message</td>
+    </tr>
+    <tr>
+        <td><strong>Track Orders</strong></td>
+        <td>B2B Wholesale → My Orders</td>
+        <td>All your orders with status</td>
+    </tr>
+    <tr>
+        <td><strong>Check Balance</strong></td>
+        <td>B2B Wholesale → My Ledger</td>
+        <td>Current balance, all transactions</td>
+    </tr>
+    <tr>
+        <td><strong>Check Credit</strong></td>
+        <td>Catalog page (top)</td>
+        <td>Credit limit, current balance, available credit</td>
+    </tr>
+</tbody></table>
+
+<hr>
+
+<h2 id="example">🎯 Real-World Example: Complete Order Journey</h2>
+
+<div class="example">
+    <h3>Scenario: You're "XYZ Opticals" Retailer</h3>
+    
+    <p><strong>Step 1: Login</strong></p>
+    <ul>
+        <li>Username: <code>xyz_opticals</code></li>
+        <li>Password: <code>your_password</code></li>
+    </ul>
+    
+    <p><strong>Step 2: Check Credit</strong></p>
+    <ul>
+        <li>Credit Limit: ₹50,000</li>
+        <li>Current Balance: ₹15,000 (you owe)</li>
+        <li><strong>Available Credit: ₹35,000</strong> ✅</li>
+    </ul>
+    
+    <p><strong>Step 3: Browse &amp; Add to Cart</strong></p>
+    <table style="margin: 15px 0;">
+        <tbody><tr>
+            <th>Product</th>
+            <th>Wholesale Price</th>
+            <th>Quantity</th>
+            <th>Total</th>
+        </tr>
+        <tr>
+            <td>RayBan Wayfarer</td>
+            <td>₹3,000</td>
+            <td>10</td>
+            <td>₹30,000</td>
+        </tr>
+        <tr>
+            <td>Progressive Lens</td>
+            <td>₹1,500</td>
+            <td>20</td>
+            <td>₹30,000</td>
+        </tr>
+        <tr>
+            <th colspan="3">Grand Total</th>
+            <th>₹60,000</th>
+        </tr>
+    </tbody></table>
+    
+    <p><strong>Step 4: Problem! ⚠️</strong></p>
+    <div class="warning-box">
+        Total (₹60,000) exceeds available credit (₹35,000)<br>
+        <strong>Solution:</strong> Reduce quantities or remove items
+    </div>
+    
+    <p><strong>Step 5: Adjust Cart</strong></p>
+    <ul>
+        <li>Remove Progressive Lens</li>
+        <li>Keep only RayBan Wayfarer: 10 units = ₹30,000 ✅</li>
+    </ul>
+    
+    <p><strong>Step 6: Place Order</strong></p>
+    <ul>
+        <li>Click "Place Order"</li>
+        <li>✅ Success! Order #123 created</li>
+        <li>Status: <span class="badge badge-pending">Pending</span></li>
+    </ul>
+    
+    <p><strong>Step 7: Admin Dispatches (Next Day)</strong></p>
+    <ul>
+        <li>Order status changes to: <span class="badge badge-dispatched">Dispatched</span></li>
+        <li>Your ledger debited: ₹30,000</li>
+        <li>New balance: ₹15,000 + ₹30,000 = <strong>₹45,000</strong></li>
+        <li>Available credit now: ₹50,000 - ₹45,000 = ₹5,000</li>
+    </ul>
+    
+    <p><strong>Step 8: You Receive Products</strong></p>
+    <ul>
+        <li>Products delivered to your store</li>
+        <li>Admin marks order as: <span class="badge badge-delivered">Delivered</span></li>
+    </ul>
+    
+    <p><strong>Step 9: You Make Payment</strong></p>
+    <ul>
+        <li>You pay ₹20,000 to admin</li>
+        <li>Admin records payment in system</li>
+        <li>Your ledger credited: ₹20,000</li>
+        <li>New balance: ₹45,000 - ₹20,000 = <strong>₹25,000</strong></li>
+        <li>Available credit: ₹50,000 - ₹25,000 = <strong>₹25,000</strong> ✅</li>
+    </ul>
+</div>
+
+<hr>
+
+<h2>⚠️ Important Notes for Retailers</h2>
+
+<div class="warning-box">
+    <h3 style="margin-top: 0;">Credit Limit Rules</h3>
+    <ul>
+        <li>You <strong>cannot</strong> place orders exceeding your available credit</li>
+        <li>Available Credit = Credit Limit - Current Balance</li>
+        <li>To increase credit limit, contact admin</li>
+        <li>Make regular payments to free up credit</li>
+    </ul>
+</div>
+
+<div class="info-box">
+    <h3 style="margin-top: 0;">Order Status Meanings</h3>
+    <ul>
+        <li><span class="badge badge-pending">Pending</span> = Order submitted, waiting for dispatch</li>
+        <li><span class="badge badge-dispatched">Dispatched</span> = Products sent from warehouse</li>
+        <li><span class="badge badge-delivered">Delivered</span> = Products received by you</li>
+        <li><span class="badge badge-cancelled">Cancelled</span> = Order cancelled</li>
+    </ul>
+</div>
+
+<div class="success-box">
+    <h3 style="margin-top: 0;">Best Practices</h3>
+    <ul>
+        <li>✅ Always check your available credit before ordering</li>
+        <li>✅ Review your cart carefully before placing order</li>
+        <li>✅ Track your orders regularly in "My Orders"</li>
+        <li>✅ Check your ledger to know your balance</li>
+        <li>✅ Make payments regularly to maintain good credit</li>
+        <li>✅ Contact admin if you have any questions</li>
+    </ul>
+</div>
+
+<hr>
+
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px; text-align: center; margin-top: 40px;">
+    <h2 style="color: white; margin-top: 0; border: none; padding: 0; background: none;">🎉 You're All Set!</h2>
+    <p style="font-size: 18px; margin: 20px 0;">
+        You now know how to place orders in the B2B wholesale portal.<br>
+        Start browsing the catalog and place your first order!
+    </p>
+    <p style="font-size: 14px; margin-top: 20px; opacity: 0.9;">
+        Need help? Contact your admin or system administrator.
+    </p>
+</div>
+
+<div style="background: #f5f5f5; padding: 20px; margin-top: 30px; border-radius: 5px; text-align: center;">
+    <p style="color: #666; margin: 0;">
+        <strong>Optical ERP - Retailer Guide</strong><br>
+        B2B Wholesale Portal | How to Place Orders<br>
+        Generated: February 3, 2026
+    </p>
+</div>
+
+</div>
+
+
+
+</body></html>
