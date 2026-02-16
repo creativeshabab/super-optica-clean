@@ -414,7 +414,12 @@ pre.code-view {
     opacity: 0.9;
   }
   .breadcrumb-separator {
-    display: none !important; /* Hide standard separator, handled by gap and chip look */
+    display: flex !important;
+    align-items: center;
+    margin: 0;
+    opacity: 0.5;
+    font-size: 0.6rem;
+    color: #fff;
   }
   .breadcrumb-list li.active {
     background: rgba(255, 255, 255, 0.25) !important;
@@ -1018,11 +1023,7 @@ span.cart-badge {
 
 /* Page Headers */
 .page-hero {
-  background: linear-gradient(
-    135deg,
-    var(--primary) 0%,
-    var(--primary-dark) 100%
-  );
+  background: var(--primary);
   padding: 8px 0;
   min-height: 40px;
   display: flex;
