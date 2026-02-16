@@ -3443,6 +3443,105 @@ section.wrapperSection {
     color: var(--primary);
 }
 
+/* =========================================
+   NEW PROFESSIONAL PRODUCT CARD & GRID
+   ========================================= */
+
+/* Responsive Grid System for Products */
+.dynamic-product-grid-v2 {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(2, 1fr); /* Mobile default */
+    padding: 10px 0;
+}
+
+@media (min-width: 768px) {
+    .dynamic-product-grid-v2 {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .dynamic-product-grid-v2 {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 30px;
+    }
+}
+
+/* Card Refinements */
+.product-card-premium .card-inner {
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    background: #ffffff;
+}
+
+.product-card-premium .card-inner:hover {
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.12);
+}
+
+/* Image Presentation */
+.product-card-premium .card-inner img {
+    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.05));
+    transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.product-card-premium .card-inner:hover img {
+    transform: scale(1.08) rotate(-2deg);
+}
+
+/* Typography Hierarchy */
+.product-card-premium .product-brand {
+    font-family: var(--font-main);
+    letter-spacing: -0.01em;
+}
+
+.product-card-premium .discount-tag {
+    color: #10b981; /* Precise Emerald */
+    background: rgba(16, 185, 129, 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+/* Button Refinement */
+.product-card-premium .btn {
+    border-width: 1.5px !important;
+}
+
+/* Animation for FadeIn */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.product-card-premium {
+    animation: fadeInUp 0.6s ease backwards;
+}
+
+/* Staggered Delay for Grid Items (up to 12) */
+.product-card-premium:nth-child(1) { animation-delay: 0.05s; }
+.product-card-premium:nth-child(2) { animation-delay: 0.1s; }
+.product-card-premium:nth-child(3) { animation-delay: 0.15s; }
+.product-card-premium:nth-child(4) { animation-delay: 0.2s; }
+.product-card-premium:nth-child(5) { animation-delay: 0.25s; }
+.product-card-premium:nth-child(6) { animation-delay: 0.3s; }
+.product-card-premium:nth-child(7) { animation-delay: 0.35s; }
+.product-card-premium:nth-child(8) { animation-delay: 0.4s; }
+
+/* Trendy UI Utilities */
+.shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+.hover\:shadow-lg:hover { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+.active\:scale-95:active { transform: scale(0.95); }
+.tracking-widest { letter-spacing: 0.1em; }
+.product-card-premium .btn-primary { background-color: var(--primary) !important; color: white !important; }
+.product-card-premium .btn-outline { border: 1.5px solid #e2e8f0 !important; color: #475569 !important; background: transparent !important; }
+
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(5px); }
     to { opacity: 1; transform: translateY(0); }

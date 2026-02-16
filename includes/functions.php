@@ -844,45 +844,54 @@ function renderProductCard($p) {
     $rating_score = '4.8'; 
     $rating_count = '2.4k';
     
-    // Labels/Badges (Lenskart labels are often "Trending" or "New")
-    $label = isset($p['label']) ? $p['label'] : 'Trending';
+    // Labels/Badges (Manageable from admin)
+    $label = isset($p['label']) && !empty($p['label']) ? $p['label'] : null;
     ?>
     <div class="product-card-premium group relative h-full">
-        <div class="card-inner bg-white border border-gray-100 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl flex flex-col h-[450px]">
+        <div class="card-inner bg-white border border-gray-100 rounded-3xl overflow-hidden transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 flex flex-col h-full" style="min-height: 480px;">
         
-            <!-- Product Image (40% Height) -->
-            <a href="<?= $url ?>" class="block relative h-[40%] bg-white p-0 overflow-hidden">
+            <!-- Product Image (Centered & Contained) -->
+            <a href="<?= $url ?>" class="block relative h-64 bg-[#f8f9fa] p-6 overflow-hidden flex items-center justify-center">
+                <?php if($label): ?>
+                    <!-- Dynamic Badge -->
+                    <div class="absolute top-4 left-4 z-10">
+                        <span class="bg-white/90 backdrop-blur-md text-gray-900 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full shadow-sm border border-gray-100">
+                            <i class="fa-solid fa-fire text-orange-500 mr-1"></i> <?= htmlspecialchars($label) ?>
+                        </span>
+                    </div>
+                <?php endif; ?>
+
                 <?php if($p['image']): ?>
-                    <img src="assets/uploads/<?= $p['image'] ?>" alt="<?= htmlspecialchars($p['name']) ?>" class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110">
+                    <img src="assets/uploads/<?= $p['image'] ?>" alt="<?= htmlspecialchars($p['name']) ?>" class="max-w-full max-h-full object-contain transform transition-transform duration-700 group-hover:scale-105">
                 <?php else: ?>
-                    <img src="https://i.ibb.co/3sxh1gV/glass-placeholder.png" class="w-full h-full object-cover opacity-50" alt="Product">
+                    <img src="https://i.ibb.co/3sxh1gV/glass-placeholder.png" class="w-32 opacity-20" alt="Product">
                 <?php endif; ?>
             </a>
 
-            <!-- Card Body (60% Height) -->
-            <div class="card-body p-6 pt-0 flex flex-col h-[60%]">
+            <!-- Card Body -->
+            <div class="card-body p-5 flex flex-col flex-1">
 
                 <!-- Product Info -->
-                <a href="<?= $url ?>" class="block mb-2">
-                    <h3 class="product-brand text-gray-900 font-black text-xl leading-tight mb-1 truncate"><?= htmlspecialchars($p['name']) ?></h3>
-                    <p class="text-gray-500 text-sm mb-2" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"><?= htmlspecialchars(strip_tags($description)) ?></p>
+                <a href="<?= $url ?>" class="block mb-3">
+                    <h3 class="product-brand text-gray-900 font-bold text-lg leading-snug mb-1 group-hover:text-primary transition-colors"><?= htmlspecialchars($p['name']) ?></h3>
+                    <p class="text-gray-400 text-xs font-medium uppercase tracking-wider mb-2" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"><?= renderProductPreview($description, 80) ?></p>
                 </a>
 
                 <!-- Price Block -->
-                <div class="price-container flex items-center gap-3">
-                    <span class="final-price text-indigo-900 font-black text-2xl tracking-tighter">₹<?= $price ?></span>
+                <div class="price-container flex items-baseline gap-2 mb-4">
+                    <span class="final-price text-gray-900 font-black text-2xl tracking-tight">₹<?= $price ?></span>
                     <?php if($discount > 0): ?>
-                        <span class="old-price text-gray-300 line-through font-bold text-lg">₹<?= number_format($actual_price, 0) ?></span>
-                        <span class="discount-tag text-cyan-400 font-black text-lg">(<?= $discount ?>% OFF)</span>
+                        <span class="old-price text-gray-400 line-through font-medium text-sm">₹<?= number_format($actual_price, 0) ?></span>
+                        <span class="discount-tag text-emerald-500 font-bold text-sm"><?= $discount ?>% OFF</span>
                     <?php endif; ?>
                 </div>
 
-                <!-- Action Buttons (Push to bottom) -->
-                <div class="mt-auto flex gap-2 pt-4">
-                     <button onclick="window.location.href='cart.php?add=<?= $p['id'] ?>&redirect=checkout.php'" class="btn btn-primary flex-1 text-sm py-2">
+                <!-- Action Buttons -->
+                <div class="mt-auto flex gap-3 pt-2">
+                     <button onclick="window.location.href='cart.php?add=<?= $p['id'] ?>&redirect=checkout.php'" class="btn btn-primary flex-1 rounded-full text-xs font-bold uppercase tracking-widest py-3 shadow-md hover:shadow-lg transition-all active:scale-95">
                         Buy Now
                     </button>
-                    <button onclick="addToCart(<?= $p['id'] ?>)" class="btn btn-outline flex-1 text-sm py-2">
+                    <button onclick="addToCart(<?= $p['id'] ?>)" class="btn btn-outline flex-1 rounded-full text-xs font-bold uppercase tracking-widest py-3 hover:bg-gray-50 transition-all active:scale-95">
                         Add Cart
                     </button>
                 </div>

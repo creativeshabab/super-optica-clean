@@ -41,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $show_raw_html = isset($_POST['show_raw_html']) ? 1 : 0;
     $price = $_POST['price'];
     $actual_price = $_POST['actual_price'] ?: null;
+    $label = $_POST['label'] ?: null;
     $category_id = $_POST['category_id'];
     $stock_quantity = isset($_POST['stock_quantity']) && $_POST['stock_quantity'] !== '' ? (int)$_POST['stock_quantity'] : null;
     $low_stock_threshold = isset($_POST['low_stock_threshold']) && $_POST['low_stock_threshold'] !== '' ? (int)$_POST['low_stock_threshold'] : 10;
@@ -77,8 +78,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             if ($product) {
                 // Update
-                $sql = "UPDATE products SET name=?, slug=?, description=?, price=?, actual_price=?, category_id=?, image=?, stock_quantity=?, low_stock_threshold=?, key_features=?, frame_specs=?";
-                $params = [$name, $slug, $description, $price, $actual_price, $category_id, $image, $stock_quantity, $low_stock_threshold, $key_features, $frame_specs];
+                $sql = "UPDATE products SET name=?, slug=?, description=?, price=?, actual_price=?, label=?, category_id=?, image=?, stock_quantity=?, low_stock_threshold=?, key_features=?, frame_specs=?";
+                $params = [$name, $slug, $description, $price, $actual_price, $label, $category_id, $image, $stock_quantity, $low_stock_threshold, $key_features, $frame_specs];
                 
                 if ($hasShowRawProductColumn) {
                     $sql .= ", show_raw_html=?";
@@ -92,9 +93,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 setFlash('success', __('product_updated_success', 'Product updated successfully'));
             } else {
                 // Create
-                $cols = "name, slug, description, price, actual_price, category_id, image, stock_quantity, low_stock_threshold, key_features, frame_specs";
-                $vals = "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?";
-                $params = [$name, $slug, $description, $price, $actual_price, $category_id, $image, $stock_quantity, $low_stock_threshold, $key_features, $frame_specs];
+                $cols = "name, slug, description, price, actual_price, label, category_id, image, stock_quantity, low_stock_threshold, key_features, frame_specs";
+                $vals = "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?";
+                $params = [$name, $slug, $description, $price, $actual_price, $label, $category_id, $image, $stock_quantity, $low_stock_threshold, $key_features, $frame_specs];
                 
                 if ($hasShowRawProductColumn) {
                     $cols .= ", show_raw_html";
@@ -417,7 +418,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="card mb-4" style="margin-bottom: 1.5rem;">
                 <h3 class="card-title mb-4" style="margin-bottom: 1.25rem;"><?= __('organization', 'Organization') ?></h3>
                 
-                <div class="form-group mb-0">
+                <div class="form-group mb-4">
                     <label class="form-label"><?= __('category_label', 'Category') ?></label>
                     <select name="category_id" class="form-control" required>
                         <option value=""><?= __('select_category', 'Select Category') ?></option>
@@ -430,6 +431,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </option>
                         <?php endforeach; ?>
                     </select>
+                </div>
+
+                <div class="form-group mb-0">
+                    <label class="form-label">Product Badge (Label)</label>
+                    <input type="text" name="label" class="form-control" value="<?= $product['label'] ?? '' ?>" placeholder="e.g. Trending, New, Sale">
+                    <small style="color: var(--admin-text-light);">Displays a small badge on the product image.</small>
                 </div>
             </div>
 
