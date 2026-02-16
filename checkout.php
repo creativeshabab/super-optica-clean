@@ -24,44 +24,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     foreach ($cart as $id => $item) {
         if (isset($_POST['lens_option'][$id])) {
-            $lens_id = $_POST['lens_option'][$id];
+            $lens_data = $_POST['lens_option'][$id]; // This is now an array [0 => lens_id, 1 => lens_id...]
             
-            // Find lens price
-            $lens_price = 0;
-            foreach ($lens_options as $lo) {
-                if ($lo['id'] == $lens_id) {
-                    $lens_price = $lo['price'];
-                    break;
+            foreach ($lens_data as $idx => $lens_id) {
+                // Find lens price
+                $lens_price = 0;
+                foreach ($lens_options as $lo) {
+                    if ($lo['id'] == $lens_id) {
+                        $lens_price = $lo['price'];
+                        break;
+                    }
                 }
-            }
-            $lens_total += $lens_price * $item['quantity'];
+                $lens_total += $lens_price; // Quantity is already accounted for by the number of entries in $lens_data
 
-            $prescriptions[$id] = [
-                'lens_option_id' => $lens_id,
-                'lens_price' => $lens_price,
-                'rx_method' => $_POST['rx_method'][$id] ?? 'manual',
-                'od_sph' => $_POST['od_sph'][$id] ?? '',
-                'od_cyl' => $_POST['od_cyl'][$id] ?? '',
-                'od_axis' => $_POST['od_axis'][$id] ?? '',
-                'od_add' => $_POST['od_add'][$id] ?? '',
-                'os_sph' => $_POST['os_sph'][$id] ?? '',
-                'os_cyl' => $_POST['os_cyl'][$id] ?? '',
-                'os_axis' => $_POST['os_axis'][$id] ?? '',
-                'os_add' => $_POST['os_add'][$id] ?? '',
-                'pd' => $_POST['pd'][$id] ?? '',
-                'file' => '' // Default empty
-            ];
+                $rx_method = $_POST['rx_method'][$id][$idx] ?? 'manual';
+                $prescriptions[$id][$idx] = [
+                    'lens_option_id' => $lens_id,
+                    'lens_price' => $lens_price,
+                    'rx_method' => $rx_method,
+                    'od_sph' => $_POST['od_sph'][$id][$idx] ?? '',
+                    'od_cyl' => $_POST['od_cyl'][$id][$idx] ?? '',
+                    'od_axis' => $_POST['od_axis'][$id][$idx] ?? '',
+                    'od_add' => $_POST['od_add'][$id][$idx] ?? '',
+                    'os_sph' => $_POST['os_sph'][$id][$idx] ?? '',
+                    'os_cyl' => $_POST['os_cyl'][$id][$idx] ?? '',
+                    'os_axis' => $_POST['os_axis'][$id][$idx] ?? '',
+                    'os_add' => $_POST['os_add'][$id][$idx] ?? '',
+                    'pd' => $_POST['pd'][$id][$idx] ?? '',
+                    'file' => '' // Default empty
+                ];
 
-            // Handle File Upload
-            if (isset($_FILES['rx_file']['name'][$id]) && $_FILES['rx_file']['error'][$id] === UPLOAD_ERR_OK) {
-                $uploadDir = 'assets/uploads/prescriptions/';
-                if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
-                
-                $fileName = time() . '_' . $id . '_' . basename($_FILES['rx_file']['name'][$id]);
-                $targetPath = $uploadDir . $fileName;
-                
-                if (move_uploaded_file($_FILES['rx_file']['tmp_name'][$id], $targetPath)) {
-                    $prescriptions[$id]['file'] = $fileName;
+                // Handle File Upload
+                if ($rx_method === 'upload' && isset($_FILES['rx_file']['name'][$id][$idx]) && $_FILES['rx_file']['error'][$id][$idx] === UPLOAD_ERR_OK) {
+                    $uploadDir = 'assets/uploads/prescriptions/';
+                    if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+                    
+                    $fileName = time() . '_' . $id . '_' . $idx . '_' . basename($_FILES['rx_file']['name'][$id][$idx]);
+                    $targetPath = $uploadDir . $fileName;
+                    
+                    if (move_uploaded_file($_FILES['rx_file']['tmp_name'][$id][$idx], $targetPath)) {
+                        $prescriptions[$id][$idx]['file'] = $fileName;
+                    }
                 }
             }
         }
@@ -125,93 +128,121 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                             </div>
 
-                            <!-- Lens Selection (Visual Grid) -->
-                            <div class="mb-6">
-                                <label class="block text-sm font-bold mb-3 uppercase tracking-wide text-gray-500">Select Lens Package</label>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                    <!-- No Lens Option -->
-                                    <label class="cursor-pointer relative">
-                                        <input type="radio" name="lens_option[<?= $id ?>]" value="" class="peer sr-only lens-select" data-item-id="<?= $id ?>" data-price="0" onchange="updateTotal()" checked>
-                                        <div class="p-4 rounded-xl border-2 border-gray-200 hover:border-gray-300 peer-checked:border-primary peer-checked:bg-red-50 transition-all h-full flex flex-col justify-between">
-                                            <div>
-                                                <div class="font-bold text-gray-900">Frame Only</div>
-                                                <div class="text-xs text-gray-500 mt-1">No lenses included</div>
-                                            </div>
-                                            <div class="font-bold text-lg mt-2">₹0</div>
+                            <div class="flex flex-col gap-6">
+                                <?php for($idx=0; $idx < $item['quantity']; $idx++): ?>
+                                <div class="unit-prescription-block border-b border-gray-100 last:border-0 pb-6 last:pb-0" data-item-id="<?= $id ?>" data-unit-idx="<?= $idx ?>">
+                                    <div class="flex justify-between items-center mb-4">
+                                        <h5 class="text-xs font-black uppercase tracking-widest text-primary">
+                                            <?= $item['quantity'] > 1 ? "Unit " . ($idx + 1) : "Refine your order" ?>
+                                        </h5>
+                                        
+                                        <?php if($item['quantity'] > 1 || count($cart) > 1): ?>
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-[10px] font-bold text-gray-400 uppercase">Duplicate from:</span>
+                                            <select class="text-[10px] font-bold border rounded px-2 py-1 bg-gray-50 focus:outline-none focus:border-primary copy-prescription-select" data-to-item="<?= $id ?>" data-to-idx="<?= $idx ?>">
+                                                <option value="">Select...</option>
+                                                <?php foreach($cart as $cid => $citem): 
+                                                    for($cidx=0; $cidx < $citem['quantity']; $cidx++): 
+                                                        if($cid == $id && $cidx == $idx) continue;
+                                                ?>
+                                                    <option value="<?= $cid ?>-<?= $cidx ?>">
+                                                        <?= htmlspecialchars($citem['name']) ?> (Unit <?= $cidx+1 ?>)
+                                                    </option>
+                                                <?php endfor; endforeach; ?>
+                                            </select>
                                         </div>
-                                        <div class="absolute top-4 right-4 text-primary opacity-0 peer-checked:opacity-100 transition-opacity">
-                                            <i class="fa-solid fa-circle-check fa-lg"></i>
-                                        </div>
-                                    </label>
+                                        <?php endif; ?>
+                                    </div>
 
-                                    <!-- Dynamic Options -->
-                                    <?php foreach ($lens_options as $lens): ?>
-                                    <label class="cursor-pointer relative">
-                                        <input type="radio" name="lens_option[<?= $id ?>]" value="<?= $lens['id'] ?>" class="peer sr-only lens-select" data-item-id="<?= $id ?>" data-price="<?= $lens['price'] ?>" onchange="updateTotal()">
-                                        <div class="p-4 rounded-xl border-2 border-gray-200 hover:border-gray-300 peer-checked:border-primary peer-checked:bg-red-50 transition-all h-full flex flex-col justify-between">
-                                            <div>
-                                                <div class="font-bold text-gray-900"><?= htmlspecialchars($lens['name']) ?></div>
-                                                <div class="text-xs text-gray-500 mt-1"><?= htmlspecialchars($lens['description']) ?></div>
-                                            </div>
-                                            <div class="font-bold text-lg text-primary mt-2">+₹<?= number_format($lens['price'], 0) ?></div>
-                                        </div>
-                                        <div class="absolute top-4 right-4 text-primary opacity-0 peer-checked:opacity-100 transition-opacity">
-                                            <i class="fa-solid fa-circle-check fa-lg"></i>
-                                        </div>
-                                    </label>
-                                    <?php endforeach; ?>
-                                </div>
-                            </div>
+                                    <!-- Lens Selection (Visual Grid) -->
+                                    <div class="mb-6">
+                                        <label class="block text-sm font-bold mb-3 uppercase tracking-wide text-gray-400">Select Lens Package</label>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                            <label class="cursor-pointer relative">
+                                                <input type="radio" name="lens_option[<?= $id ?>][<?= $idx ?>]" value="" class="peer sr-only lens-select" data-item-id="<?= $id ?>" data-unit-idx="<?= $idx ?>" data-price="0" onchange="handleLensChange(this)" checked>
+                                                <div class="p-4 rounded-xl border-2 border-gray-200 hover:border-gray-300 peer-checked:border-primary peer-checked:bg-primary/5 transition-all h-full flex flex-col justify-between">
+                                                    <div>
+                                                        <div class="font-bold text-gray-900">Frame Only</div>
+                                                        <div class="text-[10px] text-gray-500 mt-1">No special lenses</div>
+                                                    </div>
+                                                    <div class="font-bold text-lg mt-2">₹0</div>
+                                                </div>
+                                                <div class="absolute top-4 right-4 text-primary opacity-0 peer-checked:opacity-100 transition-opacity">
+                                                    <i class="fa-solid fa-circle-check fa-lg"></i>
+                                                </div>
+                                            </label>
 
-                            <!-- Prescription Entry (Toggleable) -->
-                            <div id="prescription_container_<?= $id ?>" class="hidden border-t border-gray-100 pt-6">
-                                <div class="flex gap-4 mb-4 border-b border-gray-100">
-                                    <button type="button" class="pb-2 text-sm font-bold border-b-2 border-primary text-primary px-2 rx-tab-btn" data-target="rx_manual_<?= $id ?>" onclick="switchRxTab(this, '<?= $id ?>')">
-                                        <i class="fa-solid fa-keyboard mr-1"></i> Enter Manually
-                                    </button>
-                                    <button type="button" class="pb-2 text-sm font-bold border-b-2 border-transparent text-gray-500 hover:text-gray-700 px-2 rx-tab-btn" data-target="rx_upload_<?= $id ?>" onclick="switchRxTab(this, '<?= $id ?>')">
-                                        <i class="fa-solid fa-upload mr-1"></i> Upload Image
-                                    </button>
-                                </div>
-                                <input type="hidden" name="rx_method[<?= $id ?>]" id="rx_method_<?= $id ?>" value="manual">
+                                            <?php foreach ($lens_options as $lens): ?>
+                                            <label class="cursor-pointer relative">
+                                                <input type="radio" name="lens_option[<?= $id ?>][<?= $idx ?>]" value="<?= $lens['id'] ?>" class="peer sr-only lens-select" data-item-id="<?= $id ?>" data-unit-idx="<?= $idx ?>" data-price="<?= $lens['price'] ?>" onchange="handleLensChange(this)">
+                                                <div class="p-4 rounded-xl border-2 border-gray-200 hover:border-gray-300 peer-checked:border-primary peer-checked:bg-primary/5 transition-all h-full flex flex-col justify-between">
+                                                    <div>
+                                                        <div class="font-bold text-gray-900"><?= htmlspecialchars($lens['name']) ?></div>
+                                                        <div class="text-[10px] text-gray-500 mt-1 line-clamp-1"><?= htmlspecialchars($lens['description']) ?></div>
+                                                    </div>
+                                                    <div class="font-bold text-lg text-primary mt-2">+₹<?= number_format($lens['price'], 0) ?></div>
+                                                </div>
+                                                <div class="absolute top-4 right-4 text-primary opacity-0 peer-checked:opacity-100 transition-opacity">
+                                                    <i class="fa-solid fa-circle-check fa-lg"></i>
+                                                </div>
+                                            </label>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    </div>
 
-                                <!-- Manual Entry -->
-                                <div id="rx_manual_<?= $id ?>" class="rx-content">
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
-                                            <div class="text-xs font-bold text-center mb-2 text-primary tracking-widest">RIGHT EYE (OD)</div>
-                                            <div class="grid grid-cols-2 gap-2">
-                                                <div><label class="text-[10px] text-gray-500 uppercase font-bold">SPH</label><input type="text" name="od_sph[<?= $id ?>]" class="form-input h-9 text-sm text-center" placeholder="+0.00"></div>
-                                                <div><label class="text-[10px] text-gray-500 uppercase font-bold">CYL</label><input type="text" name="od_cyl[<?= $id ?>]" class="form-input h-9 text-sm text-center" placeholder="-0.00"></div>
-                                                <div><label class="text-[10px] text-gray-500 uppercase font-bold">AXIS</label><input type="text" name="od_axis[<?= $id ?>]" class="form-input h-9 text-sm text-center" placeholder="180"></div>
-                                                <div><label class="text-[10px] text-gray-500 uppercase font-bold">ADD</label><input type="text" name="od_add[<?= $id ?>]" class="form-input h-9 text-sm text-center" placeholder="+2.00"></div>
+                                    <!-- Prescription Entry (Toggleable) -->
+                                    <div id="prescription_container_<?= $id ?>_<?= $idx ?>" class="hidden border-t border-gray-100 pt-6">
+                                        <div class="flex gap-4 mb-4 border-b border-gray-100">
+                                            <button type="button" class="pb-2 text-sm font-bold border-b-2 border-primary text-primary px-2 rx-tab-btn" data-target="rx_manual_<?= $id ?>_<?= $idx ?>" onclick="switchRxTab(this, '<?= $id ?>', '<?= $idx ?>')">
+                                                <i class="fa-solid fa-keyboard mr-1"></i> Enter Manually
+                                            </button>
+                                            <button type="button" class="pb-2 text-sm font-bold border-b-2 border-transparent text-gray-500 hover:text-gray-700 px-2 rx-tab-btn" data-target="rx_upload_<?= $id ?>_<?= $idx ?>" onclick="switchRxTab(this, '<?= $id ?>', '<?= $idx ?>')">
+                                                <i class="fa-solid fa-upload mr-1"></i> Upload Image
+                                            </button>
+                                        </div>
+                                        <input type="hidden" name="rx_method[<?= $id ?>][<?= $idx ?>]" id="rx_method_<?= $id ?>_<?= $idx ?>" value="manual">
+
+                                        <!-- Manual Entry -->
+                                        <div id="rx_manual_<?= $id ?>_<?= $idx ?>" class="rx-content block">
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">
+                                                    <div class="text-[9px] font-black text-center mb-3 text-primary tracking-[0.2em] border-b border-gray-200 pb-2">RIGHT EYE (OD)</div>
+                                                    <div class="grid grid-cols-2 gap-3">
+                                                        <div><label class="text-[9px] text-gray-400 uppercase font-black tracking-wider mb-1 block">SPH</label><input type="text" name="od_sph[<?= $id ?>][<?= $idx ?>]" data-rx-field="od_sph" class="form-input h-10 text-sm text-center font-bold" placeholder="+0.00"></div>
+                                                        <div><label class="text-[9px] text-gray-400 uppercase font-black tracking-wider mb-1 block">CYL</label><input type="text" name="od_cyl[<?= $id ?>][<?= $idx ?>]" data-rx-field="od_cyl" class="form-input h-10 text-sm text-center font-bold" placeholder="-0.00"></div>
+                                                        <div><label class="text-[9px] text-gray-400 uppercase font-black tracking-wider mb-1 block">AXIS</label><input type="text" name="od_axis[<?= $id ?>][<?= $idx ?>]" data-rx-field="od_axis" class="form-input h-10 text-sm text-center font-bold" placeholder="180"></div>
+                                                        <div><label class="text-[9px] text-gray-400 uppercase font-black tracking-wider mb-1 block">ADD</label><input type="text" name="od_add[<?= $id ?>][<?= $idx ?>]" data-rx-field="od_add" class="form-input h-10 text-sm text-center font-bold" placeholder="+2.00"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">
+                                                    <div class="text-[9px] font-black text-center mb-3 text-primary tracking-[0.2em] border-b border-gray-200 pb-2">LEFT EYE (OS)</div>
+                                                    <div class="grid grid-cols-2 gap-3">
+                                                        <div><label class="text-[9px] text-gray-400 uppercase font-black tracking-wider mb-1 block">SPH</label><input type="text" name="os_sph[<?= $id ?>][<?= $idx ?>]" data-rx-field="os_sph" class="form-input h-10 text-sm text-center font-bold" placeholder="+0.00"></div>
+                                                        <div><label class="text-[9px] text-gray-400 uppercase font-black tracking-wider mb-1 block">CYL</label><input type="text" name="os_cyl[<?= $id ?>][<?= $idx ?>]" data-rx-field="os_cyl" class="form-input h-10 text-sm text-center font-bold" placeholder="-0.00"></div>
+                                                        <div><label class="text-[9px] text-gray-400 uppercase font-black tracking-wider mb-1 block">AXIS</label><input type="text" name="os_axis[<?= $id ?>][<?= $idx ?>]" data-rx-field="os_axis" class="form-input h-10 text-sm text-center font-bold" placeholder="180"></div>
+                                                        <div><label class="text-[9px] text-gray-400 uppercase font-black tracking-wider mb-1 block">ADD</label><input type="text" name="os_add[<?= $id ?>][<?= $idx ?>]" data-rx-field="os_add" class="form-input h-10 text-sm text-center font-bold" placeholder="+2.00"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mt-4 w-full md:w-1/3">
+                                                <label class="text-[9px] text-gray-400 uppercase font-black tracking-wider mb-1 block">Pupillary Distance (PD)</label>
+                                                <input type="text" name="pd[<?= $id ?>][<?= $idx ?>]" data-rx-field="pd" class="form-input h-10 text-sm font-bold" placeholder="e.g. 62mm">
                                             </div>
                                         </div>
-                                        <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
-                                            <div class="text-xs font-bold text-center mb-2 text-primary tracking-widest">LEFT EYE (OS)</div>
-                                            <div class="grid grid-cols-2 gap-2">
-                                                <div><label class="text-[10px] text-gray-500 uppercase font-bold">SPH</label><input type="text" name="os_sph[<?= $id ?>]" class="form-input h-9 text-sm text-center" placeholder="+0.00"></div>
-                                                <div><label class="text-[10px] text-gray-500 uppercase font-bold">CYL</label><input type="text" name="os_cyl[<?= $id ?>]" class="form-input h-9 text-sm text-center" placeholder="-0.00"></div>
-                                                <div><label class="text-[10px] text-gray-500 uppercase font-bold">AXIS</label><input type="text" name="os_axis[<?= $id ?>]" class="form-input h-9 text-sm text-center" placeholder="180"></div>
-                                                <div><label class="text-[10px] text-gray-500 uppercase font-bold">ADD</label><input type="text" name="os_add[<?= $id ?>]" class="form-input h-9 text-sm text-center" placeholder="+2.00"></div>
+
+                                        <!-- Upload Entry -->
+                                        <div id="rx_upload_<?= $id ?>_<?= $idx ?>" class="rx-content hidden">
+                                            <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center bg-gray-50 hover:bg-white transition-colors cursor-pointer" onclick="this.querySelector('input').click()">
+                                                <i class="fa-solid fa-cloud-arrow-up text-3xl text-gray-300 mb-2"></i>
+                                                <p class="text-[11px] font-black text-gray-700 mb-1 uppercase tracking-wider">Upload Prescription</p>
+                                                <p class="text-[10px] text-gray-400 mb-4 font-bold">JPG, PNG, PDF (Max 5MB)</p>
+                                                <input type="file" name="rx_file[<?= $id ?>][<?= $idx ?>]" class="hidden" onchange="updateFileName(this)">
+                                                <div class="file-name-display text-[11px] text-primary font-bold hidden mt-2"></div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="mt-3 w-full md:w-1/3">
-                                        <label class="text-xs font-bold uppercase text-gray-500">PD (Pupillary Distance)</label>
-                                        <input type="text" name="pd[<?= $id ?>]" class="form-input h-9 text-sm" placeholder="e.g. 62mm">
-                                    </div>
                                 </div>
-
-                                <!-- Upload Entry -->
-                                <div id="rx_upload_<?= $id ?>" class="rx-content hidden">
-                                    <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center bg-gray-50 hover:bg-white transition-colors">
-                                        <i class="fa-solid fa-cloud-arrow-up text-3xl text-gray-300 mb-3"></i>
-                                        <p class="text-sm font-bold text-gray-700 mb-1">Upload Prescription Image</p>
-                                        <p class="text-xs text-gray-400 mb-4">Supported formats: JPG, PNG, PDF</p>
-                                        <input type="file" name="rx_file[<?= $id ?>]" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-red-700">
-                                    </div>
-                                </div>
+                                <?php endfor; ?>
                             </div>
                         </div>
                         <?php endforeach; ?>
@@ -219,27 +250,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <script>
+                function handleLensChange(radio) {
+                    const itemId = radio.dataset.itemId;
+                    const unitIdx = radio.dataset.unitIdx;
+                    const price = parseFloat(radio.dataset.price) || 0;
+                    const container = document.getElementById(`prescription_container_${itemId}_${unitIdx}`);
+                    
+                    if (price > 0) {
+                        container.classList.remove('hidden');
+                    } else {
+                        container.classList.add('hidden');
+                    }
+                    updateTotal();
+                }
+
                 function updateTotal() {
                     let lensTotal = 0;
                     document.querySelectorAll('.lens-select:checked').forEach(radio => {
-                        const price = parseFloat(radio.dataset.price) || 0;
-                        const itemId = radio.dataset.itemId;
-                        const container = document.getElementById('prescription_container_' + itemId);
-                        
-                        lensTotal += price;
-                        
-                        if (price > 0) {
-                            container.classList.remove('hidden');
-                        } else {
-                            container.classList.add('hidden');
-                        }
+                        lensTotal += parseFloat(radio.dataset.price) || 0;
                     });
                     
                     const lensSpan = document.getElementById('lensAmount');
                     const lensRow = document.getElementById('lensRow');
                     const finalTotalSpan = document.getElementById('finalTotal');
-                    const baseTotal = <?= $total ?>; // Base cart total
-                    const discount = parseFloat(document.getElementById('discountAmount').innerText.replace(/,/g, '')) || 0;
+                    const baseTotal = <?= $total ?>; 
+                    const discount = parseFloat(document.getElementById('discountAmount')?.innerText.replace(/,/g, '') || 0);
                     
                     if (lensSpan) lensSpan.innerText = lensTotal.toLocaleString('en-IN', {minimumFractionDigits: 2});
                     if (lensRow) {
@@ -251,25 +286,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if (finalTotalSpan) finalTotalSpan.innerText = finalTotal.toLocaleString('en-IN', {minimumFractionDigits: 2});
                 }
 
-                function switchRxTab(btn, id) {
+                function switchRxTab(btn, id, idx) {
                     const parent = btn.parentElement;
-                    // Reset tabs
                     parent.querySelectorAll('.rx-tab-btn').forEach(b => {
                         b.classList.remove('border-primary', 'text-primary');
                         b.classList.add('border-transparent', 'text-gray-500');
                     });
-                    // Activate this tab
                     btn.classList.add('border-primary', 'text-primary');
                     btn.classList.remove('border-transparent', 'text-gray-500');
                     
-                    // Show Content
-                    const container = document.getElementById('prescription_container_' + id);
+                    const container = document.getElementById(`prescription_container_${id}_${idx}`);
                     container.querySelectorAll('.rx-content').forEach(c => c.classList.add('hidden'));
                     document.getElementById(btn.dataset.target).classList.remove('hidden');
                     
-                    // Update hidden method field
-                    document.getElementById('rx_method_' + id).value = btn.dataset.target.includes('manual') ? 'manual' : 'upload';
+                    document.getElementById(`rx_method_${id}_${idx}`).value = btn.dataset.target.includes('manual') ? 'manual' : 'upload';
                 }
+
+                function updateFileName(input) {
+                    const display = input.parentElement.querySelector('.file-name-display');
+                    if (input.files && input.files[0]) {
+                        display.innerText = input.files[0].name;
+                        display.classList.remove('hidden');
+                    } else {
+                        display.classList.add('hidden');
+                    }
+                }
+
+                // Copy Logic
+                document.querySelectorAll('.copy-prescription-select').forEach(select => {
+                    select.addEventListener('change', function() {
+                        const val = this.value; // "cid-cidx"
+                        if (!val) return;
+                        
+                        const [fromId, fromIdx] = val.split('-');
+                        const toId = this.dataset.toItem;
+                        const toIdx = this.dataset.toIdx;
+                        
+                        // Copy Lens Option
+                        const selectedLens = document.querySelector(`input[name="lens_option[${fromId}][${fromIdx}]"]:checked`);
+                        if (selectedLens) {
+                            const newRadio = document.querySelector(`input[name="lens_option[${toId}][${toIdx}]"][value="${selectedLens.value}"]`);
+                            if (newRadio) {
+                                newRadio.checked = true;
+                                handleLensChange(newRadio);
+                            }
+                        }
+                        
+                        // Copy Manual Fields
+                        const fields = ['od_sph', 'od_cyl', 'od_axis', 'od_add', 'os_sph', 'os_cyl', 'os_axis', 'os_add', 'pd'];
+                        fields.forEach(f => {
+                            const fromInput = document.querySelector(`input[name="${f}[${fromId}][${fromIdx}]"]`);
+                            const toInput = document.querySelector(`input[name="${f}[${toId}][${toIdx}]"]`);
+                            if (fromInput && toInput) toInput.value = fromInput.value;
+                        });
+
+                        // Copy Method
+                        const fromMethod = document.getElementById(`rx_method_${fromId}_${fromIdx}`).value;
+                        const toTabBtn = document.querySelector(`.rx-tab-btn[data-target="rx_${fromMethod}_${toId}_${toIdx}"]`);
+                        if(toTabBtn) toTabBtn.click();
+
+                        // Reset select
+                        this.value = "";
+                        alert("Prescription copied!");
+                    });
+                });
                 </script>
 
                 <!-- Shipping Details Card -->
@@ -333,20 +413,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </h3>
                 
                 <div class="summary-list flex flex-col gap-4 mb-6">
-                    <?php foreach ($cart as $item): ?>
-                    <div class="summary-item flex justify-between items-center pb-4 border-b border-gray-100 last:border-0">
+                    <?php foreach ($cart as $id => $item): ?>
+                    <div class="summary-item group flex justify-between items-center pb-4 border-b border-gray-100 last:border-0 relative">
                         <div class="flex gap-3 items-center">
                             <?php if($item['image']): ?>
                                 <img src="assets/uploads/<?= $item['image'] ?>" class="w-16 h-16 object-cover rounded-md flex-shrink-0 border border-gray-200">
                             <?php endif; ?>
                             <div>
                                 <div class="font-bold text-sm"><?= htmlspecialchars($item['name']) ?></div>
-                                <div class="text-xs text-muted"><?= __('quantity') ?>: <?= $item['quantity'] ?></div>
+                                <div class="text-[10px] text-gray-400 font-bold uppercase tracking-wider"><?= __('quantity') ?>: <?= $item['quantity'] ?></div>
                             </div>
                         </div>
-                        <span class="font-bold text-primary">₹<?= number_format($item['price'] * $item['quantity'], 2) ?></span>
+                        <div class="text-right">
+                             <div class="font-black text-primary mb-1">₹<?= number_format($item['price'] * $item['quantity'], 2) ?></div>
+                             <button type="button" onclick="removeFromCheckout('<?= $id ?>')" class="text-[10px] text-gray-400 hover:text-red-500 font-bold uppercase transition-colors">
+                                <i class="fa-solid fa-trash-can mr-1"></i> <?= __('remove') ?>
+                             </button>
+                        </div>
                     </div>
                     <?php endforeach; ?>
+                </div>
+
+                <script>
+                function removeFromCheckout(id) {
+                    if (confirm('Are you sure you want to remove this item?')) {
+                        window.location.href = 'cart.php?remove=' + id + '&redirect=checkout.php';
+                    }
+                }
+                </script>
                 </div>
 
                 <!-- Coupon Section -->
