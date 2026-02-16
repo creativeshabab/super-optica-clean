@@ -332,10 +332,12 @@ pre.code-view {
 /* Breadcrumb nav margin removed for compact hero design */
 
 .breadcrumb-list {
-  display: inline-flex;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
   list-style: none;
   padding: 0;
+  margin: 0;
   background: transparent;
   border-radius: 0;
   gap: 0.6rem;
@@ -345,6 +347,7 @@ pre.code-view {
   /* Soft white for non-active */
   border: none;
   box-shadow: none;
+  white-space: normal; /* Force wrapping */
 }
 
 .breadcrumb-list li {
@@ -382,6 +385,44 @@ pre.code-view {
   background: rgba(255, 255, 255, 0.15);
   padding: 4px 12px;
   border-radius: 4px;
+  white-space: normal;
+  text-align: left;
+}
+
+@media (max-width: 768px) {
+  .breadcrumb-list {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    width: 100%;
+    gap: 0.5rem !important;
+    font-size: 0.7rem;
+    line-height: 1.4;
+    white-space: normal !important;
+    padding: 4px 0;
+  }
+  .breadcrumb-list li {
+    display: flex !important;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.08); /* Subtle chip background */
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .breadcrumb-list li a {
+    display: inline !important;
+    color: #fff !important;
+    opacity: 0.9;
+  }
+  .breadcrumb-separator {
+    display: none !important; /* Hide standard separator, handled by gap and chip look */
+  }
+  .breadcrumb-list li.active {
+    background: rgba(255, 255, 255, 0.25) !important;
+    border-color: rgba(255, 255, 255, 0.4);
+    font-weight: 700;
+  }
+  
+  /* Add tiny arrow using pseudo-element if preferred, but chips are cleaner on tight wraps */
 }
 
 .product-badge {
@@ -982,11 +1023,25 @@ span.cart-badge {
     var(--primary) 0%,
     var(--primary-dark) 100%
   );
-  padding: 0;
-  height: 40px;
+  padding: 8px 0;
+  min-height: 40px;
   display: flex;
   align-items: center;
   color: white;
+}
+
+@media (max-width: 768px) {
+  .page-hero {
+    height: auto !important;
+    min-height: 48px;
+    padding: 12px 0;
+    display: block !important; /* Allow natural flow */
+  }
+  .page-hero .container {
+    display: block !important;
+    height: auto !important;
+    padding: 0 1rem;
+  }
 }
 
 .page-hero .container {
