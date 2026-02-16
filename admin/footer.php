@@ -1,3 +1,4 @@
+    </div><!-- .admin-container -->
     </main>
 </div>
 </body>

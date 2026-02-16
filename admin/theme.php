@@ -103,7 +103,7 @@ $cta_overlay = getThemeSetting('theme_cta_overlay', '0.0');
         display: flex;
         gap: 0.5rem;
         margin-bottom: 2rem;
-        border-bottom: 1px solid #e2e8f0;
+        border-bottom: 1px solid var(--admin-border);
         padding-bottom: 1rem;
         flex-wrap: wrap;
     }
@@ -111,7 +111,7 @@ $cta_overlay = getThemeSetting('theme_cta_overlay', '0.0');
         padding: 0.75rem 1.5rem;
         border: none;
         background: none;
-        color: #64748b;
+        color: var(--admin-text-light);
         font-weight: 600;
         cursor: pointer;
         border-radius: 8px;
@@ -121,19 +121,23 @@ $cta_overlay = getThemeSetting('theme_cta_overlay', '0.0');
         align-items: center;
         gap: 0.5rem;
     }
-    .tab-btn:hover { background: #f1f5f9; color: var(--admin-primary); }
+    .tab-btn:hover { background: var(--admin-bg); color: var(--admin-primary); }
     .tab-btn.active { background: var(--admin-primary); color: white; }
     .tab-content { display: none; animation: fadeIn 0.3s ease; }
     .tab-content.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     
     .color-preview-box {
-        width: 100%; height: 40px; border-radius: 6px; border: 1px solid #e2e8f0; margin-top: 0.5rem;
+        width: 100%; height: 40px; border-radius: 6px; border: 1px solid var(--admin-border); margin-top: 0.5rem;
     }
     .control-group {
-        background: #f8fafc; padding: 1.5rem; border-radius: 12px; border: 1px solid #e2e8f0; height: 100%;
+        background: var(--admin-bg); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--admin-border); height: 100%;
     }
-    .control-group h5 { margin-bottom: 1rem; color: #334155; font-size: 1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem; }
+    .control-group h5 { margin-bottom: 1rem; color: var(--admin-text); font-size: 1rem; border-bottom: 1px solid var(--admin-border); padding-bottom: 0.5rem; }
+    label { color: var(--admin-text); }
+    small { color: var(--admin-text-light); }
+    .bg-white.rounded { background: var(--admin-card) !important; border-color: var(--admin-border) !important; color: var(--admin-text) !important; }
+    .text-muted { color: var(--admin-text-light) !important; }
 </style>
 
 <div class="card" style="max-width: 1200px;">

@@ -167,30 +167,7 @@ $unread_count = $unread_count_stmt->fetchColumn();
     </script>
 </head>
 <body class="admin-body">
-    <header class="mobile-header">
-        <div class="admin-logo" style="margin-bottom: 0;">
-            <i class="fa-solid fa-bolt" style="color: var(--admin-primary);"></i>
-            Luxe
-        </div>
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <!-- Language Switcher Mobile -->
-            <div class="language-switcher" style="margin-right: 0.5rem;">
-                <a href="?lang=en" class="<?= !isset($_SESSION['lang']) || $_SESSION['lang'] == 'en' ? 'active' : '' ?>" style="color: var(--admin-text); text-decoration: none; font-weight: 600; font-size: 0.8rem;">EN</a>
-                <span style="color: var(--admin-text-light);">|</span>
-                <a href="?lang=hi" class="<?= isset($_SESSION['lang']) && $_SESSION['lang'] == 'hi' ? 'active' : '' ?>" style="color: var(--admin-text); text-decoration: none; font-weight: 600; font-size: 0.8rem;">HI</a>
-            </div>
 
-            <a href="notifications.php" class="notification-bell" title="<?= __('notifications') ?>">
-                <i class="fa-solid fa-bell"></i>
-                <?php if ($unread_count > 0): ?>
-                    <span class="notification-badge"><?= $unread_count > 99 ? '99+' : $unread_count ?></span>
-                <?php endif; ?>
-            </a>
-            <button class="sidebar-toggle" id="sidebarToggle">
-                <i class="fa-solid fa-bars"></i>
-            </button>
-        </div>
-    </header>
 
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
@@ -199,18 +176,7 @@ $unread_count = $unread_count_stmt->fetchColumn();
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem;">
                 <div class="admin-logo" style="margin-bottom: 0;">
                     <i class="fa-solid fa-bolt" style="color: var(--admin-primary);"></i>
-                    Super Optical
-                </div>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <!-- Language Switcher Desktop -->
-                    <div class="language-switcher" style="display: flex; gap: 5px; font-size: 0.75rem; font-weight: 700; background: rgba(255,255,255,0.05); padding: 4px 8px; border-radius: 6px;">
-                        <a href="?lang=en" class="<?= !isset($_SESSION['lang']) || $_SESSION['lang'] == 'en' ? 'text-primary' : 'text-muted' ?>" style="text-decoration: none; color: <?= !isset($_SESSION['lang']) || $_SESSION['lang'] == 'en' ? 'var(--admin-primary)' : 'var(--admin-text-light)' ?>">EN</a>
-                        <span style="color: var(--admin-text-light);">|</span>
-                        <a href="?lang=hi" class="<?= isset($_SESSION['lang']) && $_SESSION['lang'] == 'hi' ? 'text-primary' : 'text-muted' ?>" style="text-decoration: none; color: <?= isset($_SESSION['lang']) && $_SESSION['lang'] == 'hi' ? 'var(--admin-primary)' : 'var(--admin-text-light)' ?>">HI</a>
-                    </div>
-                    <button class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">
-                        <i class="fa-solid fa-moon"></i>
-                    </button>
+                    <span class="logo-text">Super Optical</span>
                 </div>
             </div>
             
@@ -220,91 +186,206 @@ $unread_count = $unread_count_stmt->fetchColumn();
                 function isActive($page, $current) { return $page == $current ? 'active' : ''; }
                 ?>
                 
-                <a href="index.php" class="sidebar-link <?= isActive('index.php', $current_page) ?>">
-                    <i class="fa-solid fa-chart-pie"></i> <?= __('dashboard') ?>
+                <a href="index.php" class="sidebar-link <?= isActive('index.php', $current_page) ?>" title="<?= __('dashboard') ?>">
+                    <i class="fa-solid fa-chart-pie"></i> <span><?= __('dashboard') ?></span>
                 </a>
 
                 <!-- Commerce & Operations -->
                 <div class="sidebar-group-label"><?= __('commerce_operations') ?></div>
                 
-                <a href="orders.php" class="sidebar-link <?= isActive('orders.php', $current_page) ?>">
-                    <i class="fa-solid fa-cart-shopping"></i> <?= __('orders') ?>
+                <a href="orders.php" class="sidebar-link <?= isActive('orders.php', $current_page) ?>" title="<?= __('orders') ?>">
+                    <i class="fa-solid fa-cart-shopping"></i> <span><?= __('orders') ?></span>
                 </a>
-                <a href="products.php" class="sidebar-link <?= isActive('products.php', $current_page) ?>">
-                    <i class="fa-solid fa-glasses"></i> <?= __('products') ?>
+                <a href="products.php" class="sidebar-link <?= isActive('products.php', $current_page) ?>" title="<?= __('products') ?>">
+                    <i class="fa-solid fa-glasses"></i> <span><?= __('products') ?></span>
                 </a>
-                <a href="categories.php" class="sidebar-link <?= isActive('categories.php', $current_page) ?>">
-                    <i class="fa-solid fa-layer-group"></i> <?= __('categories') ?>
+                <a href="categories.php" class="sidebar-link <?= isActive('categories.php', $current_page) ?>" title="<?= __('categories') ?>">
+                    <i class="fa-solid fa-layer-group"></i> <span><?= __('categories') ?></span>
                 </a>
-                <a href="coupons.php" class="sidebar-link <?= isActive('coupons.php', $current_page) ?>">
-                    <i class="fa-solid fa-ticket"></i> <?= __('coupons_offers') ?>
+                <a href="coupons.php" class="sidebar-link <?= isActive('coupons.php', $current_page) ?>" title="<?= __('coupons_offers') ?>">
+                    <i class="fa-solid fa-ticket"></i> <span><?= __('coupons_offers') ?></span>
                 </a>
-                <a href="appointments.php" class="sidebar-link <?= isActive('appointments.php', $current_page) ?>">
-                    <i class="fa-solid fa-calendar-check"></i> <?= __('appointments') ?>
+                <a href="appointments.php" class="sidebar-link <?= isActive('appointments.php', $current_page) ?>" title="<?= __('appointments') ?>">
+                    <i class="fa-solid fa-calendar-check"></i> <span><?= __('appointments') ?></span>
                 </a>
-                <a href="lens_options.php" class="sidebar-link <?= isActive('lens_options.php', $current_page) ?>">
-                    <i class="fa-solid fa-eye"></i> Lens Options
+                <a href="lens_options.php" class="sidebar-link <?= isActive('lens_options.php', $current_page) ?>" title="Lens Options">
+                    <i class="fa-solid fa-eye"></i> <span>Lens Options</span>
                 </a>
 
                 <!-- Content Management -->
                 <div class="sidebar-group-label"><?= __('content_management') ?></div>
 
-                <a href="services.php" class="sidebar-link <?= isActive('services.php', $current_page) ?>">
-                    <i class="fa-solid fa-hand-holding-medical"></i> <?= __('services') ?>
+                <a href="services.php" class="sidebar-link <?= isActive('services.php', $current_page) ?>" title="<?= __('services') ?>">
+                    <i class="fa-solid fa-hand-holding-medical"></i> <span><?= __('services') ?></span>
                 </a>
-                <a href="gallery.php" class="sidebar-link <?= isActive('gallery.php', $current_page) ?>">
-                    <i class="fa-solid fa-images"></i> <?= __('gallery') ?>
+                <a href="gallery.php" class="sidebar-link <?= isActive('gallery.php', $current_page) ?>" title="<?= __('gallery') ?>">
+                    <i class="fa-solid fa-images"></i> <span><?= __('gallery') ?></span>
                 </a>
-                <a href="sliders.php" class="sidebar-link <?= isActive('sliders.php', $current_page) ?>">
-                    <i class="fa-solid fa-images"></i> <?= __('main_slider') ?>
+                <a href="sliders.php" class="sidebar-link <?= isActive('sliders.php', $current_page) ?>" title="<?= __('main_slider') ?>">
+                    <i class="fa-solid fa-images"></i> <span><?= __('main_slider') ?></span>
                 </a>
-                <a href="reviews.php" class="sidebar-link <?= isActive('reviews.php', $current_page) ?>">
-                    <i class="fa-solid fa-star"></i> <?= __('reviews') ?>
+                <a href="reviews.php" class="sidebar-link <?= isActive('reviews.php', $current_page) ?>" title="<?= __('reviews') ?>">
+                    <i class="fa-solid fa-star"></i> <span><?= __('reviews') ?></span>
                 </a>
-                <a href="posts.php" class="sidebar-link <?= isActive('posts.php', $current_page) ?>">
-                    <i class="fa-solid fa-newspaper"></i> <?= __('blog_posts') ?>
+                <a href="posts.php" class="sidebar-link <?= isActive('posts.php', $current_page) ?>" title="<?= __('blog_posts') ?>">
+                    <i class="fa-solid fa-newspaper"></i> <span><?= __('blog_posts') ?></span>
                 </a>
 
                 <!-- System & Design -->
                 <div class="sidebar-group-label"><?= __('system_design') ?></div>
 
-                <a href="theme.php" class="sidebar-link <?= isActive('theme.php', $current_page) ?>">
-                    <i class="fa-solid fa-palette"></i> <?= __('design_system') ?>
+                <a href="theme.php" class="sidebar-link <?= isActive('theme.php', $current_page) ?>" title="<?= __('design_system') ?>">
+                    <i class="fa-solid fa-palette"></i> <span><?= __('design_system') ?></span>
                 </a>
-                <a href="settings.php" class="sidebar-link <?= isActive('settings.php', $current_page) ?>">
-                    <i class="fa-solid fa-gear"></i> <?= __('settings') ?>
+                <a href="settings.php" class="sidebar-link <?= isActive('settings.php', $current_page) ?>" title="<?= __('settings') ?>">
+                    <i class="fa-solid fa-gear"></i> <span><?= __('settings') ?></span>
                 </a>
-                <a href="integrations.php" class="sidebar-link <?= isActive('integrations.php', $current_page) ?>">
-                    <i class="fa-solid fa-plug"></i> <?= __('integrations') ?>
+                <a href="integrations.php" class="sidebar-link <?= isActive('integrations.php', $current_page) ?>" title="<?= __('integrations') ?>">
+                    <i class="fa-solid fa-plug"></i> <span><?= __('integrations') ?></span>
                 </a>
-                <a href="notifications.php" class="sidebar-link <?= isActive('notifications.php', $current_page) ?>" style="position: relative;">
-                    <i class="fa-solid fa-bell"></i> <?= __('notifications') ?>
+                <a href="notifications.php" class="sidebar-link <?= isActive('notifications.php', $current_page) ?>" style="position: relative;" title="<?= __('notifications') ?>">
+                    <i class="fa-solid fa-bell"></i> <span><?= __('notifications') ?></span>
                     <?php if ($unread_count > 0): ?>
                         <span class="sidebar-notification-badge"><?= $unread_count > 99 ? '99+' : $unread_count ?></span>
                     <?php endif; ?>
                 </a>
                 
-                <a href="../index.php" class="sidebar-link" target="_blank" style="margin-top: 2rem; border: 1px solid rgba(255,255,255,0.1);">
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i> <?= __('view_site') ?>
+                <a href="../index.php" class="sidebar-link" target="_blank" style="margin-top: 2rem; border: 1px solid rgba(255,255,255,0.1);" title="<?= __('view_site') ?>">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> <span><?= __('view_site') ?></span>
                 </a>
-                <a href="../logout.php" class="sidebar-link logout-link">
-                    <i class="fa-solid fa-right-from-bracket"></i> <?= __('logout') ?>
+                <a href="../logout.php" class="sidebar-link logout-link" title="<?= __('logout') ?>">
+                    <i class="fa-solid fa-right-from-bracket"></i> <span><?= __('logout') ?></span>
                 </a>
             </nav>
         </aside>
 
     <script>
-    document.getElementById('sidebarToggle').addEventListener('click', function() {
-        document.getElementById('adminSidebar').classList.add('active');
-        document.getElementById('sidebarOverlay').classList.add('active');
-    });
+    document.addEventListener('DOMContentLoaded', function() {
+        // Unified Sidebar Toggle
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const body = document.body;
+        const sidebar = document.getElementById('adminSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        
+        // Handle Sidebar Toggle Logic
+        if(sidebarToggle) {
+            sidebarToggle.addEventListener('click', function() {
+                if(window.innerWidth > 1024) {
+                    // Desktop Behavior: Collapse
+                    body.classList.toggle('sidebar-collapsed');
+                    localStorage.setItem('sidebar-collapsed', body.classList.contains('sidebar-collapsed'));
+                } else {
+                    // Mobile Behavior: Overlay
+                    sidebar.classList.toggle('active');
+                    overlay.classList.toggle('active');
+                }
+            });
+        }
 
-    document.getElementById('sidebarOverlay').addEventListener('click', function() {
-        document.getElementById('adminSidebar').classList.remove('active');
-        document.getElementById('sidebarOverlay').classList.remove('active');
+        // Check local storage for desktop collapse on load
+        if(window.innerWidth > 1024 && localStorage.getItem('sidebar-collapsed') === 'true') {
+            body.classList.add('sidebar-collapsed');
+        }
+
+        // Overlay Click
+        if(overlay) {
+            overlay.addEventListener('click', function() {
+                document.getElementById('adminSidebar').classList.remove('active');
+                overlay.classList.remove('active');
+            });
+        }
+
+        // Close Dropdowns on Outside Click
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.dropdown')) {
+                document.querySelectorAll('.dropdown-menu.show').forEach(function(menu) {
+                    menu.classList.remove('show');
+                });
+            }
+        });
     });
     </script>
     <main class="main-content">
+        <!-- Top Header -->
+        <header class="admin-top-bar">
+            <div class="top-bar-left">
+                <!-- Sidebar Toggle (Unified) -->
+                <button class="icon-btn" id="sidebarToggle" title="Toggle Sidebar">
+                    <i class="fa-solid fa-bars-staggered"></i>
+                </button>
+                <div class="dashboard-date">
+                    <i class="fa-regular fa-calendar"></i> <?= date('F j, Y') ?>
+                </div>
+            </div>
+
+            <div class="top-bar-right">
+                <!-- Theme Toggle -->
+                <button class="icon-btn theme-toggle" title="Toggle Theme">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+
+                <!-- Language Info (Static for now, using Session) -->
+                <div class="dropdown" style="position: relative;">
+                    <button class="icon-btn" onclick="document.getElementById('langDropdown').classList.toggle('show')">
+                        <i class="fa-solid fa-globe"></i>
+                        <span class="btn-text" style="font-size: 0.8rem; font-weight: 700; margin-left: 0.25rem;">
+                            <?= strtoupper($_SESSION['lang'] ?? 'EN') ?>
+                        </span>
+                    </button>
+                    <div id="langDropdown" class="dropdown-menu">
+                        <a href="?lang=en" class="dropdown-item <?= (!isset($_SESSION['lang']) || $_SESSION['lang'] == 'en') ? 'active' : '' ?>">
+                            English
+                        </a>
+                        <a href="?lang=hi" class="dropdown-item <?= (isset($_SESSION['lang']) && $_SESSION['lang'] == 'hi') ? 'active' : '' ?>">
+                            Hindi
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Notification -->
+                <div class="notification-wrapper">
+                    <a href="notifications.php" class="icon-btn relative" title="Notifications">
+                        <i class="fa-regular fa-bell"></i>
+                        <?php if ($unread_count > 0): ?>
+                            <span class="notification-badge-dot"></span>
+                        <?php endif; ?>
+                    </a>
+                </div>
+
+                <!-- Profile Dropdown -->
+                <div class="dropdown" style="position: relative;">
+                    <button class="profile-btn" onclick="document.getElementById('profileDropdown').classList.toggle('show')">
+                        <div class="avatar-circle">
+                            <?= strtoupper(substr($_SESSION['user_name'] ?? 'Admin', 0, 1)) ?>
+                        </div>
+                        <div class="profile-info mobile-hidden">
+                            <span class="user-name"><?= htmlspecialchars($_SESSION['user_name'] ?? 'Admin') ?></span>
+                            <span class="user-role"><?= ucfirst($_SESSION['role'] ?? 'Administrator') ?></span>
+                        </div>
+                        <i class="fa-solid fa-chevron-down mobile-hidden" style="font-size: 0.7rem;"></i>
+                    </button>
+                    <div id="profileDropdown" class="dropdown-menu right">
+                        <div class="dropdown-header">
+                            <strong style="display: block;"><?= htmlspecialchars($_SESSION['user_name'] ?? 'Admin') ?></strong>
+                            <small class="text-muted"><?= $_SESSION['email'] ?? 'admin@example.com' ?></small>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a href="profile.php" class="dropdown-item">
+                            <i class="fa-regular fa-user"></i> My Profile
+                        </a>
+                        <a href="settings.php" class="dropdown-item">
+                            <i class="fa-solid fa-gear"></i> Settings
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="../logout.php" class="dropdown-item text-danger">
+                            <i class="fa-solid fa-right-from-bracket"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="admin-container">
         <div id="toast-container"></div>
 
         <script>

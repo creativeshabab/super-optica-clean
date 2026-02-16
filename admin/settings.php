@@ -103,7 +103,7 @@ $trust_btn_link = getSetting('trust_btn_link', 'book_appointment.php');
         display: flex;
         gap: 0.5rem;
         margin-bottom: 2rem;
-        border-bottom: 1px solid #e2e8f0;
+        border-bottom: 1px solid var(--admin-border);
         padding-bottom: 1rem;
         flex-wrap: wrap;
     }
@@ -111,7 +111,7 @@ $trust_btn_link = getSetting('trust_btn_link', 'book_appointment.php');
         padding: 0.6rem 1.2rem;
         border: none;
         background: none;
-        color: #64748b;
+        color: var(--admin-text-light);
         font-weight: 600;
         cursor: pointer;
         border-radius: 8px;
@@ -125,32 +125,15 @@ $trust_btn_link = getSetting('trust_btn_link', 'book_appointment.php');
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    .toggle-switch {
-        position: relative;
-        display: inline-block;
-        width: 50px;
-        height: 24px;
-    }
-    .toggle-switch input { opacity: 0; width: 0; height: 0; }
-    .toggle-slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background-color: #cbd5e1;
-        transition: .4s;
-        border-radius: 34px;
-    }
-    .toggle-slider:before {
-        position: absolute;
-        content: "";
-        height: 18px; width: 18px;
-        left: 3px; bottom: 3px;
-        background-color: white;
-        transition: .4s;
-        border-radius: 50%;
-    }
-    input:checked + .toggle-slider { background-color: var(--admin-primary); }
-    input:checked + .toggle-slider:before { transform: translateX(26px); }
+
+
+
+    label { color: var(--admin-text); }
+    small { color: var(--admin-text-light); }
+    .alert-info { background: var(--admin-bg); border-color: var(--admin-border); color: var(--admin-text); }
+    .card.bg-light { background: var(--admin-bg) !important; border: 1px solid var(--admin-border) !important; }
+    .service-item.card { background: var(--admin-bg) !important; border: 1px solid var(--admin-border) !important; }
+    .form-group label { margin-bottom: 0.5rem; display: block; }
 </style>
 
 <div class="card" style="max-width: 1000px;">
@@ -185,7 +168,7 @@ $trust_btn_link = getSetting('trust_btn_link', 'book_appointment.php');
             </div>
 
             <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #f1f5f9;">
-                <label style="margin-bottom: 1rem; display: block;">Social Share Image (OG Image)</label>
+                <label style="margin-bottom: 1rem; display: block; color: var(--admin-text);">Social Share Image (OG Image)</label>
                 <div class="drag-upload-container">
                     <div id="ogDragBox" class="drag-upload-box">
                         <div class="drag-upload-icon"><i class="fa-solid fa-share-nodes"></i></div>

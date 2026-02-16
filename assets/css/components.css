@@ -61,7 +61,7 @@
 .badge--danger { background: #fff1f2; color: #991b1b; }
 
 /* Notifications */
-.notification-item { border-radius: 12px; border: 1px solid #f1f5f9; padding: 1rem; box-shadow: var(--shadow-sm); background: white; }
+.notification-item { border-radius: 12px; border: 1px solid #f1f5f9; padding: 1rem; box-shadow: var(--shadow-sm); background: var(--surface); }
 .notification-item.unread { border-left: 4px solid var(--primary); background: #f8fafc; }
 
 /* Small utilities */

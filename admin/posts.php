@@ -40,7 +40,7 @@ $posts = $pdo->query("SELECT * FROM posts ORDER BY created_at DESC")->fetchAll()
             <tbody>
                 <?php foreach ($posts as $p): ?>
                 <tr>
-                    <td style="font-weight: 700; color: var(--admin-sidebar); font-size: 1.05rem;">
+                    <td style="font-weight: 700; color: var(--admin-text); font-size: 1.05rem;">
                         <?= htmlspecialchars($p['title']) ?> <?= !empty($p['show_raw_html']) ? '<span class="badge" style="margin-left:0.5rem;">Code</span>' : '' ?>
                     </td>
                     <td style="color: var(--admin-text-light); font-weight: 500;"><?= date('M d, Y', strtotime($p['created_at'])) ?></td>
