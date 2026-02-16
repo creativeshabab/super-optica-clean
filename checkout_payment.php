@@ -8,7 +8,8 @@ if (empty($_SESSION['checkout_data'])) redirect('checkout.php');
 // 1. Initial State
 $checkout = $_SESSION['checkout_data'];
 $cart = $_SESSION['cart'] ?? [];
-$subtotal = getCartTotal();
+$lens_total = $checkout['lens_total'] ?? 0;
+$subtotal = getCartTotal() + $lens_total;
 $discount = 0;
 $coupon_id = null;
 $coupon_code = '';
@@ -105,6 +106,23 @@ if (isset($_POST['confirm_order'])) {
                 $update_stock->execute([$new_stock, $item['id']]);
                 
                 checkStockAndNotify($item['id']);
+            }
+        }
+
+        // Save Prescriptions
+        if (!empty($checkout['prescriptions'])) {
+            $rx_stmt = $pdo->prepare("INSERT INTO order_prescriptions (order_id, product_id, lens_option_id, od_sph, od_cyl, od_axis, od_add, os_sph, os_cyl, os_axis, os_add, pd, prescription_file) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            
+            foreach ($checkout['prescriptions'] as $prod_id => $rx) {
+                $rx_stmt->execute([
+                    $order_id,
+                    $prod_id,
+                    $rx['lens_option_id'],
+                    $rx['od_sph'], $rx['od_cyl'], $rx['od_axis'], $rx['od_add'],
+                    $rx['os_sph'], $rx['os_cyl'], $rx['os_axis'], $rx['os_add'],
+                    $rx['pd'],
+                    $rx['file'] ?? null
+                ]);
             }
         }
 
@@ -263,8 +281,14 @@ if (isset($_POST['confirm_order'])) {
                 <div class="total-wrapper border-none pt-0 mt-0">
                     <div class="summary-item">
                         <span><?= __('items_total') ?></span>
-                        <span>₹<?= number_format($subtotal, 2) ?></span>
+                        <span>₹<?= number_format(getCartTotal(), 2) ?></span>
                     </div>
+                    <?php if ($lens_total > 0): ?>
+                    <div class="summary-item text-primary">
+                        <span>Lens Charges</span>
+                        <span>+₹<?= number_format($lens_total, 2) ?></span>
+                    </div>
+                    <?php endif; ?>
                     <?php if ($coupon_id): ?>
                     <div id="uiDiscountRow" class="summary-item <?= $is_prepaid_only ? 'hidden' : 'flex' ?>">
                         <span>Coupon (<?= htmlspecialchars($coupon_code) ?>)</span>

@@ -403,6 +403,70 @@ td:last-child {
     border-radius: 10px;
 }
 
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    border-radius: 8px;
+}
+
+
+/* Outline Buttons */
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--admin-border);
+    color: var(--admin-text);
+}
+
+.btn-outline:hover {
+    background: var(--admin-bg);
+    border-color: var(--admin-text-light);
+}
+
+.btn-outline-primary {
+    background: transparent;
+    border: 1px solid var(--admin-primary);
+    color: var(--admin-primary);
+}
+
+.btn-outline-primary:hover {
+    background: var(--admin-primary);
+    color: white;
+}
+
+.btn-outline-secondary {
+    background: transparent;
+    border: 1px solid var(--admin-border);
+    color: var(--admin-text-light);
+}
+
+.btn-outline-secondary:hover {
+    background: #f1f5f9;
+    color: var(--admin-text);
+    border-color: var(--admin-text);
+}
+
+.btn-outline-success {
+    background: transparent;
+    border: 1px solid #10b981;
+    color: #10b981;
+}
+
+.btn-outline-success:hover {
+    background: #10b981;
+    color: white;
+}
+
+.btn-outline-danger {
+    background: transparent;
+    border: 1px solid #ef4444;
+    color: #ef4444;
+}
+
+.btn-outline-danger:hover {
+    background: #ef4444;
+    color: white;
+}
+
 .btn-edit {
     background: #fef9c3;
     color: #a16207;
@@ -1403,4 +1467,163 @@ textarea:focus {
         flex-shrink: 0; /* Prevent label wrapping if possible */
         width: 40%; /* Fixed width for better alignment */
     }
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1050;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    backdrop-filter: blur(4px);
+    transition: all 0.3s ease;
+}
+
+.modal.active {
+    display: flex;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+    background: white;
+    width: 100%;
+    max-width: 500px;
+    border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    transform: scale(0.95);
+    transition: transform 0.2s ease;
+}
+
+.modal.active .modal-content {
+    transform: scale(1);
+}
+
+/* Lens Option Detail - Force Single Row Toolbar */
+.lens-option-btn {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 0.5rem !important;
+    overflow-x: auto; /* scroll if absolutely necessary, but pref not */
+    scrollbar-width: none; /* hide scrollbar */
+}
+
+.lens-option-btn::-webkit-scrollbar {
+    display: none;
+}
+
+.lens-option-btn > * {
+    flex: 1;
+    min-width: fit-content;
+}
+
+/* Delete form should not grow as much as others if mostly icon */
+.lens-option-btn form:last-child {
+    flex: 0 0 auto !important;
+    min-width: auto;
+}
+
+.lens-option-btn .btn {
+    white-space: nowrap !important;
+    height: 38px; /* Consistent height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (max-width: 480px) {
+    .lens-option-btn .btn {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.75rem;
+    }
+}
+
+/* Lens Card Style (Matches Website .product-card) */
+.lens-card {
+    background: white;
+    border-radius: 32px; /* Matches website */
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f1f5f9;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.lens-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+    border-color: var(--admin-primary);
+}
+
+.modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--admin-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8fafc;
+}
+
+.modal-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--admin-sidebar);
+    margin: 0;
+}
+
+.close-modal {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--admin-text-light);
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    transition: color 0.2s;
+}
+
+.close-modal:hover {
+    color: var(--admin-text);
+}
+
+.modal form {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--admin-border);
+}
+
+/* Checkbox Container */
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    user-select: none;
+    font-weight: 500;
+    color: var(--admin-text);
+}
+
+.checkbox-container input {
+    width: 1.25rem;
+    height: 1.25rem;
+    accent-color: var(--admin-primary);
+    cursor: pointer;
 }

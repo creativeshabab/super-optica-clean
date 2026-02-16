@@ -29,6 +29,29 @@ if (!$isAdmin && !$isOwner) {
 $items_stmt = $pdo->prepare("SELECT oi.*, p.name FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE oi.order_id = ?");
 $items_stmt->execute([$order_id]);
 $orderItems = $items_stmt->fetchAll();
+
+// Fetch Prescriptions
+$rx_stmt = $pdo->prepare("SELECT op.*, lo.name as lens_name, lo.price as lens_price 
+                         FROM order_prescriptions op 
+                         LEFT JOIN lens_options lo ON op.lens_option_id = lo.id 
+                         WHERE op.order_id = ?");
+$rx_stmt->execute([$order_id]);
+$prescriptions = $rx_stmt->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_UNIQUE);
+// Re-key manually if needed, but FETCH_UNIQUE on id might not be product_id.
+// Let's use the loop approach again to be safe.
+$prescriptions_by_product = [];
+// Re-execute or just use what we have if fetchAll consumed it? fetchAll consumes.
+// Wait, I assigned to $prescriptions. I need to loop that.
+foreach ($prescriptions as $rx) {
+    // If FETCH_GROUP | FETCH_UNIQUE used, the key is the first column (id).
+    // Better to just fetchAll and loop.
+}
+// RETRY with standard fetch
+$rx_stmt->execute([$order_id]);
+$prescriptions_by_product = [];
+foreach ($rx_stmt->fetchAll() as $rx) {
+    $prescriptions_by_product[$rx['product_id']] = $rx;
+}
 ?>
 
 <!DOCTYPE html>
@@ -283,12 +306,59 @@ $orderItems = $items_stmt->fetchAll();
                     <td>
                         <p class="item-name"><?= htmlspecialchars($item['name']) ?></p>
                         <p style="font-size: 11px; color: var(--text-light);">Product ID: #<?= $item['product_id'] ?></p>
+                        
+                        <?php if (isset($prescriptions_by_product[$item['product_id']])): 
+                            $p_rx = $prescriptions_by_product[$item['product_id']];
+                        ?>
+                        <div style="margin-top: 8px; font-size: 10px; border: 1px solid #e2e8f0; border-radius: 4px; padding: 5px;">
+                            <div style="margin-bottom: 4px; font-weight: 700; color: var(--primary);">
+                                Lens: <?= htmlspecialchars($p_rx['lens_name']) ?>
+                            </div>
+                            <table style="width: 100%; margin: 0; border: none; font-size: 9px;">
+                                <tr style="background: #f8fafc;">
+                                    <td style="padding: 2px; border: none;">Eye</td>
+                                    <td style="padding: 2px; border: none; text-align: center;">SPH</td>
+                                    <td style="padding: 2px; border: none; text-align: center;">CYL</td>
+                                    <td style="padding: 2px; border: none; text-align: center;">AXIS</td>
+                                    <td style="padding: 2px; border: none; text-align: center;">ADD</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 2px; border: none; font-weight: 600;">OD</td>
+                                    <td style="padding: 2px; border: none; text-align: center;"><?= $p_rx['od_sph'] ?: '-' ?></td>
+                                    <td style="padding: 2px; border: none; text-align: center;"><?= $p_rx['od_cyl'] ?: '-' ?></td>
+                                    <td style="padding: 2px; border: none; text-align: center;"><?= $p_rx['od_axis'] ?: '-' ?></td>
+                                    <td style="padding: 2px; border: none; text-align: center;"><?= $p_rx['od_add'] ?: '-' ?></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 2px; border: none; font-weight: 600;">OS</td>
+                                    <td style="padding: 2px; border: none; text-align: center;"><?= $p_rx['os_sph'] ?: '-' ?></td>
+                                    <td style="padding: 2px; border: none; text-align: center;"><?= $p_rx['os_cyl'] ?: '-' ?></td>
+                                    <td style="padding: 2px; border: none; text-align: center;"><?= $p_rx['os_axis'] ?: '-' ?></td>
+                                    <td style="padding: 2px; border: none; text-align: center;"><?= $p_rx['os_add'] ?: '-' ?></td>
+                                </tr>
+                            </table>
+                            <div style="margin-top: 2px;">PD: <strong><?= $p_rx['pd'] ?: '-' ?></strong></div>
+                        </div>
+                        <?php endif; ?>
                     </td>
                     <td style="text-align: center;">₹<?= number_format($item['price'], 2) ?></td>
                     <td style="text-align: center;">x<?= $item['quantity'] ?></td>
                     <td style="text-align: right; font-weight: 700;">₹<?= number_format($item['price'] * $item['quantity'], 2) ?></td>
                 </tr>
                 <?php endforeach; ?>
+                <?php 
+                $lensTotal = 0;
+                if (!empty($prescriptions_by_product)) {
+                    foreach($prescriptions_by_product as $rx) $lensTotal += $rx['lens_price']; 
+                }
+                if ($lensTotal > 0):
+                ?>
+                <tr>
+                    <td colspan="2"></td>
+                    <td style="text-align: right; font-weight: 700; color: var(--text-light); text-transform: uppercase; font-size: 11px; padding: 8px 15px;">Lens Charges</td>
+                    <td style="text-align: right; font-weight: 700; padding: 8px 15px;">+₹<?= number_format($lensTotal, 2) ?></td>
+                </tr>
+                <?php endif; ?>
                 <tr class="total-row">
                     <td colspan="2"></td>
                     <td class="grand-total-label">Grand Total</td>

@@ -150,6 +150,40 @@
 .bg-blue-50 { background-color: #eff6ff !important; }
 .bg-green-50 { background-color: #f0fdf4 !important; }
 .bg-red-50 { background-color: #fef2f2 !important; }
+.bg-orange-50 { background-color: #fff7ed !important; }
+.bg-purple-50 { background-color: #faf5ff !important; }
+.bg-emerald-50 { background-color: #ecfdf5 !important; }
+
+/* Border Colors */
+.border-blue-100 { border-color: #dbeafe !important; }
+.border-green-100 { border-color: #dcfce7 !important; }
+.border-red-100 { border-color: #fee2e2 !important; }
+.border-orange-100 { border-color: #ffedd5 !important; }
+.border-purple-100 { border-color: #f3e8ff !important; }
+.border-emerald-100 { border-color: #d1fae5 !important; }
+
+.border-blue-200 { border-color: #bfdbfe !important; }
+.border-green-200 { border-color: #bbf7d0 !important; }
+.border-orange-200 { border-color: #fed7aa !important; }
+.border-purple-200 { border-color: #e9d5ff !important; }
+.border-emerald-200 { border-color: #a7f3d0 !important; }
+
+/* Text Colors Extended */
+.text-blue-700 { color: #1d4ed8 !important; }
+.text-green-700 { color: #15803d !important; }
+.text-orange-700 { color: #c2410c !important; }
+.text-purple-700 { color: #7e22ce !important; }
+.text-emerald-700 { color: #047857 !important; }
+.text-orange-800 { color: #9a3412 !important; }
+.text-purple-800 { color: #6b21a8 !important; }
+.text-emerald-800 { color: #065f46 !important; }
+
+/* Hover Backgrounds */
+.hover\:bg-blue-100:hover { background-color: #dbeafe !important; }
+.hover\:bg-green-100:hover { background-color: #dcfce7 !important; }
+.hover\:bg-orange-100:hover { background-color: #ffedd5 !important; }
+.hover\:bg-purple-100:hover { background-color: #f3e8ff !important; }
+.hover\:bg-emerald-100:hover { background-color: #d1fae5 !important; }
 
 /* Text Colors */
 .text-primary { color: var(--color-primary) !important; }
@@ -268,12 +302,14 @@
     .hidden { display: none !important; } /* If not overridden by flex/block above */
 }
 
-/* --- Compatibility Aliases (Tailwind-style) --- */
+/* Compatibility Aliases (Tailwind-style) */
 .flex { display: flex !important; }
 .inline-flex { display: inline-flex !important; }
 .justify-between { justify-content: space-between !important; }
 .items-center { align-items: center !important; }
 .flex-shrink-0 { flex-shrink: 0 !important; }
+.flex-1 { flex: 1 1 0% !important; }
+.flex-grow { flex-grow: 1 !important; }
 
 /* Width/Height Utilities */
 .w-10 { width: 2.5rem !important; }

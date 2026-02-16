@@ -242,6 +242,9 @@ $unread_count = $unread_count_stmt->fetchColumn();
                 <a href="appointments.php" class="sidebar-link <?= isActive('appointments.php', $current_page) ?>">
                     <i class="fa-solid fa-calendar-check"></i> <?= __('appointments') ?>
                 </a>
+                <a href="lens_options.php" class="sidebar-link <?= isActive('lens_options.php', $current_page) ?>">
+                    <i class="fa-solid fa-eye"></i> Lens Options
+                </a>
 
                 <!-- Content Management -->
                 <div class="sidebar-group-label"><?= __('content_management') ?></div>
