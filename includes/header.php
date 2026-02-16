@@ -279,7 +279,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
          <!-- Desktop Search Bar -->
          <form action="shop.php" method="GET" class="header-search mobile-hidden">
             <i class="fa-solid fa-search"></i>
-            <input type="text" name="search" placeholder="What are you looking for?">
+            <input type="text" name="search" placeholder="Search for products">
         </form>
 
         <!-- Actions -->
