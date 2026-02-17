@@ -167,14 +167,16 @@ $shippingMethods = $integrationManager->getShippingMethods();
 }
 </style>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h1 class="admin-title">Shipping & Logistics</h1>
-        <p style="color: var(--admin-text-light); margin: var(--space-2) 0 0 0;">Configure shipping carriers and delivery services</p>
+<div class="page-header">
+    <div class="page-header-info">
+        <h1 class="page-title">Shipping & Logistics</h1>
+        <p class="page-subtitle">Configure shipping carriers and delivery services</p>
     </div>
-    <a href="integrations.php" class="btn btn-secondary">
-        <i class="fa-solid fa-arrow-left"></i> Back to Integrations
-    </a>
+    <div class="page-header-actions">
+        <a href="integrations.php" class="btn btn-secondary">
+            <i class="fa-solid fa-arrow-left"></i> Back to Integrations
+        </a>
+    </div>
 </div>
 
 <div class="tabs-container">

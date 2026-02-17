@@ -18,31 +18,43 @@ $out_of_stock = $pdo->query("SELECT * FROM products WHERE stock_quantity = 0 ORD
 $recent_notifications = $pdo->query("SELECT * FROM admin_notifications ORDER BY created_at DESC LIMIT 5")->fetchAll();
 ?>
 
-<h1 class="admin-title"><?= __('dashboard_overview') ?></h1>
+<div class="page-header">
+    <div class="page-header-info">
+        <h1 class="page-title"><?= __('dashboard_overview') ?></h1>
+        <p class="page-subtitle">Get a quick snapshot of your business performance and recent activities.</p>
+    </div>
+</div>
 
 <!-- Modern Stats Grid -->
+<!-- Modern Stats Grid with Hover Animations -->
 <div class="stats-grid">
-    <div class="stat-card">
+    <a href="products.php" class="stat-card">
         <div class="stat-icon" style="background: rgba(37, 99, 235, 0.1); color: #2563eb;">
             <i class="fa-solid fa-glasses"></i>
         </div>
         <div class="stat-info">
             <h3><?= __('total_products') ?></h3>
             <p><?= number_format($prod_count) ?></p>
+            <span style="font-size: 0.7rem; color: var(--admin-primary); font-weight: 600; display: flex; align-items: center; gap: 0.25rem; margin-top: 0.25rem;">
+                <?= __('view_all') ?> <i class="fa-solid fa-chevron-right" style="font-size: 0.6rem;"></i>
+            </span>
         </div>
-    </div>
+    </a>
     
-    <div class="stat-card">
+    <a href="orders.php" class="stat-card">
         <div class="stat-icon" style="background: rgba(22, 163, 74, 0.1); color: #16a34a;">
             <i class="fa-solid fa-cart-shopping"></i>
         </div>
         <div class="stat-info">
             <h3><?= __('total_orders') ?></h3>
             <p><?= number_format($order_count) ?></p>
+            <span style="font-size: 0.7rem; color: #16a34a; font-weight: 600; display: flex; align-items: center; gap: 0.25rem; margin-top: 0.25rem;">
+                <?= __('view_all') ?> <i class="fa-solid fa-chevron-right" style="font-size: 0.6rem;"></i>
+            </span>
         </div>
-    </div>
+    </a>
     
-    <div class="stat-card">
+    <div class="stat-card" style="transition: all 0.3s ease;">
         <div class="stat-icon" style="background: rgba(147, 51, 234, 0.1); color: #9333ea;">
             <i class="fa-solid fa-users"></i>
         </div>
@@ -52,15 +64,18 @@ $recent_notifications = $pdo->query("SELECT * FROM admin_notifications ORDER BY 
         </div>
     </div>
     
-    <div class="stat-card">
+    <a href="orders.php?status=completed" class="stat-card">
         <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
             <i class="fa-solid fa-indian-rupee-sign"></i>
         </div>
         <div class="stat-info">
             <h3><?= __('total_revenue') ?></h3>
             <p>₹<?= number_format($revenue) ?></p>
+            <span style="font-size: 0.7rem; color: #f59e0b; font-weight: 600; display: flex; align-items: center; gap: 0.25rem; margin-top: 0.25rem;">
+                <?= __('view_reports') ?> <i class="fa-solid fa-chevron-right" style="font-size: 0.6rem;"></i>
+            </span>
         </div>
-    </div>
+    </a>
 </div>
 
 <div class="dashboard-grid">
@@ -81,7 +96,7 @@ $recent_notifications = $pdo->query("SELECT * FROM admin_notifications ORDER BY 
                 <?php if (empty($recent_orders)): ?>
                     <p style="padding: 2rem; text-align: center; color: var(--admin-text-light);"><?= __('no_recent_orders') ?></p>
                 <?php else: ?>
-                    <table class="widget-table">
+                    <table class="widget-table responsive-table">
                         <thead>
                             <tr>
                                 <th><?= __('order_id') ?></th>
@@ -114,7 +129,7 @@ $recent_notifications = $pdo->query("SELECT * FROM admin_notifications ORDER BY 
         </div>
 
         <!-- Stock Alerts -->
-        <div class="admin-grid" style="grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+        <div class="grid grid-2 gap-md-1">
             <!-- Low Stock -->
             <div class="admin-table-widget" style="border-left: 4px solid #f59e0b;">
                 <div class="widget-header">
@@ -129,15 +144,24 @@ $recent_notifications = $pdo->query("SELECT * FROM admin_notifications ORDER BY 
                             <i class="fa-solid fa-check-circle"></i> <?= __('stock_good') ?>
                         </p>
                     <?php else: ?>
-                        <?php foreach ($low_stock as $item): ?>
-                            <div style="display: flex; justify-content: space-between; padding: 0.75rem 1rem; border-bottom: 1px solid var(--admin-border); align-items: center;">
-                                <div>
-                                    <div style="font-weight: 600; font-size: 0.85rem; color: var(--admin-text);"><?= htmlspecialchars($item['name']) ?></div>
-                                    <div style="font-size: 0.75rem; color: #f59e0b;"><?= __('stock') ?>: <?= $item['stock_quantity'] ?></div>
+                        <?php foreach ($low_stock as $item): 
+                            $threshold = $item['low_stock_threshold'] ?: 5;
+                            $percentage = ($item['stock_quantity'] / $threshold) * 100;
+                            $bar_color = $percentage < 50 ? '#ef4444' : '#f59e0b';
+                        ?>
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--admin-border);">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                    <div>
+                                        <div style="font-weight: 600; font-size: 0.85rem; color: var(--admin-text);"><?= htmlspecialchars($item['name']) ?></div>
+                                        <div style="font-size: 0.75rem; color: var(--admin-text-light);"><?= __('stock') ?>: <span style="color: <?= $bar_color ?>; font-weight: 700;"><?= $item['stock_quantity'] ?></span> / <?= $threshold ?></div>
+                                    </div>
+                                    <a href="product_form.php?id=<?= $item['id'] ?>" class="btn-action btn-action-edit" style="width: 28px; height: 28px; font-size: 0.75rem;">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </a>
                                 </div>
-                                <a href="product_form.php?id=<?= $item['id'] ?>" class="btn-action btn-action-edit" style="width: 28px; height: 28px; font-size: 0.75rem;">
-                                    <i class="fa-solid fa-pen"></i>
-                                </a>
+                                <div style="width: 100%; height: 6px; background: var(--admin-bg); border-radius: 3px; overflow: hidden;">
+                                    <div style="width: <?= min(100, $percentage) ?>%; height: 100%; background: <?= $bar_color ?>; border-radius: 3px; transition: width 0.5s ease;"></div>
+                                </div>
                             </div>
                         <?php endforeach; ?>
                     <?php endif; ?>
@@ -159,13 +183,16 @@ $recent_notifications = $pdo->query("SELECT * FROM admin_notifications ORDER BY 
                         </p>
                     <?php else: ?>
                         <?php foreach ($out_of_stock as $item): ?>
-                            <div style="display: flex; justify-content: space-between; padding: 0.75rem 1rem; border-bottom: 1px solid var(--admin-border); align-items: center;">
+                            <div style="display: flex; justify-content: space-between; padding: 1rem; border-bottom: 1px solid var(--admin-border); align-items: center; background: rgba(239, 68, 68, 0.02);">
                                 <div>
                                     <div style="font-weight: 600; font-size: 0.85rem; color: var(--admin-text);"><?= htmlspecialchars($item['name']) ?></div>
-                                    <div style="font-size: 0.75rem; color: #ef4444; font-weight: 700;"><?= __('out_of_stock_msg') ?></div>
+                                    <div style="display: flex; align-items: center; gap: 0.4rem; margin-top: 0.25rem;">
+                                        <span style="padding: 0.1rem 0.4rem; background: #ef4444; color: white; border-radius: 4px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase;"><?= __('out_of_stock') ?></span>
+                                        <span style="font-size: 0.75rem; color: var(--admin-text-light);">ID: #<?= $item['id'] ?></span>
+                                    </div>
                                 </div>
-                                <a href="product_form.php?id=<?= $item['id'] ?>" class="btn-action btn-action-edit" style="width: 28px; height: 28px; font-size: 0.75rem;">
-                                    <i class="fa-solid fa-plus"></i>
+                                <a href="product_form.php?id=<?= $item['id'] ?>" class="btn-action" style="width: 32px; height: 32px; background: #ef4444; color: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none;">
+                                    <i class="fa-solid fa-plus-circle"></i>
                                 </a>
                             </div>
                         <?php endforeach; ?>
@@ -226,7 +253,7 @@ $recent_notifications = $pdo->query("SELECT * FROM admin_notifications ORDER BY 
             <div class="card-title" style="font-size: 1rem; margin-bottom: 1rem;">
                 <?= __('quick_actions') ?>
             </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="grid grid-2 grid-2-sm gap-md-1">
                 <a href="product_form.php" class="btn btn-secondary" style="justify-content: center; flex-direction: column; gap: 0.5rem; padding: 1rem; height: auto;">
                     <i class="fa-solid fa-plus text-primary" style="font-size: 1.25rem;"></i>
                     <span style="font-size: 0.8rem;"><?= __('add_product') ?></span>

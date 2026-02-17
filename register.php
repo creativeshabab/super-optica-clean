@@ -12,6 +12,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $phone = $_POST['phone'] ?? null;
     if (false) { // Passwords are no longer used for registration
         $error = "Passwords do not match";
+    } elseif (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
+        $error = "Invalid form submission (CSRF check failed)";
     } else {
         // Check if email or phone exists
         $stmt = $pdo->prepare("SELECT id FROM users WHERE (email IS NOT NULL AND email = ?) OR (phone IS NOT NULL AND phone = ?)");
@@ -28,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $user_id = $pdo->lastInsertId();
                 
                 // Create OTP
-                $otp = sprintf("%06d", mt_rand(1, 999999));
+                $otp = sprintf("%06d", random_int(0, 999999));
                 $expires_at = date('Y-m-d H:i:s', strtotime('+10 minutes'));
                 
                 $stmt = $pdo->prepare("INSERT INTO verification_codes (user_id, code, expires_at) VALUES (?, ?, ?)");
@@ -94,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php if (!empty($error)): ?>
              <div class="bg-red-50 text-red-700 p-4 rounded-lg flex items-center gap-3 border border-red-100">
                 <i class="fa-solid fa-circle-exclamation text-xl"></i> 
-                <span class="font-medium"><?= $error ?></span>
+                <span class="font-medium"><?= htmlspecialchars($error) ?></span>
             </div>
         <?php endif; ?>
 
@@ -102,6 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
         <form method="POST" class="space-y-6">
+            <?= csrfField() ?>
             <div>
                  <label class="form-label text-gray-700 font-bold mb-2"><?= __('full_name') ?></label>
                  <div class="relative">
@@ -119,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                             <i class="fa-solid fa-envelope"></i>
                         </div>
-                        <input type="email" name="email" placeholder="name@example.com" class="form-input pl-10 block w-full border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
+                        <input type="email" name="email" required placeholder="name@example.com" class="form-input pl-10 block w-full border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
                     </div>
                 </div>
                 <div>
@@ -133,7 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary w-full py-3 text-lg font-bold shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all">
+            <button type="submit" class="btn btn-primary w-full py-3 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all mt-4 no-margin">
                 <?= __('register_now') ?> <i class="fa-solid fa-user-check ml-2"></i>
             </button>
         </form>

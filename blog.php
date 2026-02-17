@@ -34,11 +34,9 @@ if (isset($_GET['id'])) {
     <div class="container section-padding">
         <article class="blog-detail-container">
             <!-- Header -->
-            <div class="blog-header">
-                <span class="blog-date-badge">
-                    <?= date('F d, Y', strtotime($post['created_at'])) ?>
-                </span>
-                <h1 class="blog-title"><?= htmlspecialchars($post['title']) ?></h1>
+            <div class="blog-header mb-8">
+                <span class="text-primary font-bold uppercase tracking-widest text-xs mb-2 block"><?= date('F d, Y', strtotime($post['created_at'])) ?></span>
+                <h1 class="text-2xl md:text-4xl font-black text-gray-900 leading-tight"><?= htmlspecialchars($post['title']) ?></h1>
             </div>
 
             <!-- Featured Image -->
@@ -79,10 +77,10 @@ if (isset($_GET['id'])) {
 
     <div class="container section-padding">
 
-        <div class="blog-list-header">
-            <div class="blog-list-title-section">
-                 <span class="blog-section-label"><?= __('knowledge_hub') ?></span>
-                 <h1 class="blog-list-title">Our <span class="highlight">Blog</span></h1>
+        <div class="flex flex-row justify-between items-center mb-10 gap-4">
+            <div class="text-left m-0">
+                <span class="text-primary font-bold uppercase tracking-widest text-sm"><?= __('knowledge_hub') ?></span>
+                <h1 class="page-title-responsive font-black text-gray-800 mt-2">Our <span class="text-primary">Blog</span></h1>
             </div>
         </div>
         

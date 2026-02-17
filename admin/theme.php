@@ -90,12 +90,16 @@ $cta_overlay = getThemeSetting('theme_cta_overlay', '0.0');
 
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h1 class="admin-title" style="margin-bottom: 0;">Design System Manager</h1>
-        <p style="color: #64748b; margin-top: 0.5rem;">Control the global visual language of your website.</p>
+<div class="page-header">
+    <div class="page-header-info">
+        <h1 class="page-title">Design System Manager</h1>
+        <p class="page-subtitle">Control the global visual language of your website.</p>
     </div>
-    <a href="../index.php" target="_blank" class="btn btn-outline"><i class="fa-solid fa-eye"></i> View Live Site</a>
+    <div class="page-header-actions">
+        <a href="../index.php" target="_blank" class="btn btn-secondary">
+            <i class="fa-solid fa-eye"></i> View Live Site
+        </a>
+    </div>
 </div>
 
 <style>

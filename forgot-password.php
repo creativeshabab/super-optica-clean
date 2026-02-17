@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php if ($error): ?>
             <div class="bg-red-50 text-red-700 p-4 rounded-lg flex items-center gap-3 border border-red-100">
                 <i class="fa-solid fa-circle-exclamation text-xl"></i> 
-                <span class="font-medium"><?= $error ?></span>
+                <span class="font-medium"><?= htmlspecialchars($error) ?></span>
             </div>
         <?php endif; ?>
 
@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary w-full py-3 text-lg font-bold shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all">
+            <button type="submit" class="btn btn-primary w-full py-3 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all">
                 Reset Password <i class="fa-solid fa-envelope ml-2"></i>
             </button>
         </form>

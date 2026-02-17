@@ -160,16 +160,35 @@
   margin-top: 0.25rem;
 }
 
+/* Offers Container Grid */
+.offers-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 992px) {
+  .offers-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .offers-container {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Offer Box */
 .offer-box {
-  margin-bottom: 1rem;
   background: #fef3c7;
   border: 1px solid #fde047;
   border-radius: 8px;
-  padding: 0.75rem;
+  padding: 0.6rem 0.75rem;
   display: flex;
-  gap: 0.75rem;
+  gap: 0.5rem;
   align-items: flex-start;
+  height: 100%;
 }
 
 .offer-box.green {
@@ -338,21 +357,18 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.btn-add-cart {
-  background: var(--color-primary, #e31e24);
+.btn-buy-now {
+  background: #0f172a;
   color: #fff;
+  border-color: #0f172a;
 }
 
-.btn-add-cart:hover {
-  background: #c41e24;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(227, 30, 36, 0.25);
+.btn-buy-now:hover {
+  background: #1e293b;
+  border-color: #1e293b;
 }
 
-.btn-add-cart:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(227, 30, 36, 0.15);
-}
+/* .btn-add-cart inherits global styles */
 
 .btn-whatsapp {
   background: #25d366;

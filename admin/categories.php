@@ -82,12 +82,14 @@ function buildCategoryOptions($categories, $parent_id = null, $prefix = '', $exc
 
 <?php require_once 'header.php'; ?>
 
-<div style="margin-bottom: 2.5rem;">
-    <h1 class="admin-title" style="margin-bottom: 0.5rem;"><?= __('categories_title') ?></h1>
-    <p style="color: var(--admin-text-light); font-weight: 500;"><?= __('categories_subtitle') ?></p>
+<div class="page-header">
+    <div class="page-header-info">
+        <h1 class="page-title"><?= __('categories_title') ?></h1>
+        <p class="page-subtitle"><?= __('categories_subtitle') ?></p>
+    </div>
 </div>
 
-<div class="admin-grid" style="grid-template-columns: 1fr 2fr;">
+<div class="admin-grid container-wide">
     <!-- Form -->
     <div class="card" style="height: fit-content; padding: 2rem;">
         <h3 class="card-title" style="font-weight: 800; color: var(--admin-sidebar); margin-bottom: 2rem;">
@@ -95,7 +97,7 @@ function buildCategoryOptions($categories, $parent_id = null, $prefix = '', $exc
         </h3>
         <?php if (isset($error)): ?>
             <div class="alert" style="background: #fff1f2; color: #991b1b; padding: 1.25rem; border-radius: 12px; margin-bottom: 2rem; font-size: 0.85rem; border: 1px solid #fee2e2; font-weight: 600;">
-                <i class="fa-solid fa-circle-exclamation" style="margin-right: 0.5rem; color: var(--admin-primary);"></i> <?= $error ?>
+                <i class="fa-solid fa-circle-exclamation" style="margin-right: 0.5rem; color: var(--admin-primary);"></i> <?= htmlspecialchars($error) ?>
             </div>
         <?php endif; ?>
         <form method="POST">
@@ -138,9 +140,10 @@ function buildCategoryOptions($categories, $parent_id = null, $prefix = '', $exc
             </div>
         </div>
         <div class="widget-content">
-            <table class="widget-table">
+            <table class="widget-table responsive-table">
                 <thead>
                     <tr>
+                        <th width="60" style="text-align: center;">ID</th>
                         <th style="padding-left: 1rem;"><?= __('category_name') ?></th>
                         <th><?= __('slug') ?></th>
                         <th width="150" style="text-align: center;"><?= __('actions') ?></th>
@@ -155,19 +158,20 @@ function buildCategoryOptions($categories, $parent_id = null, $prefix = '', $exc
                         $icon = $level === 0 ? '<i class="fa-solid fa-folder" style="color: var(--admin-primary); margin-right: 0.5rem;"></i>' : '<i class="fa-solid fa-arrow-turn-up" style="transform: rotate(90deg); color: var(--admin-text-light); margin-right: 0.5rem; font-size: 0.75rem;"></i>';
                         
                         echo '<tr>';
-                        echo '<td style="padding-left: ' . $padding . 'rem; font-weight: ' . (700 - ($level*100)) . '; color: var(--admin-sidebar);">';
+                        echo '<td data-label="ID" style="text-align: center; font-family: monospace; font-size: 0.8rem; color: var(--admin-primary); font-weight: 700;">#' . $category['id'] . '</td>';
+                        echo '<td data-label="' . __('category_name') . '" style="padding-left: ' . $padding . 'rem; font-weight: ' . (700 - ($level*100)) . '; color: var(--admin-sidebar);">';
                         echo $icon . htmlspecialchars($category['name']);
                         echo '</td>';
-                        echo '<td style="color: var(--admin-text-light); font-size: 0.85rem; font-family: \'Montserrat\', sans-serif; font-weight: 600;">' . htmlspecialchars($category['slug']) . '</td>';
-                        echo '<td>
-                                <div style="display: flex; gap: 0.75rem; justify-content: center; align-items: center;">
-                                    <a href="categories.php?edit=' . $category['id'] . '" class="btn-action btn-action-edit" title="Edit">
-                                        <i class="fa-solid fa-pen-to-square"></i>
-                                    </a>
-                                    <a href="categories.php?delete=' . $category['id'] . '" class="btn-action btn-action-delete" onclick="return confirm(\'Are you sure?\')" title="Delete">
-                                        <i class="fa-solid fa-trash-can"></i>
-                                    </a>
-                                </div>
+                        echo '<td data-label="' . __('slug') . '" style="color: var(--admin-text-light); font-size: 0.85rem; font-family: \'Montserrat\', sans-serif; font-weight: 600;">' . htmlspecialchars($category['slug']) . '</td>';
+                        echo '<td data-label="' . __('actions') . '">
+                        <div class="flex items-center gap-2 justify-center">
+                            <a href="categories.php?edit=' . $category['id'] . '" class="btn-action btn-action-edit" title="Edit">
+                                <i class="fa-solid fa-pen"></i>
+                            </a>
+                            <a href="categories.php?delete=' . $category['id'] . '" class="btn-action btn-action-delete" onclick="return confirm(\'Are you sure?\')" title="Delete">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
+                        </div>
                               </td>';
                         echo '</tr>';
 

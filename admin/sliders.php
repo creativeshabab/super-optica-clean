@@ -11,13 +11,83 @@ if (isset($_POST['delete'])) {
     exit;
 }
 
-// Fetch Sliders
-$sliders = $pdo->query("SELECT * FROM sliders ORDER BY created_at DESC")->fetchAll();
+// Get Listing Parameters
+$params = getListingParams('created_at', 'DESC');
+$page = $params['page'];
+$search = $params['search'];
+$sort = $params['sort'];
+$order = $params['order'];
+$limit = $params['limit'];
+
+// Build Query
+$where = "1=1";
+$sqlParams = [];
+
+if ($search) {
+    $where .= " AND (title LIKE ? OR subtitle LIKE ?)";
+    $sqlParams[] = "%$search%";
+    $sqlParams[] = "%$search%";
+}
+
+// Get Total Count
+$countQuery = "SELECT COUNT(*) FROM sliders WHERE $where";
+$stmt = $pdo->prepare($countQuery);
+$stmt->execute($sqlParams);
+$totalItems = $stmt->fetchColumn();
+
+// Get Pagination Data
+$pagination = getPaginationData($totalItems, $limit);
+$offset = $pagination['offset'];
+
+// Fetch Paginated Sliders
+$allowedSorts = ['title', 'created_at'];
+if (!in_array($sort, $allowedSorts)) { $sort = 'created_at'; }
+
+$query = "SELECT * FROM sliders 
+          WHERE $where 
+          ORDER BY $sort $order 
+          LIMIT $limit OFFSET $offset";
+
+$stmt = $pdo->prepare($query);
+$stmt->execute($sqlParams);
+$sliders = $stmt->fetchAll();
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-4" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem;">
-    <h1 class="admin-title" style="margin-bottom: 0;"><?= __('sliders_title') ?></h1>
-    <a href="slider_form.php" class="btn btn-primary"><i class="fas fa-plus"></i> <?= __('add_new_slide') ?></a>
+<div class="page-header">
+    <div class="page-header-info">
+        <h1 class="page-title"><?= __('sliders_title') ?></h1>
+        <p class="page-subtitle">Manage your homepage hero sliders and promotional banners.</p>
+    </div>
+    <div class="page-header-actions">
+        <a href="slider_form.php" class="btn btn-primary">
+            <i class="fa-solid fa-plus"></i> <?= __('add_new_slide') ?>
+        </a>
+    </div>
+</div>
+
+<!-- Listing Controls -->
+<div class="listing-controls">
+    <form method="GET" class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="Search slides..." class="form-control">
+        <?php if($search): ?>
+            <a href="sliders.php" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); color: var(--admin-text-light);"><i class="fa-solid fa-xmark" style="position: static; padding: 0;"></i></a>
+        <?php endif; ?>
+    </form>
+
+    <div class="filter-group">
+        <form method="GET" style="display: flex; gap: 0.75rem; align-items: center;">
+            <input type="hidden" name="search" value="<?= htmlspecialchars($search) ?>">
+            <select name="sort" onchange="this.form.submit()" class="form-control">
+                <option value="created_at" <?= $sort == 'created_at' ? 'selected' : '' ?>>Newest First</option>
+                <option value="title" <?= $sort == 'title' ? 'selected' : '' ?>>Title</option>
+            </select>
+            <select name="order" onchange="this.form.submit()" class="form-control" style="min-width: 100px;">
+                <option value="DESC" <?= $order == 'DESC' ? 'selected' : '' ?>>DESC</option>
+                <option value="ASC" <?= $order == 'ASC' ? 'selected' : '' ?>>ASC</option>
+            </select>
+        </form>
+    </div>
 </div>
 
 <div class="admin-table-widget">
@@ -27,11 +97,11 @@ $sliders = $pdo->query("SELECT * FROM sliders ORDER BY created_at DESC")->fetchA
             <?= __('existing_slides', 'Existing Slides') ?>
         </div>
         <div style="font-size: 0.85rem; color: var(--admin-text-light);">
-            <?= count($sliders) ?> <?= __('items') ?>
+            Showing <?= count($sliders) ?> of <?= $totalItems ?> <?= __('items') ?>
         </div>
     </div>
     <div class="widget-content">
-        <table class="widget-table">
+        <table class="widget-table responsive-table">
             <thead>
                 <tr>
                     <th width="50"><?= __('slider_id') ?></th>
@@ -44,8 +114,8 @@ $sliders = $pdo->query("SELECT * FROM sliders ORDER BY created_at DESC")->fetchA
             <tbody>
                 <?php foreach ($sliders as $s): ?>
                 <tr>
-                    <td style="font-weight: 600; color: var(--admin-text-light);"><?= $s['id'] ?></td>
-                    <td>
+                    <td data-label="<?= __('slider_id') ?>" style="font-weight: 600; color: var(--admin-text-light);"><?= $s['id'] ?></td>
+                    <td data-label="<?= __('slider_image') ?>">
                         <?php if ($s['image']): ?>
                             <img src="../assets/uploads/<?= htmlspecialchars($s['image']) ?>" width="100" style="border-radius: 8px; height: 60px; object-fit: cover; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                         <?php else: ?>
@@ -54,11 +124,11 @@ $sliders = $pdo->query("SELECT * FROM sliders ORDER BY created_at DESC")->fetchA
                             </div>
                         <?php endif; ?>
                     </td>
-                    <td>
+                    <td data-label="<?= __('slider_content') ?>">
                         <div style="font-weight: 700; font-size: 1.1rem; color: var(--admin-sidebar);"><?= htmlspecialchars($s['title']) ?></div>
                         <div style="color: var(--admin-text-light); font-size: 0.9rem; margin-top: 0.25rem;"><?= htmlspecialchars($s['subtitle']) ?></div>
                     </td>
-                    <td>
+                    <td data-label="<?= __('slider_link') ?>">
                         <?php if ($s['link']): ?>
                             <a href="<?= htmlspecialchars($s['link']) ?>" target="_blank" class="btn btn-primary" style="padding: 0.5rem 1.25rem; border-radius: 50px; font-size: 0.8rem; background: var(--admin-sidebar);">
                                 <?= $s['link_text'] ?: __('visit_link') ?> <i class="fa-solid fa-arrow-up-right-from-square" style="margin-left: 0.5rem; font-size: 0.7rem;"></i>
@@ -67,7 +137,7 @@ $sliders = $pdo->query("SELECT * FROM sliders ORDER BY created_at DESC")->fetchA
                             <span style="color: #cbd5e1;">-</span>
                         <?php endif; ?>
                     </td>
-                    <td>
+                    <td data-label="<?= __('actions') ?>">
                         <div style="display: flex; gap: 0.5rem; justify-content: center; align-items: center;">
                             <a href="slider_form.php?id=<?= $s['id'] ?>" class="btn-action btn-action-edit" title="<?= __('edit_slide') ?>">
                                 <i class="fa-solid fa-pen-to-square"></i>
@@ -96,5 +166,7 @@ $sliders = $pdo->query("SELECT * FROM sliders ORDER BY created_at DESC")->fetchA
         </table>
     </div>
 </div>
+
+<?= renderPagination($page, $pagination['total_pages']) ?>
 
 <?php require_once 'footer.php'; ?>

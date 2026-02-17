@@ -60,9 +60,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-4" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem;">
-    <h1 class="admin-title" style="margin-bottom: 0;"><?= $service ? __('edit_service') : __('add_new_service') ?></h1>
-    <a href="services.php" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> <?= __('back_to_list') ?></a>
+<div class="page-header">
+    <div class="page-header-info">
+        <h1 class="page-title"><?= $service ? __('edit_service') : __('add_new_service') ?></h1>
+    </div>
+    <div class="page-header-actions">
+        <a href="services.php" class="btn btn-secondary">
+            <i class="fa-solid fa-arrow-left"></i> <?= __('back_to_list') ?>
+        </a>
+    </div>
 </div>
 
 <div class="card" style="max-width: 700px;">
@@ -70,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     <?php if (isset($error)): ?>
         <div class="alert" style="background: #fee2e2; color: #b91c1c; padding: 1rem; border-radius: 12px; margin-bottom: 2rem; border: 1px solid #fecaca;">
-            <i class="fa-solid fa-circle-exclamation" style="margin-right: 0.5rem;"></i> <?= $error ?>
+            <i class="fa-solid fa-circle-exclamation" style="margin-right: 0.5rem;"></i> <?= htmlspecialchars($error) ?>
         </div>
     <?php endif; ?>
     

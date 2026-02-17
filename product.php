@@ -136,8 +136,8 @@
             <?php endif; ?>
          </div>
          
-         <?php if (!empty($gallery_images)): ?>
-         <div class="thumbnail-grid">
+         <div class="thumbnail-grid" id="productThumbnailGrid">
+            <?php if (!empty($gallery_images)): ?>
             <!-- Main Image Thumbnail -->
             <div class="thumbnail active" onclick="switchImage('<?= getBaseURL() ?>assets/uploads/<?= $product['image'] ?>', this)">
                <img src="<?= getBaseURL() ?>assets/uploads/<?= $product['image'] ?>" alt="Main Image">
@@ -147,8 +147,8 @@
                <img src="<?= getBaseURL() ?>assets/uploads/<?= $img['image_path'] ?>" alt="Gallery Image">
             </div>
             <?php endforeach; ?>
+            <?php endif; ?>
          </div>
-         <?php endif; ?>
       </div>
       <!-- Details -->
       <div class="product-details">
@@ -175,27 +175,19 @@
          $offer_stmt = $pdo->prepare("SELECT * FROM coupons WHERE is_active = 1 AND is_prepaid_only = 1 AND (start_date IS NULL OR start_date <= NOW()) AND (end_date IS NULL OR end_date >= NOW()) ORDER BY id DESC");
          $offer_stmt->execute();
          $active_offers = $offer_stmt->fetchAll();
+         ?>
          
-         if (!empty($active_offers)):
-             foreach ($active_offers as $offer):
-         ?>
-         <div class="offer-box">
-             <i class="fa-solid fa-tags"></i>
-             <div class="offer-details">
-                 <div class="offer-title"><?= htmlspecialchars($offer['description'] ?: "Special Prepaid Offer") ?></div>
-                 <div class="offer-code">Use coupon code: <strong><?= htmlspecialchars($offer['code']) ?></strong></div>
+         <?php if (!empty($active_offers)): ?>
+         <div class="offers-container mb-6">
+             <?php foreach ($active_offers as $offer): ?>
+             <div class="offer-box">
+                 <i class="fa-solid fa-tags"></i>
+                 <div class="offer-details">
+                     <div class="offer-title"><?= htmlspecialchars($offer['description'] ?: "Special Prepaid Offer") ?></div>
+                     <div class="offer-code">Use code: <strong><?= htmlspecialchars($offer['code']) ?></strong></div>
+                 </div>
              </div>
-         </div>
-         <?php 
-             endforeach;
-         else: 
-         ?>
-         <div class="offer-box green">
-             <i class="fa-solid fa-tags"></i>
-             <div class="offer-details">
-                 <div class="offer-title">Flat 10% Off on Prepaid Orders</div>
-                 <div class="offer-code">Use coupon code: <strong>SUPER10</strong></div>
-             </div>
+             <?php endforeach; ?>
          </div>
          <?php endif; ?>
          
@@ -203,14 +195,14 @@
          <div class="product-variants mb-6">
             <h4 class="mb-3 font-bold text-accent"><?= __('Choose Color') ?>: <span id="selectedVariantName" class="text-primary font-normal text-sm ml-2"></span></h4>
             <div class="color-swatches flex flex-wrap gap-3">
-               <?php foreach ($variants as $v): 
+               <?php foreach ($variants as $key => $v): 
                    $v_image = $v['image_path'] ? getBaseURL() . 'assets/uploads/' . $v['image_path'] : '';
                    $v_gallery = !empty($v['images']) ? htmlspecialchars(json_encode($v['images'])) : '';
                ?>
                <label class="swatch-container relative cursor-pointer group" title="<?= htmlspecialchars($v['color_name']) ?>">
-               <input type="radio" name="selected_color" value="<?= htmlspecialchars($v['color_name']) ?>" class="peer sr-only" data-image="<?= $v_image ?>" data-gallery="<?= $v_gallery ?>">
+               <input type="radio" name="selected_color" value="<?= htmlspecialchars($v['color_name']) ?>" class="peer sr-only" data-image="<?= $v_image ?>" data-gallery="<?= $v_gallery ?>" <?= $key === 0 ? 'checked' : '' ?>>
                <span class="swatch block w-8 h-8 rounded-full border border-gray-200 ring-2 ring-transparent peer-checked:ring-primary transition-all color-swatch-item" data-color="<?= $v['color_code'] ?>"></span>
-               <span class="color-tooltip absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none"><?= htmlspecialchars($v['color_name']) ?></span>
+                <span class="color-tooltip"><?= htmlspecialchars($v['color_name']) ?></span>
                </label>
                <?php endforeach; ?>
             </div>
@@ -276,23 +268,25 @@
          <?php if ($is_in_stock): ?>
          <div class="product-actions">
              <div class="action-buttons-row">
-                 <button type="submit" name="buy_now" class="btn-buy-now">
+                 <button type="submit" name="buy_now" class="btn btn-primary btn-buy-now no-margin">
                      <i class="fa-solid fa-bolt"></i> <?= __('buy_now') ?>
                  </button>
-                 <button type="submit" name="add_to_cart" class="btn-add-cart">
+                 <button type="submit" name="add_to_cart" class="btn btn-secondary btn-add-cart no-margin">
                      <i class="fa-solid fa-cart-shopping"></i> Add to Cart
                  </button>
-                 <?php 
-                    // Build WhatsApp message with product details
-                    $price = '₹' . number_format($product['price'], 2);
-                    $whatsappMessage = "Hi, I'm interested in this product:\n\n" . 
-                                      "Product: " . $product['name'] . "\n" .
-                                      "Price: " . $price . "\n\n" .
-                                      "Please share more details.";
-                 ?>
-                 <a href="https://wa.me/919523798222?text=<?= urlencode($whatsappMessage) ?>" target="_blank" class="btn-whatsapp" title="Contact us on WhatsApp">
-                     <i class="fa-brands fa-whatsapp"></i>
-                 </a>
+                  <?php 
+                     // Build WhatsApp message with product details
+                     $price = '₹' . number_format($product['price'], 2);
+                     $productUrl = getBaseURL() . 'product.php?slug=' . $product['slug'];
+                     $whatsappMessage = "Hi, I'm interested in this product:\n\n" . 
+                                       "Product: " . $product['name'] . "\n" .
+                                       "Price: " . $price . "\n" .
+                                       "Link: " . $productUrl . "\n\n" .
+                                       "Please share more details.";
+                  ?>
+                  <a href="https://wa.me/919523798222?text=<?= urlencode($whatsappMessage) ?>" target="_blank" class="btn-whatsapp" title="Contact us on WhatsApp">
+                      <i class="fa-brands fa-whatsapp"></i>
+                  </a>
                  <input type="hidden" name="quantity" value="1">
              </div>
          </div>
@@ -458,7 +452,7 @@
             setTimeout(() => { img.style.transformOrigin = 'center center'; }, 200);
         });
     }
-
+ 
     // --- Variant Logic ---
     // Swatch Color Handler
     document.querySelectorAll('.color-swatch-item').forEach(el => {
@@ -470,7 +464,7 @@
     // Variant Image Switcher & Label Update
     const variantInputs = document.querySelectorAll('input[name="selected_color"]');
     const variantLabel = document.getElementById('selectedVariantName');
-    const thumbnailGrid = document.querySelector('.thumbnail-grid');
+    const thumbnailGrid = document.getElementById('productThumbnailGrid');
 
     variantInputs.forEach(input => {
         input.addEventListener('change', function() {
@@ -524,6 +518,14 @@
                 }
             }
         });
+    });
+
+    // Auto-select first variant on load to populate gallery and label
+    window.addEventListener('DOMContentLoaded', () => {
+        const checkedVariant = document.querySelector('input[name="selected_color"]:checked');
+        if (checkedVariant) {
+            checkedVariant.dispatchEvent(new Event('change'));
+        }
     });
 
     // Toggle Product Information Section with smooth animation

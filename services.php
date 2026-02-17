@@ -11,11 +11,13 @@
 <div class="web-wrapper section-padding bg-gray-50">
    <div class="container mx-auto px-4">
       
-      <div class="text-center max-w-3xl mx-auto mb-16">
+      <!-- Standard Header (Matches Shop) -->
+      <div class="flex flex-row justify-between items-center mb-10 gap-4">
+         <div class="text-left m-0">
             <span class="text-primary font-bold uppercase tracking-widest text-sm"><?= __('our_expertise') ?></span>
-            <h1 class="text-4xl font-black text-gray-800 mt-2 mb-4"><?= __('premium_eye_care') ?></h1>
-            <p class="text-gray-500 text-lg">Comprehensive eye care solutions delivered by certified professionals using state-of-the-art technology.</p>
-        </div>
+            <h1 class="page-title-responsive font-black text-gray-800 mt-2"><?= __('premium_eye_care') ?></h1>
+         </div>
+      </div>
       <div class="flex flex-col gap-20">
       <?php 
       $index = 0;
@@ -93,8 +95,8 @@
             <p class="text-gray-300 text-lg mb-8 max-w-2xl mx-auto"><?= __('book_appointment_desc') ?></p>
             
             <div class="flex flex-col md:flex-row justify-center gap-4">
-                <a href="contact.php" class="btn bg-white text-gray-900 hover:bg-gray-100 px-8 py-3 rounded-full font-bold transition-transform hover:-translate-y-1"><?= __('contact_us') ?></a>
-                <a href="tel:+919523798222" class="btn border border-white text-white hover:bg-white hover:text-gray-900 px-8 py-3 rounded-full font-bold transition-all"><?= __('call_now') ?></a>
+                <a href="contact.php" class="btn bg-white text-gray-900 px-8 py-3 rounded-full transition-transform hover:-translate-y-1"><?= __('contact_us') ?></a>
+                <a href="tel:+919523798222" class="btn border border-white text-white px-8 py-3 rounded-full transition-all"><?= __('call_now') ?></a>
             </div>
          </div>
       </div>

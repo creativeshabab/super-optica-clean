@@ -1,9 +1,22 @@
 <?php require_once 'includes/header.php'; ?>
+<!-- Page Hero -->
+<section class="page-hero">
+    <div class="container">
+        <?php renderBreadcrumbs([__('book_appointment') => null]); ?>
+    </div>
+</section>
 
 <div class="web-wrapper section-padding">
 <div class="container">
-    <div class="booking-container">
-        <h2 class="text-center mb-5 text-accent font-black">Book Your Eye Test</h2>
+    <div class="booking-container bg-white border border-gray-100 rounded-3xl p-8 md:p-12 shadow-sm">
+        
+        <!-- Standard Header (Matches Shop) -->
+        <div class="flex flex-row justify-between items-center mb-10 gap-4">
+           <div class="text-left m-0">
+              <span class="text-primary font-bold uppercase tracking-widest text-sm"><?= __('eye_test') ?></span>
+              <h2 class="page-title-responsive font-black text-gray-800 mt-2"><?= __('book_your') ?> <span class="text-primary">Appointment</span></h2>
+           </div>
+        </div>
         
         <div class="step-indicator">
             <div class="booking-step active" id="step1-ind">1</div>

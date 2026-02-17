@@ -78,8 +78,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             if ($product) {
                 // Update
-                $sql = "UPDATE products SET name=?, slug=?, description=?, price=?, actual_price=?, label=?, category_id=?, image=?, stock_quantity=?, low_stock_threshold=?, key_features=?, frame_specs=?";
-                $params = [$name, $slug, $description, $price, $actual_price, $label, $category_id, $image, $stock_quantity, $low_stock_threshold, $key_features, $frame_specs];
+                $sql = "UPDATE products SET name=?, sku=?, slug=?, description=?, price=?, actual_price=?, label=?, category_id=?, image=?, stock_quantity=?, low_stock_threshold=?, key_features=?, frame_specs=?";
+                $params = [$name, $_POST['sku'] ?? null, $slug, $description, $price, $actual_price, $label, $category_id, $image, $stock_quantity, $low_stock_threshold, $key_features, $frame_specs];
                 
                 if ($hasShowRawProductColumn) {
                     $sql .= ", show_raw_html=?";
@@ -93,9 +93,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 setFlash('success', __('product_updated_success', 'Product updated successfully'));
             } else {
                 // Create
-                $cols = "name, slug, description, price, actual_price, label, category_id, image, stock_quantity, low_stock_threshold, key_features, frame_specs";
-                $vals = "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?";
-                $params = [$name, $slug, $description, $price, $actual_price, $label, $category_id, $image, $stock_quantity, $low_stock_threshold, $key_features, $frame_specs];
+                $cols = "sku, name, slug, description, price, actual_price, label, category_id, image, stock_quantity, low_stock_threshold, key_features, frame_specs";
+                $vals = "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?";
+                $params = [$_POST['sku'] ?? null, $name, $slug, $description, $price, $actual_price, $label, $category_id, $image, $stock_quantity, $low_stock_threshold, $key_features, $frame_specs];
                 
                 if ($hasShowRawProductColumn) {
                     $cols .= ", show_raw_html";
@@ -172,8 +172,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
 
                     // Insert Variant
-                    $stmt = $pdo->prepare("INSERT INTO product_variants (product_id, color_name, color_code, image_path) VALUES (?, ?, ?, ?)");
-                    $stmt->execute([$product_id, $v_name, $v_code, $main_variant_image]);
+                    $stmt = $pdo->prepare("INSERT INTO product_variants (product_id, sku, color_name, color_code, image_path) VALUES (?, ?, ?, ?, ?)");
+                    $stmt->execute([$product_id, $v_data['sku'] ?? null, $v_name, $v_code, $main_variant_image]);
                     $variant_id = $pdo->lastInsertId();
 
                     // Insert Images into product_variant_images
@@ -205,13 +205,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-4" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-    <h1 class="admin-title" style="margin-bottom: 0;">
-        <?= $product ? __('edit_product', 'Edit Product') : __('add_new_product', 'Add New Product') ?>
-    </h1>
-    <a href="products.php" class="btn btn-secondary">
-        <i class="fa-solid fa-arrow-left"></i> <?= __('back_to_list', 'Back to List') ?>
-    </a>
+<div class="page-header">
+    <div class="page-header-info">
+        <h1 class="page-title">
+            <?= $product ? __('edit_product', 'Edit Product') : __('add_new_product', 'Add New Product') ?>
+        </h1>
+    </div>
+    <div class="page-header-actions">
+        <a href="products.php" class="btn btn-secondary">
+            <i class="fa-solid fa-arrow-left"></i> <?= __('back_to_list', 'Back to List') ?>
+        </a>
+    </div>
 </div>
 
 <form method="POST" enctype="multipart/form-data" class="admin-form-layout">
@@ -224,13 +228,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 <?php if ($error): ?>
                     <div class="alert alert-danger mb-4" style="background: #fee2e2; color: #b91c1c; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
-                        <?= $error ?>
+                        <?= htmlspecialchars($error) ?>
                     </div>
                 <?php endif; ?>
 
-                <div class="form-group mb-4">
-                    <label class="form-label"><?= __('product_name_label', 'Product Name') ?></label>
-                    <input type="text" name="name" class="form-control" value="<?= $product['name'] ?? '' ?>" placeholder="<?= __('product_name_placeholder', 'e.g. Wayfarer Classic') ?>" required>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-8">
+                        <label class="form-label"><?= __('product_name_label', 'Product Name') ?></label>
+                        <input type="text" name="name" class="form-control" value="<?= $product['name'] ?? '' ?>" placeholder="<?= __('product_name_placeholder', 'e.g. Wayfarer Classic') ?>" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Product SKU</label>
+                        <input type="text" name="sku" class="form-control" value="<?= $product['sku'] ?? '' ?>" placeholder="e.g. SKU-001">
+                    </div>
                 </div>
 
                 <div class="form-group mb-4">
@@ -317,9 +327,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 
                                 <div class="row g-3">
                                     <div class="col-md-7">
-                                        <div class="form-group mb-3">
-                                            <label class="form-label text-secondary small fw-bold">Color Name</label>
-                                            <input type="text" name="variants[<?= $idx ?>][name]" class="form-control" value="<?= htmlspecialchars($v['color_name']) ?>" placeholder="e.g. Midnight Blue">
+                                        <div class="row g-2 mb-3">
+                                            <div class="col-md-7">
+                                                <label class="form-label text-secondary small fw-bold">Color Name</label>
+                                                <input type="text" name="variants[<?= $idx ?>][name]" class="form-control" value="<?= htmlspecialchars($v['color_name']) ?>" placeholder="e.g. Midnight Blue">
+                                            </div>
+                                            <div class="col-md-5">
+                                                <label class="form-label text-secondary small fw-bold">Variant SKU</label>
+                                                <input type="text" name="variants[<?= $idx ?>][sku]" class="form-control" value="<?= htmlspecialchars($v['sku'] ?? '') ?>" placeholder="VAR-001">
+                                            </div>
                                         </div>
                                         <div class="form-group">
                                             <label class="form-label text-secondary small fw-bold">Color Code</label>
@@ -559,9 +575,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             <div class="row g-3">
                 <div class="col-md-7">
-                    <div class="form-group mb-3">
-                        <label class="form-label text-secondary small fw-bold">Color Name</label>
-                        <input type="text" name="variants[${timestamp}][name]" class="form-control" placeholder="e.g. Midnight Blue">
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-7">
+                            <label class="form-label text-secondary small fw-bold">Color Name</label>
+                            <input type="text" name="variants[${timestamp}][name]" class="form-control" placeholder="e.g. Midnight Blue">
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label text-secondary small fw-bold">Variant SKU</label>
+                            <input type="text" name="variants[${timestamp}][sku]" class="form-control" placeholder="VAR-001">
+                        </div>
                     </div>
                     <div class="form-group">
                         <label class="form-label text-secondary small fw-bold">Color Code</label>

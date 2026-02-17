@@ -43,8 +43,15 @@ if (empty($_SESSION['cart']) || empty($_SESSION['checkout_data'])) {
 try {
     // Calculate cart total
     $total = 0;
+    // Calculate cart total from DB to prevent tampering
+    $total = 0;
     foreach ($_SESSION['cart'] as $item) {
-        $total += $item['price'] * $item['quantity'];
+        $stmt = $pdo->prepare("SELECT price FROM products WHERE id = ?");
+        $stmt->execute([$item['id']]);
+        $prod = $stmt->fetch();
+        if ($prod) {
+            $total += $prod['price'] * $item['quantity'];
+        }
     }
     
     if ($total <= 0) {

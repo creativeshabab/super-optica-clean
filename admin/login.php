@@ -7,20 +7,30 @@ if (isAdmin()) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = $_POST['email'];
-    $password = $_POST['password'];
+    if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
+         $error = "Invalid form submission";
+    } elseif (!checkAdminLoginAttempts()) {
+         $minutes = getAdminLockRemaining();
+         $error = "Too many failed attempts. Account locked for $minutes minutes.";
+    } else {
+        $email = $_POST['email'];
+        $password = $_POST['password'];
 
     $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ? AND role = 'admin'");
     $stmt->execute([$email]);
     $user = $stmt->fetch();
 
     if ($user && password_verify($password, $user['password'])) {
+        recordAdminLoginAttempt(true); // Success reset
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['role'] = $user['role'];
-        $_SESSION['name'] = $user['name'];
+        // Handle name if column exists or fallback to email
+        $_SESSION['name'] = $user['first_name'] ?? $user['email'] ?? 'Admin';
         redirect('index.php');
     } else {
+        recordAdminLoginAttempt(false); // Log failure
         $error = "Invalid admin credentials";
+    }
     }
 }
 ?>
@@ -205,11 +215,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <?php if (isset($error)): ?>
         <div class="alert-error">
-            <i class="fa-solid fa-circle-exclamation"></i> <?= $error ?>
+            <i class="fa-solid fa-circle-exclamation"></i> <?= htmlspecialchars($error) ?>
         </div>
     <?php endif; ?>
 
     <form method="POST">
+        <?= csrfField() ?>
         <div class="form-group">
             <label class="form-label">Email Address</label>
             <div class="relative">
@@ -224,7 +235,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
         
-        <button type="submit" class="btn-login">
+        <button type="submit" class="btn btn-primary w-full py-4 mt-4">
             Login to Dashboard <i class="fa-solid fa-arrow-right-long"></i>
         </button>
     </form>

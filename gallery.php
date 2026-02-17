@@ -16,6 +16,14 @@ require_once 'includes/header.php';
 </section>
 <section class="web-wrapper section-padding">
     <div class="container mx-auto px-4">
+        
+        <!-- Standard Header (Matches Shop) -->
+        <div class="flex flex-row justify-between items-center mb-10 gap-4">
+           <div class="text-left m-0">
+              <span class="text-primary font-bold uppercase tracking-widest text-sm"><?= __('our_gallery') ?></span>
+              <h2 class="page-title-responsive font-black text-gray-800 mt-2"><?= __('visual') ?> <span class="text-primary">Experience</span></h2>
+           </div>
+        </div>
     <?php if (empty($gallery_items)): ?>
        <div class="text-center py-20 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
           <i class="fa-solid fa-images text-6xl text-gray-300 mb-6"></i>

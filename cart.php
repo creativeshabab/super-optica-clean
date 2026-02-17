@@ -12,7 +12,11 @@ if (isset($_GET['add'])) {
     }
     
     if (isset($_GET['redirect'])) {
-        redirect($_GET['redirect']);
+        $allowed_redirects = ['checkout.php', 'cart.php', 'shop.php'];
+        $target = basename($_GET['redirect']); // Strip path traversal
+        if (in_array($target, $allowed_redirects)) {
+            redirect($target);
+        }
     } else {
         redirect('cart.php');
     }
@@ -158,7 +162,7 @@ $total = getCartTotal();
                                 <a href="shop.php" class="text-secondary font-bold flex items-center gap-2 hover:text-primary transition-colors">
                                     <i class="fa-solid fa-arrow-left"></i> <?= __('continue_shopping') ?>
                                 </a>
-                                <button type="submit" name="update_cart" class="btn btn-outline py-3 px-6 text-sm font-bold">
+                                <button type="submit" name="update_cart" class="btn btn-outline py-3 px-6">
                                     <i class="fa-solid fa-rotate mr-2"></i> <?= __('update_cart') ?>
                                 </button>
                             </div>
@@ -200,8 +204,8 @@ $total = getCartTotal();
                             </div>
                         </div>
                         
-                        <div class="mt-8 space-y-4">
-                            <a href="checkout.php" class="btn btn-primary w-full py-4 text-lg font-bold flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transition-all">
+                        <div class="mt-8 space-y-6">
+                            <a href="checkout.php" class="btn btn-primary w-full py-4 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transition-all">
                                 <?= __('proceed_to_checkout') ?> <i class="fa-solid fa-chevron-right text-xs"></i>
                             </a>
                             <p class="text-center text-[10px] text-gray-400 font-medium flex items-center justify-center gap-2 uppercase tracking-widest">

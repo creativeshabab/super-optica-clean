@@ -102,9 +102,30 @@ $cart_count = getCartCount();
     <link rel="stylesheet" href="<?= getBaseURL() ?>/style.css?v=<?= time() ?>">
     
     <!-- Main Custom Styles - Load AFTER components to allow overrides -->
-    <link rel="stylesheet" href="<?= getBaseURL() ?>assets/css/utilities.css?v=<?= time() ?>">
-    <link rel="stylesheet" href="<?= getBaseURL() ?>assets/css/main.css?v=2.5">
-    <link rel="stylesheet" href="<?= getBaseURL() ?>assets/css/checkout.css?v=2.1">
+    <!-- Dynamic CSS Loading (Minified vs Dev) -->
+    <?php
+    $css_files = [
+        'assets/css/variables.css', 
+        'assets/css/utilities.css', 
+        'assets/css/main.css', 
+        'assets/css/style.css',
+        'assets/css/components.css',
+        'assets/css/product-page.css',
+        'assets/css/checkout.css'
+    ];
+    
+    foreach ($css_files as $css) {
+        $min_path = str_replace('.css', '.min.css', $css);
+        $full_min_path = __DIR__ . '/../' . $min_path; // Assuming this file is in /includes and assets are in /assets
+        $full_css_path = __DIR__ . '/../' . $css;
+
+        if (defined('IS_PRODUCTION') && IS_PRODUCTION && file_exists($full_min_path)) {
+            echo '<link rel="stylesheet" href="' . getBaseURL() . $min_path . '?v=' . time() . '">' . "\n";
+        } else if (file_exists($full_css_path)) {
+            echo '<link rel="stylesheet" href="' . getBaseURL() . $css . '?v=' . time() . '">' . "\n";
+        }
+    }
+    ?>
     
     <!-- Header V2 (Isolated Fix) -->
     <link rel="stylesheet" href="<?= getBaseURL() ?>assets/css/header_v2.css?v=1.1">

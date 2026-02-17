@@ -76,36 +76,39 @@
 
 <section class="web-wrapper section-padding">
     <div class="container mx-auto px-4">
-    <!-- Category Filter -->
-    <div class="flex flex-row justify-between items-center mb-8 gap-4">
-       <div class=" text-left text-md-left m-0">
-          <span class="text-primary font-bold uppercase tracking-widest text-sm"><?= __('browse_our') ?></span>
-          <h2 class="page-title-responsive font-black text-gray-800 mt-2"><?= __('eyewear') ?> <span class="text-primary"><?= __('collection') ?></span></h2>
+    <!-- Category Filter Header -->
+    <div class="flex justify-between items-end align-center mb-8 gap-4">
+       <div>
+          <span class="text-primary font-bold uppercase tracking-widest text-xs md:text-sm"><?= __('browse_our') ?></span>
+          <h2 class="text-2xl md:text-4xl font-black text-gray-800 mt-2"><?= __('eyewear') ?> <span class="text-primary"><?= __('collection') ?></span></h2>
        </div>
-       
-       <!-- Mobile Filter Button (Icon Only) -->
-       <!-- Mobile Filter Button (Icon Only - Fixed Width) -->
-       <button class="btn btn-outline md:hidden w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-full border-gray-200 text-gray-700 hover:border-primary hover:text-primary transition-colors shadow-sm" id="mobileFilterBtn" title="Filter Categories">
-          <i class="fa-solid fa-sliders"></i>
-       </button>
-       
-       <!-- Desktop Category Scroll -->
-       <div class="category-scroll hidden md:flex gap-2 overflow-x-auto pb-2">
-         <a href="shop.php" class="btn <?= !$category_id ? 'btn-primary' : 'btn-outline' ?> rounded-full whitespace-nowrap transition-colors"><?= __('all') ?></a>
-         <?php 
-            foreach ($categories as $cat): 
-                // Only show parent categories as main filters
-                if ($cat['parent_id'] === null):
-            ?>
-         <a href="shop.php?category=<?= $cat['slug'] ?>" class="btn <?= ($category_id == $cat['id'] || $category_input == $cat['slug']) ? 'btn-primary' : 'btn-outline' ?> rounded-full whitespace-nowrap transition-colors">
-         <?= htmlspecialchars($cat['name']) ?>
-         </a>
-        <?php 
-           endif;
-           endforeach; 
-           ?>
-     </div>
+
+       <div class="flex items-center gap-4">
+            <!-- Desktop View All (Only if filtering by category or searching) -->
+                <!-- Desktop Category Scroll -->
+    <div class="category-scroll hidden md:flex gap-2 overflow-x-auto pb-4 mb-8">
+      <a href="shop.php" class="btn <?= !$category_id ? 'btn-primary' : 'btn-outline' ?> rounded-full whitespace-nowrap transition-colors no-margin"><?= __('all') ?></a>
+      <?php 
+         foreach ($categories as $cat): 
+             if ($cat['parent_id'] === null):
+         ?>
+      <a href="shop.php?category=<?= $cat['slug'] ?>" class="btn <?= ($category_id == $cat['id'] || $category_input == $cat['slug']) ? 'btn-primary' : 'btn-outline' ?> rounded-full whitespace-nowrap transition-colors no-margin">
+      <?= htmlspecialchars($cat['name']) ?>
+      </a>
+     <?php 
+        endif;
+        endforeach; 
+        ?>
     </div>
+
+            <!-- Mobile Filter Button -->
+            <button class="btn btn-outline md:hidden w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-full border-gray-200 text-gray-700 transition-colors shadow-sm" id="mobileFilterBtn" title="Filter Categories">
+                <i class="fa-solid fa-sliders"></i>
+            </button>
+       </div>
+    </div>
+
+
 
     <!-- Product Grid -->
     <?php if (count($products) > 0): ?>

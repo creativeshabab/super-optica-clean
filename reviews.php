@@ -9,10 +9,13 @@
 <section class="web-wrapper section-padding bg-gray-50">
     <div class="container mx-auto px-4">
 
-      <div class="text-left mb-12">
-        <span class="text-primary font-bold uppercase tracking-widest text-sm"><?= __('testimonials') ?></span>
-        <h2 class="text-4xl font-black text-gray-800 mt-2"><?= __('customer') ?> <span class="text-primary"><?= __('reviews') ?></span></h2>
-    </div>
+      <!-- Standard Header (Matches Shop) -->
+      <div class="flex flex-row justify-between items-center mb-10 gap-4">
+         <div class="text-left m-0">
+            <span class="text-primary font-bold uppercase tracking-widest text-sm"><?= __('testimonials') ?></span>
+            <h2 class="page-title-responsive font-black text-gray-800 mt-2"><?= __('customer') ?> <span class="text-primary"><?= __('reviews') ?></span></h2>
+         </div>
+      </div>
 
    <?php 
       $reviews = $pdo->query("SELECT * FROM reviews ORDER BY created_at DESC")->fetchAll();

@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="container mx-auto px-4 text-center">
         <h2 class="text-3xl font-bold text-accent mb-4">Need an Eye Checkup?</h2>
         <p class="text-gray-500 mb-8 max-w-2xl mx-auto leading-relaxed">Book your appointment online and skip the queue. Professional eye testing by certified opticians using state-of-the-art equipment.</p>
-        <a href="book_appointment.php" class="btn btn-primary rounded-full shadow-lg hover:shadow-xl transition-shadow inline-flex items-center gap-2">
+        <a href="book_appointment.php" class="btn btn-primary rounded-full inline-flex items-center gap-2">
             <i class="fa-solid fa-calendar-check"></i> Book Appointment Now
         </a>
     </div>
@@ -184,7 +184,8 @@ document.addEventListener('DOMContentLoaded', function() {
 <section class="bg-gray-50 section-padding">
 <div class="container mx-auto px-4">
    
-    <div class="flex justify-between items-end mb-8 md:mb-12">
+<!-- Header Feture product  -->
+     <div class="flex justify-between items-end align-center">
         <div>
             <span class="text-primary font-bold uppercase tracking-widest text-xs md:text-sm">Best Sellers</span>
             <h2 class="text-2xl md:text-4xl font-black text-gray-800 mt-2">Featured <span class="text-primary">Products</span></h2>
@@ -194,6 +195,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <!-- Desktop View All -->
         <a href="shop.php" class="text-primary font-bold hover:underline hidden md:inline-block">View All Products &rarr;</a>
     </div>
+  <!-- Header Feture product  -->  
 
     <!-- Added mobile-snap-slider class -->
     <div class="dynamic-product-grid-v2 mobile-snap-slider">
@@ -216,13 +218,19 @@ if (getThemeSetting('theme_show_services', '1') == '1' && count($services) > 0):
 
 <section class="section-padding bg-white">
 <div class="container mx-auto px-4">
-    <div class="flex justify-between items-end mb-12">
+
+
+     <div class="flex justify-between items-end align-center">
         <div>
-            <span class="text-primary font-bold uppercase tracking-widest text-sm">Top Quality</span>
-            <h2 class="text-4xl font-black text-gray-800 mt-2">Our <span class="text-primary">Services</span></h2>
+            <span class="text-primary font-bold uppercase tracking-widest text-xs md:text-sm">Top Quality</span>
+            <h2 class="text-2xl md:text-4xl font-black text-gray-800 mt-2">Our <span class="text-primary">Services</span></h2>
         </div>
+        <!-- Mobile See More -->
+        <a href="services.php" class="text-primary font-bold text-sm hover:underline md:hidden">See More &rarr;</a>
+        <!-- Desktop View All -->
         <a href="services.php" class="text-primary font-bold hover:underline hidden md:inline-block">View All Services &rarr;</a>
     </div>
+
     
     <div class="dynamic-service-grid-v2">
         <?php foreach ($services as $s): ?>
@@ -261,12 +269,15 @@ $reviews = $pdo->query("SELECT * FROM reviews ORDER BY created_at DESC LIMIT $re
 if (getThemeSetting('theme_show_reviews', '1') == '1' && count($reviews) > 0): 
 ?>
 <section class="section-padding bg-white">
-    <div class="container mx-auto px-4">
-        <div class="flex justify-between items-end mb-12">
+    <div class="container">
+        <div class="flex justify-between items-end align-center">
             <div>
-                <span class="text-primary font-bold uppercase tracking-widest text-sm"><?= __('testimonials') ?></span>
-                <h2 class="text-4xl font-black text-gray-800 mt-2">Customers <span class="text-primary">Say</span></h2>
+                <span class="text-primary font-bold uppercase tracking-widest text-xs md:text-sm"><?= __('testimonials') ?></span>
+                <h2 class="text-2xl md:text-4xl font-black text-gray-800 mt-2">Customers <span class="text-primary">Say</span></h2>
             </div>
+            <!-- Mobile See More -->
+            <a href="reviews.php" class="text-primary font-bold text-sm hover:underline md:hidden">See More &rarr;</a>
+            <!-- Desktop View All -->
             <a href="reviews.php" class="text-primary font-bold hover:underline hidden md:inline-block">View All Reviews &rarr;</a>
         </div>
         
@@ -311,11 +322,14 @@ if (getThemeSetting('theme_show_reviews', '1') == '1' && count($reviews) > 0):
 <?php if (getThemeSetting('theme_show_blog', '1') == '1'): ?>
 <section class="section-padding bg-gray-50">
     <div class="container mx-auto px-4">
-        <div class="flex justify-between items-end mb-12">
+        <div class="flex justify-between items-end align-center">
             <div>
-                <span class="text-primary font-bold uppercase tracking-widest text-sm"><?= __('our_blog') ?></span>
-                <h2 class="text-4xl font-black text-gray-800 mt-2">Latest <span class="text-primary">News</span></h2>
+                <span class="text-primary font-bold uppercase tracking-widest text-xs md:text-sm"><?= __('our_blog') ?></span>
+                <h2 class="text-2xl md:text-4xl font-black text-gray-800 mt-2">Latest <span class="text-primary">News</span></h2>
             </div>
+            <!-- Mobile See More -->
+            <a href="blog.php" class="text-primary font-bold text-sm hover:underline md:hidden">See More &rarr;</a>
+            <!-- Desktop View All -->
             <a href="blog.php" class="text-primary font-bold hover:underline hidden md:inline-block">View All News &rarr;</a>
         </div>
         

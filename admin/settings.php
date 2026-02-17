@@ -94,8 +94,10 @@ $trust_btn_text = getSetting('trust_btn_text', 'Book Eye Test');
 $trust_btn_link = getSetting('trust_btn_link', 'book_appointment.php');
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-4" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem;">
-    <h1 class="admin-title" style="margin-bottom: 0;">Website Control Center</h1>
+<div class="page-header">
+    <div class="page-header-info">
+        <h1 class="page-title">Website Control Center</h1>
+    </div>
 </div>
 
 <style>
@@ -344,6 +346,7 @@ $trust_btn_link = getSetting('trust_btn_link', 'book_appointment.php');
                     <span class="toggle-slider"></span>
                 </label>
             </div>
+
 
             <div class="form-group">
                 <label>Custom Header Code (Before &lt;/head&gt;)</label>

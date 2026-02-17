@@ -33,16 +33,91 @@ try {
     exit;
 }
 
-// Fetch all gallery items
-$stmt = $pdo->query("SELECT * FROM gallery ORDER BY display_order ASC, created_at DESC");
+// Get Listing Parameters
+$params = getListingParams('display_order', 'ASC');
+$page = $params['page'];
+$search = $params['search'];
+$sort = $params['sort'];
+$order = $params['order'];
+$limit = $params['limit'];
+
+// Build Query
+$where = "1=1";
+$sqlParams = [];
+
+if ($search) {
+    if (strpos($search, 'cat:') === 0) {
+        $cat = substr($search, 4);
+        $where .= " AND category LIKE ?";
+        $sqlParams[] = "%$cat%";
+    } else {
+        $where .= " AND (title LIKE ? OR description LIKE ? OR category LIKE ?)";
+        $sqlParams[] = "%$search%";
+        $sqlParams[] = "%$search%";
+        $sqlParams[] = "%$search%";
+    }
+}
+
+// Get Total Count
+$countQuery = "SELECT COUNT(*) FROM gallery WHERE $where";
+$stmt = $pdo->prepare($countQuery);
+$stmt->execute($sqlParams);
+$totalItems = $stmt->fetchColumn();
+
+// Get Pagination Data
+$pagination = getPaginationData($totalItems, $limit);
+$offset = $pagination['offset'];
+
+// Fetch Paginated Gallery Items
+$allowedSorts = ['title', 'display_order', 'created_at'];
+if (!in_array($sort, $allowedSorts)) { $sort = 'display_order'; }
+
+$query = "SELECT * FROM gallery 
+          WHERE $where 
+          ORDER BY $sort $order 
+          LIMIT $limit OFFSET $offset";
+
+$stmt = $pdo->prepare($query);
+$stmt->execute($sqlParams);
 $gallery_items = $stmt->fetchAll();
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="admin-title"><?= __('gallery_title') ?></h1>
-    <a href="gallery_form.php" class="btn btn-primary">
-        <i class="fa-solid fa-plus"></i> <?= __('add_new_gallery_item') ?>
-    </a>
+<div class="page-header">
+    <div class="page-header-info">
+        <h1 class="page-title"><?= __('gallery_title') ?></h1>
+        <p class="page-subtitle">Showcase your products and clinic through a visual portfolio.</p>
+    </div>
+    <div class="page-header-actions">
+        <a href="gallery_form.php" class="btn btn-primary">
+            <i class="fa-solid fa-plus"></i> <?= __('add_new_gallery_item') ?>
+        </a>
+    </div>
+</div>
+
+<!-- Listing Controls -->
+<div class="listing-controls">
+    <form method="GET" class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="Search by title or category (cat:Category)..." class="form-control">
+        <?php if($search): ?>
+            <a href="gallery.php" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); color: var(--admin-text-light);"><i class="fa-solid fa-xmark" style="position: static; padding: 0;"></i></a>
+        <?php endif; ?>
+    </form>
+
+    <div class="filter-group">
+        <form method="GET" style="display: flex; gap: 0.75rem; align-items: center;">
+            <input type="hidden" name="search" value="<?= htmlspecialchars($search) ?>">
+            <select name="sort" onchange="this.form.submit()" class="form-control">
+                <option value="display_order" <?= $sort == 'display_order' ? 'selected' : '' ?>>Display Order</option>
+                <option value="created_at" <?= $sort == 'created_at' ? 'selected' : '' ?>>Newest First</option>
+                <option value="title" <?= $sort == 'title' ? 'selected' : '' ?>>Title</option>
+            </select>
+            <select name="order" onchange="this.form.submit()" class="form-control" style="min-width: 100px;">
+                <option value="ASC" <?= $order == 'ASC' ? 'selected' : '' ?>>ASC</option>
+                <option value="DESC" <?= $order == 'DESC' ? 'selected' : '' ?>>DESC</option>
+            </select>
+        </form>
+    </div>
 </div>
 
 <?php if (empty($gallery_items)): ?>
@@ -102,5 +177,7 @@ $gallery_items = $stmt->fetchAll();
         <?php endforeach; ?>
     </div>
 <?php endif; ?>
+
+<?= renderPagination($page, $pagination['total_pages']) ?>
 
 <?php require_once 'footer.php'; ?>

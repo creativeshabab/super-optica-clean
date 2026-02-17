@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $user) {
             </div>
         <?php elseif ($error): ?>
             <div class="alert--error mb-8">
-                <i class="fa-solid fa-circle-exclamation mr-2"></i> <?= $error ?>
+                <i class="fa-solid fa-circle-exclamation mr-2"></i> <?= htmlspecialchars($error) ?>
                 <?php if (strpos($error, 'Invalid or expired') !== false): ?>
                     <div class="mt-4">
                         <a href="forgot-password.php" class="text-primary font-black">Request New Link</a>
@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $user) {
                     <input type="password" name="confirm_password" required placeholder="••••••••" class="form-input">
                 </div>
                 
-                <button type="submit" class="btn btn-primary w-full py-3 text-lg font-bold mt-4 transform hover:-translate-y-1 transition-all">
+                <button type="submit" class="btn btn-primary w-full py-3 mt-4 transform hover:-translate-y-1 transition-all">
                     Update Password <i class="fa-solid fa-check ml-2"></i>
                 </button>
             </form>

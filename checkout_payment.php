@@ -8,8 +8,7 @@ if (empty($_SESSION['checkout_data'])) redirect('checkout.php');
 // 1. Initial State
 $checkout = $_SESSION['checkout_data'];
 $cart = $_SESSION['cart'] ?? [];
-$lens_total = $checkout['lens_total'] ?? 0;
-$subtotal = getCartTotal() + $lens_total;
+$subtotal = getCartTotal();
 $discount = 0;
 $coupon_id = null;
 $coupon_code = '';
@@ -54,6 +53,12 @@ $total = $subtotal; // Default before payment method is finalized
 
 
 if (isset($_POST['confirm_order'])) {
+    if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
+         setFlash('error', 'Invalid form submission (CSRF)');
+         redirect('checkout_payment.php');
+         exit;
+    }
+
     $payment_method = $_POST['payment_method'] ?? 'cod';
     $user_id = $_SESSION['user_id'];
     $order_number = 'ORD-' . strtoupper(uniqid());
@@ -61,13 +66,34 @@ if (isset($_POST['confirm_order'])) {
     try {
         $pdo->beginTransaction();
 
+        // Security: Re-validate cart prices from DB to prevent tampering
+        foreach ($cart as $key => $item) {
+            $stmt = $pdo->prepare("SELECT price, stock_quantity, name FROM products WHERE id = ?");
+            $stmt->execute([$item['id']]);
+            $db_product = $stmt->fetch();
+            
+            if (!$db_product) {
+                throw new Exception("Product no longer available: " . $item['name']);
+            }
+            
+            // Update price in cart array for calculation
+            $cart[$key]['price'] = $db_product['price'];
+            $cart[$key]['name'] = $db_product['name']; // Ensure name matches DB
+        }
+        
+        // Recalculate subtotal with verified prices
+        $subtotal = 0;
+        foreach ($cart as $item) {
+             $subtotal += $item['price'] * $item['quantity'];
+        }
+
         // Final Discount Calculation
         $final_discount = 0;
         $final_coupon_id = null;
         
         if ($coupon_id) {
-            // VALIDATION: Check if coupon actually exists to prevent Foreign Key Error
-            $chk_coupon = $pdo->prepare("SELECT id FROM coupons WHERE id = ?");
+            // VALIDATION: Check if coupon actually exists AND is active/not expired
+            $chk_coupon = $pdo->prepare("SELECT id FROM coupons WHERE id = ? AND is_active = 1 AND (start_date IS NULL OR start_date <= NOW()) AND (end_date IS NULL OR end_date >= NOW())");
             $chk_coupon->execute([$coupon_id]);
             if ($chk_coupon->fetch()) {
                  // Apply if: It's not prepaid-only OR payment is not COD
@@ -76,7 +102,7 @@ if (isset($_POST['confirm_order'])) {
                     $final_coupon_id = $coupon_id;
                 }
             } else {
-                // Coupon ID in session is invalid/deleted
+                // Coupon is invalid, deleted, or expired
                 $coupon_id = null; 
             }
         }
@@ -99,34 +125,19 @@ if (isset($_POST['confirm_order'])) {
             $stmt = $pdo->prepare("INSERT INTO order_items (order_id, product_id, product_name, sku, quantity, price) VALUES (?, ?, ?, ?, ?, ?)");
             $stmt->execute([$order_id, $item['id'], $product['name'] ?? $item['name'], $product['sku'] ?? '', $item['quantity'], $item['price']]);
             
-            // Reduce stock
+            // Reduce stock (Atomic update to prevent race conditions)
             if (isset($product['stock_quantity']) && $product['stock_quantity'] !== null) {
-                $new_stock = max(0, $product['stock_quantity'] - $item['quantity']);
-                $update_stock = $pdo->prepare("UPDATE products SET stock_quantity = ? WHERE id = ?");
-                $update_stock->execute([$new_stock, $item['id']]);
+                $update_stock = $pdo->prepare("UPDATE products SET stock_quantity = stock_quantity - ? WHERE id = ? AND stock_quantity >= ?");
+                $result = $update_stock->execute([$item['quantity'], $item['id'], $item['quantity']]);
+                
+                if ($update_stock->rowCount() === 0) {
+                     throw new Exception('Insufficient stock for: ' . ($product['name'] ?? $item['name']));
+                }
                 
                 checkStockAndNotify($item['id']);
             }
         }
 
-        // Save Prescriptions (Nested Split)
-        if (!empty($checkout['prescriptions'])) {
-            $rx_stmt = $pdo->prepare("INSERT INTO order_prescriptions (order_id, product_id, lens_option_id, od_sph, od_cyl, od_axis, od_add, os_sph, os_cyl, os_axis, os_add, pd, prescription_file) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            
-            foreach ($checkout['prescriptions'] as $prod_id => $units) {
-                foreach ($units as $idx => $rx) {
-                    $rx_stmt->execute([
-                        $order_id,
-                        $prod_id,
-                        $rx['lens_option_id'],
-                        $rx['od_sph'], $rx['od_cyl'], $rx['od_axis'], $rx['od_add'],
-                        $rx['os_sph'], $rx['os_cyl'], $rx['os_axis'], $rx['os_add'],
-                        $rx['pd'],
-                        $rx['file'] ?? null
-                    ]);
-                }
-            }
-        }
 
         $pdo->commit();
         
@@ -183,20 +194,19 @@ if (isset($_POST['confirm_order'])) {
 <div class="checkout-container">
     <div class="container">
         <!-- Stepper -->
+        <!-- Stepper -->
         <div class="checkout-stepper">
             <div class="step completed">
                 <span class="step-number"><i class="fa-solid fa-check"></i></span>
-                <span><?= __('shipping') ?></span>
+                <span class="step-label"><?= __('shipping') ?></span>
             </div>
-            <div class="step-line bg-success"></div>
             <div class="step active">
                 <span class="step-number">02</span>
-                <span><?= __('payment') ?></span>
+                <span class="step-label"><?= __('payment') ?></span>
             </div>
-            <div class="step-line"></div>
             <div class="step">
                 <span class="step-number">03</span>
-                <span><?= __('success') ?></span>
+                <span class="step-label"><?= __('success') ?></span>
             </div>
         </div>
 
@@ -210,10 +220,11 @@ if (isset($_POST['confirm_order'])) {
             <!-- Payment Section -->
             <div class="checkout-card">
                 <h3 class="checkout-card-title">
-                    <i class="fa-solid fa-credit-card"></i> <?= __('payment_method') ?>
+                    <i class="fa-solid fa-credit-card"></i> 2. Choose Payment Method
                 </h3>
                 
                 <form method="POST" id="paymentForm">
+                    <?= csrfField() ?>
                     <input type="hidden" name="confirm_order" value="1">
                     <div class="flex flex-col gap-4 mb-8">
                         <?php
@@ -255,10 +266,15 @@ if (isset($_POST['confirm_order'])) {
                         <?php endif; ?>
                     </div>
 
-                    <button type="submit" name="confirm_order" id="placeOrderBtn" class="btn btn-checkout" <?= empty($gateways) ? 'disabled' : '' ?>>
-                        <?= __('place_order') ?> (₹<?= number_format($total, 2) ?>) <i class="fa-solid fa-check ml-2"></i>
-                    </button>
-                    <p class="text-center mt-4 text-xs text-muted">
+                    <div class="flex gap-4">
+                        <a href="checkout.php" class="btn btn-outline flex-1 py-4 flex items-center justify-center gap-2 no-margin">
+                             <i class="fa-solid fa-chevron-left text-xs"></i> Back
+                        </a>
+                        <button type="submit" name="confirm_order" id="placeOrderBtn" class="btn btn-primary flex-1 py-4 shadow-xl hover:shadow-primary/20 transition-all flex items-center justify-center gap-3" <?= empty($gateways) ? 'disabled' : '' ?>>
+                            <?= __('place_order') ?> (₹<?= number_format($total, 2) ?>) <i class="fa-solid fa-check ml-2"></i>
+                        </button>
+                    </div>
+                    <p class="text-center mt-6 text-[10px] text-gray-400 font-medium uppercase tracking-widest">
                         <?= __('terms_agree') ?>
                     </p>
                 </form>
@@ -285,12 +301,6 @@ if (isset($_POST['confirm_order'])) {
                         <span><?= __('items_total') ?></span>
                         <span>₹<?= number_format(getCartTotal(), 2) ?></span>
                     </div>
-                    <?php if ($lens_total > 0): ?>
-                    <div class="summary-item text-primary">
-                        <span>Lens Charges</span>
-                        <span>+₹<?= number_format($lens_total, 2) ?></span>
-                    </div>
-                    <?php endif; ?>
                     <?php if ($coupon_id): ?>
                     <div id="uiDiscountRow" class="summary-item <?= $is_prepaid_only ? 'hidden' : 'flex' ?>">
                         <span>Coupon (<?= htmlspecialchars($coupon_code) ?>)</span>

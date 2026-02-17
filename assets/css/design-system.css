@@ -363,12 +363,28 @@
     align-items: center;
     justify-content: center;
     padding: var(--btn-padding, 0.8rem 1.5rem);
+    font-family: inherit;
     font-weight: var(--btn-font-weight, 600);
     border-radius: var(--btn-radius, 8px);
     transition: all 0.3s ease;
     cursor: pointer;
     text-decoration: none;
     line-height: 1.25;
+    margin-bottom: 1rem;
+}
+
+.btn.no-margin {
+    margin-bottom: 0 !important;
+}
+
+.btn-sm {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.85rem !important;
+}
+
+.btn-lg {
+    padding: 1rem 2rem !important;
+    font-size: 1.1rem !important;
 }
 
 .btn-primary {
@@ -391,15 +407,44 @@
     border-color: #475569;
 }
 
-.btn-outline {
-    background-color: transparent;
-    border: 1px solid #e2e8f0;
-    color: var(--text-main);
+/* Action Buttons - Universal Premium Style */
+.btn-action {
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    flex-shrink: 0;
 }
-.btn-outline:hover {
-    border-color: var(--color-primary);
-    color: var(--color-primary);
-    background-color: #fff;
+
+.btn-action:hover {
+    transform: translateY(-2px);
+}
+
+.btn-action-edit {
+    background: #eff6ff;
+    color: #334155;
+}
+
+.btn-action-edit:hover {
+    background: #dbeafe;
+    box-shadow: 0 4px 12px rgba(51, 65, 85, 0.1);
+}
+
+.btn-action-delete {
+    background: #fff1f2;
+    color: #ef4444;
+}
+
+.btn-action-delete:hover {
+    background: #fee2e2;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
 }
 
 /* Cards */
@@ -635,5 +680,47 @@
     font-size: 0.7rem;
     display: block;
     margin-top: 5px;
+}
+
+/* OTP Multi-Input Styles */
+.otp-input-container {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+}
+
+.otp-box {
+    width: 3.5rem;
+    height: 4rem;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    background-color: #f1f5f9; /* Light gray from screenshot */
+    border: 2px solid rgba(0,0,0,0.05);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.otp-box:focus {
+    background-color: #ffffff;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 4px rgba(227, 30, 36, 0.1);
+}
+
+.otp-box::placeholder {
+    color: #94a3b8;
+}
+
+@media (max-width: 480px) {
+    .otp-input-container {
+        gap: 0.5rem;
+    }
+    .otp-box {
+        width: 2.8rem;
+        height: 3.5rem;
+        font-size: 1.25rem;
+    }
 }
 

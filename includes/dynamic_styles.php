@@ -89,6 +89,12 @@ switch($btn_size_preset) {
         $btn_padding = '0.8rem 1.5rem';
 }
 
+// Custom Font Size Override from Dashboard
+$custom_btn_size = getThemeSetting('theme_btn_font_size_custom', '');
+if (!empty($custom_btn_size)) {
+    $btn_font_size = $custom_btn_size;
+}
+
 // Button Defaults
 $btn_radius = '12px';
 $btn_font_weight = '700';
@@ -199,6 +205,15 @@ $footer_text = getThemeSetting('theme_footer_text', '#f8fafc');
     --surface: <?= $surface_color ?>;
     --text-main: <?= $text_main ?>;
     --text-light: <?= $text_light ?>;
+
+    /* Legacy Mappings for compatibility */
+    --color-primary: <?= $primary_color ?>;
+    --color-secondary: <?= $secondary_color ?>;
+    --color-accent: <?= $accent_color ?>;
+    --bg-color: <?= $background_color ?>;
+    --surface-color: <?= $surface_color ?>;
+    --text-main-color: <?= $text_main ?>;
+    --text-light-color: <?= $text_light ?>;
     
     --font-family: <?= $font_family ?>;
     --base-font-size: <?= $base_font_size_mobile ?>; /* Default Mobile */
@@ -401,6 +416,8 @@ p {
 .btn {
     border-radius: var(--btn-radius);
     padding: var(--btn-padding);
+    font-size: var(--btn-font-size);
+    font-family: var(--font-family);
     font-weight: var(--btn-font-weight);
     transition: all var(--anim-duration) var(--anim-easing);
     display: inline-flex;
@@ -437,6 +454,7 @@ p {
 
 .btn-outline:hover {
     background-color: var(--primary);
+    border-color: var(--primary);
     color: #ffffff;
 }
 

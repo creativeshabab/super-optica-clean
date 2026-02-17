@@ -41,15 +41,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<div style="margin-bottom: 2.5rem;">
-    <h1 class="admin-title" style="margin-bottom: 0.5rem;"><?= $coupon ? __('edit_coupon') : __('create_coupon_title') ?></h1>
-    <p style="color: var(--admin-text-light); font-weight: 500;"><?= __('coupon_config_subtitle') ?></p>
+<div class="page-header">
+    <div class="page-header-info">
+        <h1 class="page-title"><?= $coupon ? __('edit_coupon') : __('create_coupon_title') ?></h1>
+        <p class="page-subtitle"><?= __('coupon_config_subtitle') ?></p>
+    </div>
 </div>
 
 <div class="card" style="max-width: 800px; padding: 2.5rem;">
     <?php if (isset($error)): ?>
         <div class="alert status-failed" style="padding: 1rem; border-radius: 12px; margin-bottom: 2rem;">
-            <i class="fa-solid fa-circle-exclamation"></i> <?= $error ?>
+            <i class="fa-solid fa-circle-exclamation"></i> <?= htmlspecialchars($error) ?>
         </div>
     <?php endif; ?>
 

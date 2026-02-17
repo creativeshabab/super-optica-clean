@@ -41,13 +41,17 @@ $notifications = $stmt->fetchAll();
 ?>
 
 <div class="admin-content">
-    <div class="admin-header-actions">
-        <h1><i class="fa-solid fa-bell" style="color: var(--admin-primary);"></i> Notifications</h1>
-        <form method="POST" style="display: inline;">
-            <button type="submit" name="mark_all_read" class="admin-btn admin-btn-primary">
-                <i class="fa-solid fa-check-double"></i> Mark All as Read
-            </button>
-        </form>
+    <div class="page-header">
+        <div class="page-header-info">
+            <h1 class="page-title"><i class="fa-solid fa-bell" style="color: var(--admin-primary);"></i> Notifications</h1>
+        </div>
+        <div class="page-header-actions">
+            <form method="POST" style="display: inline;">
+                <button type="submit" name="mark_all_read" class="btn btn-primary">
+                    <i class="fa-solid fa-check-double"></i> Mark All as Read
+                </button>
+            </form>
+        </div>
     </div>
 
     <!-- Filter Tabs -->

@@ -22,12 +22,17 @@ if (empty($code)) {
 }
 
 try {
-    $stmt = $pdo->prepare("SELECT * FROM coupons WHERE code = ? AND is_active = 1 LIMIT 1");
+    $stmt = $pdo->prepare("SELECT * FROM coupons WHERE code = ? LIMIT 1");
     $stmt->execute([$code]);
     $coupon = $stmt->fetch();
 
     if (!$coupon) {
-        echo json_encode(['success' => false, 'message' => 'Invalid or inactive coupon code.']);
+        echo json_encode(['success' => false, 'message' => 'Invalid coupon code.']);
+        exit;
+    }
+
+    if ($coupon['is_active'] == 0) {
+        echo json_encode(['success' => false, 'message' => 'This coupon is currently inactive.']);
         exit;
     }
 
@@ -89,5 +94,6 @@ try {
     ]);
 
 } catch (Exception $e) {
-    echo json_encode(['success' => false, 'message' => 'Error validating coupon: ' . $e->getMessage()]);
+    error_log("Coupon validation error: " . $e->getMessage());
+    echo json_encode(['success' => false, 'message' => 'An error occurred while validating the coupon. Please try again.']);
 }

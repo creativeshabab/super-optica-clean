@@ -332,24 +332,33 @@ pre.code-view {
 /* Breadcrumb nav margin removed for compact hero design */
 
 .breadcrumb-list {
-  display: inline-flex;
+  display: flex;
+  flex-wrap: nowrap;
   align-items: center;
   list-style: none;
   padding: 0;
+  margin: 0;
   background: transparent;
   border-radius: 0;
   gap: 0.6rem;
   font-size: 0.85rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.7);
-  /* Soft white for non-active */
   border: none;
   box-shadow: none;
+  white-space: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.breadcrumb-list::-webkit-scrollbar {
+  display: none;
 }
 
 .breadcrumb-list li {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .breadcrumb-list li a {
@@ -369,6 +378,7 @@ pre.code-view {
   font-size: 0.65rem;
   color: rgba(255, 255, 255, 0.4);
   margin: 0 0.1rem;
+  flex-shrink: 0;
 }
 
 .breadcrumb-list li i.fa-house {
@@ -382,6 +392,55 @@ pre.code-view {
   background: rgba(255, 255, 255, 0.15);
   padding: 4px 12px;
   border-radius: 4px;
+  white-space: nowrap;
+  text-align: left;
+}
+
+@media (max-width: 768px) {
+  .breadcrumb-list {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    width: 100%;
+    gap: 0.5rem !important;
+    font-size: 0.7rem;
+    line-height: 1.4;
+    white-space: nowrap !important;
+    padding: 4px 0;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none;
+  }
+  .breadcrumb-list::-webkit-scrollbar {
+    display: none;
+  }
+  .breadcrumb-list li {
+    display: flex !important;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.08); /* Subtle chip background */
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0 !important;
+  }
+  .breadcrumb-list li a {
+    display: inline !important;
+    color: #fff !important;
+    opacity: 0.9;
+  }
+  .breadcrumb-separator {
+    display: flex !important;
+    align-items: center;
+    margin: 0;
+    opacity: 0.5;
+    font-size: 0.6rem;
+    color: #fff;
+    flex-shrink: 0 !important;
+  }
+  .breadcrumb-list li.active {
+    background: rgba(255, 255, 255, 0.25) !important;
+    border-color: rgba(255, 255, 255, 0.4);
+    font-weight: 700;
+  }
 }
 
 .product-badge {
@@ -2714,6 +2773,9 @@ section.wrapperSection {
 .feature-list li {
   margin-bottom: 0.75rem;
   display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
 /* --- Header Redesign 2026 (Professional) --- */
 
 /* Top Bar */

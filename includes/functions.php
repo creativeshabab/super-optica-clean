@@ -3,6 +3,84 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// ===== CSRF Protection =====
+function generateCSRFToken() {
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+function validateCSRFToken($token) {
+    return !empty($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token ?? '');
+}
+
+function csrfField() {
+    return '<input type="hidden" name="csrf_token" value="' . generateCSRFToken() . '">';
+}
+
+// ===== OTP Rate Limiting =====
+function checkOTPAttempts() {
+    $max = 5;
+    return ($_SESSION['otp_attempts'] ?? 0) < $max;
+}
+
+function recordOTPAttempt() {
+    $_SESSION['otp_attempts'] = ($_SESSION['otp_attempts'] ?? 0) + 1;
+}
+
+function resetOTPAttempts() {
+    unset($_SESSION['otp_attempts']);
+}
+
+function checkOTPResendCooldown() {
+    $cooldown = 60; // seconds
+    $lastResend = $_SESSION['otp_last_resend'] ?? 0;
+    return (time() - $lastResend) >= $cooldown;
+}
+
+function recordOTPResend() {
+    $_SESSION['otp_last_resend'] = time();
+}
+
+// ===== Admin Brute-Force Protection =====
+function checkAdminLoginAttempts() {
+    $max = 5;
+    $lockout = 900; // 15 minutes
+    $attempts = $_SESSION['admin_login_attempts'] ?? 0;
+    $lockUntil = $_SESSION['admin_lock_until'] ?? 0;
+    
+    if ($lockUntil > time()) {
+        return false; // Still locked
+    }
+    if ($lockUntil > 0 && $lockUntil <= time()) {
+        // Lock expired, reset
+        $_SESSION['admin_login_attempts'] = 0;
+        $_SESSION['admin_lock_until'] = 0;
+    }
+    return $attempts < $max;
+}
+
+function recordAdminLoginAttempt($success = false) {
+    if ($success) {
+        $_SESSION['admin_login_attempts'] = 0;
+        $_SESSION['admin_lock_until'] = 0;
+        return;
+    }
+    $_SESSION['admin_login_attempts'] = ($_SESSION['admin_login_attempts'] ?? 0) + 1;
+    if ($_SESSION['admin_login_attempts'] >= 5) {
+        $_SESSION['admin_lock_until'] = time() + 900; // Lock for 15 min
+    }
+}
+
+function getAdminLockRemaining() {
+    $lockUntil = $_SESSION['admin_lock_until'] ?? 0;
+    if ($lockUntil > time()) {
+        return ceil(($lockUntil - time()) / 60);
+    }
+    return 0;
+}
+
 function isLoggedIn() {
     return isset($_SESSION['user_id']);
 }
@@ -68,6 +146,92 @@ function getFlash() {
     return null;
 }
 
+/**
+ * Pagination & Listing Helpers
+ */
+function getListingParams($default_sort = 'created_at', $default_order = 'DESC') {
+    $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 20;
+    // Allow only specific limits for security/UX
+    $allowed_limits = [10, 20, 40, 100];
+    if (!in_array($limit, $allowed_limits)) $limit = 20;
+
+    return [
+        'page' => isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1,
+        'search' => isset($_GET['search']) ? trim($_GET['search']) : '',
+        'sort' => isset($_GET['sort']) ? $_GET['sort'] : $default_sort,
+        'order' => (isset($_GET['order']) && strtoupper($_GET['order']) === 'ASC') ? 'ASC' : $default_order,
+        'limit' => $limit
+    ];
+}
+
+function getPaginationData($total_items, $items_per_page = 20) {
+    $current_page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+    $total_pages = max(1, ceil($total_items / $items_per_page));
+    $offset = ($current_page - 1) * $items_per_page;
+
+    return [
+        'current_page' => $current_page,
+        'total_pages' => $total_pages,
+        'offset' => $offset,
+        'items_per_page' => $items_per_page
+    ];
+}
+
+function renderPagination($current_page, $total_pages) {
+    if ($total_pages <= 0) return '';
+
+    $params = $_GET;
+    $limit = $params['limit'] ?? 20;
+
+    $html = '<div class="pagination-container">';
+    
+    // Limit Selector
+    $html .= '<div class="pagination-limit">';
+    $html .= '<span>Show</span>';
+    $html .= '<select class="form-control" onchange="window.location.href=\'?\' + this.value" style="width: auto; height: 36px; padding: 0 1rem; border-radius: 8px;">';
+    foreach ([10, 20, 40] as $l) {
+        $tempParams = $params;
+        $tempParams['limit'] = $l;
+        $tempParams['page'] = 1; // Reset to page 1 when changing limit
+        $url = http_build_query($tempParams);
+        $selected = ($limit == $l) ? 'selected' : '';
+        $html .= '<option value="' . $url . '" ' . $selected . '>' . $l . '</option>';
+    }
+    $html .= '</select>';
+    $html .= '<span>records</span>';
+    $html .= '</div>';
+
+    $html .= '<div class="pagination-info">Page ' . $current_page . ' of ' . $total_pages . '</div>';
+    $html .= '<ul class="pagination">';
+
+    // Previous Button
+    if ($current_page > 1) {
+        $params['page'] = $current_page - 1;
+        $html .= '<li><a href="?' . http_build_query($params) . '" class="pagination-btn"><i class="fa-solid fa-chevron-left"></i></a></li>';
+    }
+
+    // Page Numbers (Smart truncation)
+    $range = 2;
+    for ($i = 1; $i <= $total_pages; $i++) {
+        if ($i == 1 || $i == $total_pages || ($i >= $current_page - $range && $i <= $current_page + $range)) {
+            $params['page'] = $i;
+            $activeClass = ($i == $current_page) ? 'active' : '';
+            $html .= '<li><a href="?' . http_build_query($params) . '" class="pagination-btn ' . $activeClass . '">' . $i . '</a></li>';
+        } elseif ($i == $current_page - $range - 1 || $i == $current_page + $range + 1) {
+            $html .= '<li class="pagination-dots">...</li>';
+        }
+    }
+
+    // Next Button
+    if ($current_page < $total_pages) {
+        $params['page'] = $current_page + 1;
+        $html .= '<li><a href="?' . http_build_query($params) . '" class="pagination-btn"><i class="fa-solid fa-chevron-right"></i></a></li>';
+    }
+
+    $html .= '</ul></div>';
+    return $html;
+}
+
 // Cart functions
 function addToCart($id) {
     global $pdo;
@@ -103,6 +267,27 @@ function getCartTotal() {
         foreach ($_SESSION['cart'] as $item) {
             if (is_array($item) && isset($item['price'], $item['quantity'])) {
                 $total += $item['price'] * $item['quantity'];
+            }
+        }
+    }
+    return $total;
+}
+
+/**
+ * Re-validate cart total from database prices (prevents session price manipulation)
+ */
+function getCartTotalFromDB() {
+    global $pdo;
+    $total = 0;
+    if (isset($_SESSION['cart']) && is_array($_SESSION['cart'])) {
+        foreach ($_SESSION['cart'] as $item) {
+            if (is_array($item) && isset($item['id'], $item['quantity'])) {
+                $stmt = $pdo->prepare("SELECT price FROM products WHERE id = ?");
+                $stmt->execute([$item['id']]);
+                $product = $stmt->fetch();
+                if ($product) {
+                    $total += $product['price'] * $item['quantity'];
+                }
             }
         }
     }
@@ -421,14 +606,16 @@ function sendEmail($to, $subject, $body, $debug = false) {
         $mail->Port       = $config['port'];
         $mail->CharSet    = 'UTF-8';
 
-        // Fix for XAMPP SSL Issues
-        $mail->SMTPOptions = array(
-            'ssl' => array(
-                'verify_peer' => false,
-                'verify_peer_name' => false,
-                'allow_self_signed' => true
-            )
-        );
+        // SSL verification bypass — only for local development
+        if (defined('IS_PRODUCTION') && !IS_PRODUCTION) {
+            $mail->SMTPOptions = array(
+                'ssl' => array(
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                    'allow_self_signed' => true
+                )
+            );
+        }
 
         // Recipients
         $mail->setFrom($config['from_email'], $config['from_name']);
@@ -536,8 +723,9 @@ function optimizeUpload($file, $targetDir, $customName = null, $sizes = null, $q
         return false; // Invalid file type
     }
 
-    // Generate filename
-    $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+    // Generate filename — derive extension from MIME type (don't trust user filename)
+    $mimeToExt = ['image/jpeg' => 'jpg', 'image/jpg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
+    $ext = $mimeToExt[$mimeType] ?? pathinfo($file['name'], PATHINFO_EXTENSION);
     $baseName = $customName ? $customName : uniqid();
     $filename = $baseName . '.' . $ext;
     $targetPath = rtrim($targetDir, '/') . '/' . $filename;
@@ -783,31 +971,30 @@ function deleteImageVariants($imagePath) {
     return true;
 }
 /**
- * Calculate average rating from reviews
+ * Calculate average rating from reviews (optionally per-product)
  */
-function getAverageRating() {
+function getAverageRating($productId = null) {
     global $pdo;
-    static $avg = null;
-    
-    if ($avg !== null) return $avg;
     
     try {
-        $stmt = $pdo->query("SELECT AVG(rating) as average, COUNT(*) as count FROM reviews");
+        if ($productId) {
+            $stmt = $pdo->prepare("SELECT AVG(rating) as average, COUNT(*) as count FROM reviews WHERE product_id = ?");
+            $stmt->execute([$productId]);
+        } else {
+            $stmt = $pdo->query("SELECT AVG(rating) as average, COUNT(*) as count FROM reviews");
+        }
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if (!$result || $result['count'] == 0) {
-            $avg = ['score' => 0, 'count' => 0];
-        } else {
-            $avg = [
-                'score' => round($result['average'], 1),
-                'count' => $result['count']
-            ];
+            return null;
         }
+        return [
+            'score' => round($result['average'], 1),
+            'count' => (int)$result['count']
+        ];
     } catch (Exception $e) {
-        $avg = ['score' => 0, 'count' => 0];
+        return null;
     }
-    
-    return $avg;
 }
 
 // Hex to RGB Helper
@@ -840,9 +1027,10 @@ function renderProductCard($p) {
         $discount = round((($actual_price - $p['price']) / $actual_price) * 100);
     }
     
-    // Rating (Fallback for demo if no reviews yet)
-    $rating_score = '4.8'; 
-    $rating_count = '2.4k';
+    // Rating — use real review data (no fake ratings)
+    $rating_data = getAverageRating($p['id'] ?? 0);
+    $rating_score = $rating_data ? $rating_data['score'] : null;
+    $rating_count = $rating_data ? $rating_data['count'] : 0;
     
     // Labels/Badges (Manageable from admin)
     $label = isset($p['label']) && !empty($p['label']) ? $p['label'] : null;
@@ -862,7 +1050,7 @@ function renderProductCard($p) {
                 <?php endif; ?>
 
                 <?php if($p['image']): ?>
-                    <img src="assets/uploads/<?= $p['image'] ?>" alt="<?= htmlspecialchars($p['name']) ?>" class="max-w-full max-h-full object-contain transform transition-transform duration-700 group-hover:scale-105">
+                    <img src="assets/uploads/<?= $p['image'] ?>" alt="<?= htmlspecialchars($p['name']) ?>" loading="lazy" class="max-w-full max-h-full object-contain transform transition-transform duration-700 group-hover:scale-105">
                 <?php else: ?>
                     <img src="https://i.ibb.co/3sxh1gV/glass-placeholder.png" class="w-32 opacity-20" alt="Product">
                 <?php endif; ?>
@@ -888,10 +1076,10 @@ function renderProductCard($p) {
 
                 <!-- Action Buttons -->
                 <div class="mt-auto flex gap-3 pt-2">
-                     <button onclick="window.location.href='cart.php?add=<?= $p['id'] ?>&redirect=checkout.php'" class="btn btn-primary flex-1 rounded-full text-xs font-bold uppercase tracking-widest py-3 shadow-md hover:shadow-lg transition-all active:scale-95">
+                     <button onclick="window.location.href='cart.php?add=<?= $p['id'] ?>&redirect=checkout.php'" class="btn btn-primary flex-1 rounded-full py-3 no-margin">
                         Buy Now
                     </button>
-                    <button onclick="addToCart(<?= $p['id'] ?>)" class="btn btn-outline flex-1 rounded-full text-xs font-bold uppercase tracking-widest py-3 hover:bg-gray-50 transition-all active:scale-95">
+                    <button onclick="addToCart(<?= $p['id'] ?>)" class="btn btn-outline flex-1 rounded-full py-3 no-margin">
                         Add Cart
                     </button>
                 </div>

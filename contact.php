@@ -107,7 +107,7 @@
                 </div>
                 
                 <div class="text-center mt-6">
-                    <button type="submit" class="btn btn-primary font-bold shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all rounded-full">
+                    <button type="submit" class="btn btn-primary shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all rounded-full">
                         <?= __('send_message') ?> <i class="fa-solid fa-paper-plane ml-2"></i>
                     </button>
                 </div>

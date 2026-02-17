@@ -15,15 +15,16 @@ $error = '';
 
 // Handle profile update
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name = trim($_POST['name']);
+    $first_name = trim($_POST['first_name']);
+    $last_name = trim($_POST['last_name']);
     $email = trim($_POST['email']);
     $current_password = $_POST['current_password'] ?? '';
     $new_password = $_POST['new_password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
     
     // Validate inputs
-    if (empty($name) || empty($email)) {
-        $error = "Name and email are required.";
+    if (empty($first_name) || empty($email)) {
+        $error = "First name and email are required.";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = "Invalid email format.";
     } else {
@@ -34,12 +35,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = "Email is already in use by another account.";
         } else {
             // Update basic info
-            $stmt = $pdo->prepare("UPDATE users SET name = ?, email = ? WHERE id = ?");
-            $stmt->execute([$name, $email, $_SESSION['user_id']]);
+            $stmt = $pdo->prepare("UPDATE users SET first_name = ?, last_name = ?, email = ? WHERE id = ?");
+            $stmt->execute([$first_name, $last_name, $email, $_SESSION['user_id']]);
             
             // Update session
-            $_SESSION['name'] = $name;
-            $_SESSION['user_name'] = $name;
+            $_SESSION['name'] = $first_name;
+            $_SESSION['user_name'] = $first_name . ' ' . $last_name;
             $_SESSION['email'] = $email;
             
             $success = "Profile updated successfully!";
@@ -73,9 +74,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <div class="admin-container">
     <div style="max-width: 800px; margin: 0 auto;">
-        <h1 class="admin-title">
-            <i class="fa-regular fa-user"></i> My Profile
-        </h1>
+        <div class="page-header">
+            <div class="page-header-info">
+                <h1 class="page-title"><i class="fa-regular fa-user"></i> My Profile</h1>
+                <p class="page-subtitle">Update your personal information and security settings.</p>
+            </div>
+        </div>
         
         <?php if ($success): ?>
             <div class="alert alert-success" style="background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; border: 1px solid rgba(16, 185, 129, 0.2);">
@@ -103,17 +107,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </h3>
                     
                     <div style="display: grid; gap: 1.25rem;">
-                        <div class="form-group">
-                            <label for="name">Full Name</label>
-                            <input 
-                                type="text" 
-                                id="name" 
-                                name="name" 
-                                class="form-control" 
-                                value="<?= htmlspecialchars($admin['name']) ?>" 
-                                required
-                                style="background: var(--admin-bg);"
-                            >
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label for="first_name">First Name</label>
+                                <input 
+                                    type="text" 
+                                    id="first_name" 
+                                    name="first_name" 
+                                    class="form-control" 
+                                    value="<?= htmlspecialchars($admin['first_name'] ?? '') ?>" 
+                                    required
+                                    style="background: var(--admin-bg);"
+                                >
+                            </div>
+                            <div class="form-group">
+                                <label for="last_name">Last Name</label>
+                                <input 
+                                    type="text" 
+                                    id="last_name" 
+                                    name="last_name" 
+                                    class="form-control" 
+                                    value="<?= htmlspecialchars($admin['last_name'] ?? '') ?>" 
+                                    style="background: var(--admin-bg);"
+                                >
+                            </div>
                         </div>
                         
                         <div class="form-group">
@@ -216,7 +233,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div style="display: grid; gap: 0.75rem; font-size: 0.85rem;">
                 <div style="display: flex; justify-content: space-between; padding-bottom: 0.5rem; border-bottom: 1px dashed var(--admin-border);">
                     <span style="color: var(--admin-text-light);">Account ID</span>
-                    <strong style="color: var(--admin-text); font-family: monospace;">UUID-<?= str_pad($admin['id'], 6, '0', STR_PAD_LEFT) ?></strong>
+                    <strong style="color: var(--admin-text); font-family: monospace;">UUID-<?= str_pad($admin['id'] ?? 0, 6, '0', STR_PAD_LEFT) ?></strong>
                 </div>
                 <div style="display: flex; justify-content: space-between;">
                     <span style="color: var(--admin-text-light);">Member Since</span>

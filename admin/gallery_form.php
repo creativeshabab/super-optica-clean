@@ -46,9 +46,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="admin-title"><?= $gallery_item ? __('edit_gallery_item') : __('add_new_gallery_item') ?></h1>
-    <a href="gallery.php" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> <?= __('back_to_gallery') ?></a>
+<div class="page-header">
+    <div class="page-header-info">
+        <h1 class="page-title"><?= $gallery_item ? __('edit_gallery_item') : __('add_new_gallery_item') ?></h1>
+    </div>
+    <div class="page-header-actions">
+        <a href="gallery.php" class="btn btn-secondary">
+            <i class="fa-solid fa-arrow-left"></i> <?= __('back_to_gallery') ?>
+        </a>
+    </div>
 </div>
 
 <div class="card" style="max-width: 700px;">
@@ -56,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     <?php if (isset($error)): ?>
         <div class="alert" style="background: #fee2e2; color: #b91c1c; padding: 1rem; border-radius: 12px; margin-bottom: 2rem; border: 1px solid #fecaca;">
-            <i class="fa-solid fa-circle-exclamation" style="margin-right: 0.5rem;"></i> <?= $error ?>
+            <i class="fa-solid fa-circle-exclamation" style="margin-right: 0.5rem;"></i> <?= htmlspecialchars($error) ?>
         </div>
     <?php endif; ?>
     

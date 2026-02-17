@@ -166,8 +166,10 @@ if (isset($_GET['debug'])) {
 }
 </style>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="admin-title">Integrations Hub</h1>
+<div class="page-header">
+    <div class="page-header-info">
+        <h1 class="page-title">Integrations Hub</h1>
+    </div>
 </div>
 
 <?php if ($flash = getFlash()): ?>

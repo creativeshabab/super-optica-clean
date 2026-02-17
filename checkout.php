@@ -13,69 +13,84 @@ if (empty($cart)) redirect('shop.php');
 $total = getCartTotal();
 $user_id = $_SESSION['user_id'];
 
-// Fetch Lens Options
-$lens_stmt = $pdo->query("SELECT * FROM lens_options WHERE is_active = 1 ORDER BY price ASC");
-$lens_options = $lens_stmt->fetchAll();
+// Fetch Wizard Setting
+$enable_wizard = getSetting('enable_advanced_lens_wizard', 'off') === 'on';
+
+
+// Fetch Active Coupons
+$now = date('Y-m-d H:i:s');
+$coupon_stmt = $pdo->prepare("SELECT * FROM coupons WHERE is_active = 1 AND (start_date IS NULL OR start_date <= ?) AND (end_date IS NULL OR end_date >= ?) ORDER BY id DESC");
+$coupon_stmt->execute([$now, $now]);
+$available_coupons = $coupon_stmt->fetchAll();
+
+// Check for Applied Coupon
+$coupon_id = null;
+$coupon_code = '';
+$coupon_discount = 0;
+
+if (isset($_SESSION['applied_coupon'])) {
+    $applied = $_SESSION['applied_coupon'];
+    $coupon_id = $applied['id'];
+    $coupon_code = $applied['code'];
+    
+    // Calculate initial discount for display
+    if ($applied['type'] === 'percent') {
+        $coupon_discount = ($total * $applied['value']) / 100;
+    } else {
+        $coupon_discount = $applied['value'];
+    }
+
+    // New: Check if the applied coupon is still valid (not expired)
+    $check_stmt = $pdo->prepare("SELECT id FROM coupons WHERE id = ? AND is_active = 1 AND (start_date IS NULL OR start_date <= ?) AND (end_date IS NULL OR end_date >= ?)");
+    $check_stmt->execute([$applied['id'], $now, $now]);
+    if (!$check_stmt->fetch()) {
+        unset($_SESSION['applied_coupon']);
+        $coupon_id = null;
+        $coupon_code = '';
+        $coupon_discount = 0;
+    }
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Capture Prescription Data
-    $prescriptions = [];
-    $lens_total = 0;
-    
-    foreach ($cart as $id => $item) {
-        if (isset($_POST['lens_option'][$id])) {
-            $lens_data = $_POST['lens_option'][$id]; // This is now an array [0 => lens_id, 1 => lens_id...]
-            
-            foreach ($lens_data as $idx => $lens_id) {
-                // Find lens price
-                $lens_price = 0;
-                foreach ($lens_options as $lo) {
-                    if ($lo['id'] == $lens_id) {
-                        $lens_price = $lo['price'];
-                        break;
-                    }
-                }
-                $lens_total += $lens_price; // Quantity is already accounted for by the number of entries in $lens_data
+    if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
+         setFlash('error', 'Invalid form submission (CSRF)');
+         redirect('checkout.php');
+         exit;
+    }
 
-                $rx_method = $_POST['rx_method'][$id][$idx] ?? 'manual';
-                $prescriptions[$id][$idx] = [
-                    'lens_option_id' => $lens_id,
-                    'lens_price' => $lens_price,
-                    'rx_method' => $rx_method,
-                    'od_sph' => $_POST['od_sph'][$id][$idx] ?? '',
-                    'od_cyl' => $_POST['od_cyl'][$id][$idx] ?? '',
-                    'od_axis' => $_POST['od_axis'][$id][$idx] ?? '',
-                    'od_add' => $_POST['od_add'][$id][$idx] ?? '',
-                    'os_sph' => $_POST['os_sph'][$id][$idx] ?? '',
-                    'os_cyl' => $_POST['os_cyl'][$id][$idx] ?? '',
-                    'os_axis' => $_POST['os_axis'][$id][$idx] ?? '',
-                    'os_add' => $_POST['os_add'][$id][$idx] ?? '',
-                    'pd' => $_POST['pd'][$id][$idx] ?? '',
-                    'file' => '' // Default empty
-                ];
-
-                // Handle File Upload
-                if ($rx_method === 'upload' && isset($_FILES['rx_file']['name'][$id][$idx]) && $_FILES['rx_file']['error'][$id][$idx] === UPLOAD_ERR_OK) {
-                    $uploadDir = 'assets/uploads/prescriptions/';
-                    if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
-                    
-                    $fileName = time() . '_' . $id . '_' . $idx . '_' . basename($_FILES['rx_file']['name'][$id][$idx]);
-                    $targetPath = $uploadDir . $fileName;
-                    
-                    if (move_uploaded_file($_FILES['rx_file']['tmp_name'][$id][$idx], $targetPath)) {
-                        $prescriptions[$id][$idx]['file'] = $fileName;
-                    }
-                }
-            }
-        }
+    // Server-side Validation
+    if (empty($_POST['customer_name']) || strlen(trim($_POST['customer_name'])) < 3) {
+        setFlash('error', "Please enter a valid full name.");
+        redirect('checkout.php');
+        exit;
+    } elseif (empty($_POST['phone']) || !preg_match('/^[0-9]{10}$/', $_POST['phone'])) {
+        setFlash('error', "Please enter a valid 10-digit phone number.");
+        redirect('checkout.php');
+        exit;
+    } elseif (empty($_POST['address_line1']) || strlen(trim($_POST['address_line1'])) < 5) {
+        setFlash('error', "Please enter a valid address.");
+        redirect('checkout.php');
+        exit;
+    } elseif (empty($_POST['pincode']) || !preg_match('/^[0-9]{6}$/', $_POST['pincode'])) {
+        setFlash('error', "Please enter a valid 6-digit pincode.");
+        redirect('checkout.php');
+        exit;
+    } elseif (empty($_POST['city'])) {
+        setFlash('error', "City is required.");
+        redirect('checkout.php');
+        exit;
+    } elseif (empty($_POST['state'])) {
+        setFlash('error', "State is required.");
+        redirect('checkout.php');
+        exit;
     }
 
     $_SESSION['checkout_data'] = [
-        'customer_name' => $_POST['customer_name'],
-        'phone' => $_POST['phone'],
-        'address' => $_POST['address_line1'] . ", " . $_POST['city'] . " - " . $_POST['pincode'] . ", " . $_POST['state'],
-        'prescriptions' => $prescriptions,
-        'lens_total' => $lens_total
+        'customer_name' => htmlspecialchars(trim($_POST['customer_name'])),
+        'phone' => htmlspecialchars(trim($_POST['phone'])),
+        'address' => htmlspecialchars(trim($_POST['address_line1'])) . ", " . htmlspecialchars(trim($_POST['city'])) . " - " . htmlspecialchars(trim($_POST['pincode'])) . ", " . htmlspecialchars(trim($_POST['state'])),
+        'prescriptions' => [],
+        'lens_total' => 0
     ];
     redirect('checkout_payment.php');
     exit;
@@ -87,426 +102,346 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="checkout-container">
     <div class="container mx-auto px-4">
         <!-- Stepper -->
-        <div class="checkout-stepper flex justify-between items-center mb-5">
-            <div class="step active flex flex-col items-center">
-                <span class="step-number bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center font-bold">01</span>
-                <span class="text-sm mt-1 font-medium"><?= __('shipping') ?></span>
+        <div class="checkout-stepper">
+            <div class="step active">
+                <span class="step-number">01</span>
+                <span class="step-label"><?= __('shipping') ?></span>
             </div>
-            <div class="step-line flex-1 h-1 bg-gray-200 mx-2"></div>
-            <div class="step flex flex-col items-center opacity-50">
-                <span class="step-number bg-gray-200 text-gray-500 rounded-full w-8 h-8 flex items-center justify-center font-bold">02</span>
-                <span class="text-sm mt-1 font-medium"><?= __('payment') ?></span>
+            <div class="step">
+                <span class="step-number">02</span>
+                <span class="step-label">Payment</span>
             </div>
-            <div class="step-line flex-1 h-1 bg-gray-200 mx-2"></div>
-            <div class="step flex flex-col items-center opacity-50">
-                <span class="step-number bg-gray-200 text-gray-500 rounded-full w-8 h-8 flex items-center justify-center font-bold">03</span>
-                <span class="text-sm mt-1 font-medium"><?= __('success') ?></span>
+            <div class="step">
+                <span class="step-number">03</span>
+                <span class="step-label">Success</span>
             </div>
         </div>
 
-        <div class="checkout-grid grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="checkout-grid">
             <!-- Form Section -->
-            <div class="md:col-span-2 space-y-6">
+            <div class="space-y-6">
                 
-                <!-- Prescription & Lens Selection -->
-                <div class="checkout-card card">
-                    <h3 class="checkout-card-title text-xl font-bold mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-glasses text-primary"></i> Lenses & Prescription
+                    <form method="POST" id="checkoutForm" enctype="multipart/form-data">
+                        <?= csrfField() ?>
+
+                <!-- Shipping Card -->
+                <div class="checkout-card">
+                    <h3 class="checkout-card-title">
+                        <i class="fa-solid fa-truck-fast"></i> 1. Enter Shipping Details
+                    </h3>
+                    <span class="checkout-section-desc">Where should we deliver your premium eyewear?</span>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="form-floating">
+                            <label><?= __('full_name') ?></label>
+                            <input type="text" name="customer_name" value="<?= htmlspecialchars($_SESSION['user_name'] ?? '') ?>" required placeholder="<?= __('full_name') ?>">
+                        </div>
+                        <div class="form-floating">
+                            <label><?= __('contact_number') ?></label>
+                            <input type="text" name="phone" required placeholder="<?= __('contact_number') ?>">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-end mb-2">
+                        <label class="checkout-section-header mb-0 border-none pb-0">Map Your Shipping Address</label>
+                        <button type="button" onclick="detectCheckoutLocation()" class="btn-utility btn-detect">
+                            <i class="fa-solid fa-location-crosshairs"></i> <?= __('detect_location') ?>
+                        </button>
+                    </div>
+                    <span class="checkout-section-desc">Provide a detailed address or use 'Detect Location' for faster entry.</span>
+
+                    <div class="form-floating mb-6">
+                        <input type="text" name="address_line1" id="autocomplete_address" required placeholder="Flat / House No / Building / Street" autocomplete="off">
+                        <div id="address_suggestions" class="suggestions-dropdown absolute w-full bg-white border rounded-xl shadow-2xl z-50 hidden mt-2 py-2 overflow-hidden"></div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="form-floating">
+                            <label><?= __('city') ?></label>
+                            <input type="text" name="city" id="checkout_city" required placeholder="<?= __('city') ?>">
+                        </div>
+                        <div class="form-floating">
+                            <label><?= __('pincode') ?></label>
+                            <input type="text" name="pincode" id="checkout_pincode" required placeholder="<?= __('pincode') ?>">
+                        </div>
+                    </div>
+
+                    <div class="form-floating mb-10">
+                        <label><?= __('state') ?></label>
+                        <input type="text" name="state" id="checkout_state" required placeholder="<?= __('state') ?>">
+                    </div>
+
+                    <div class="flex gap-4">
+                        <a href="cart.php" class="btn btn-outline flex-1 py-4 flex items-center justify-center gap-2 no-margin">
+                             <i class="fa-solid fa-chevron-left text-xs"></i> Back
+                        </a>
+                        <button type="submit" class="btn btn-primary flex-1 py-4 shadow-xl hover:shadow-primary/20 transition-all flex items-center justify-center gap-3">
+                            <?= __('continue') ?> <i class="fa-solid fa-chevron-right text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Section -->
+            <div class="space-y-6 sticky top-6">
+                <div class="checkout-card">
+                    <h3 class="checkout-card-title">
+                        <i class="fa-solid fa-receipt"></i> <?= __('order_summary') ?>
                     </h3>
                     
-                    <form method="POST" id="checkoutForm" enctype="multipart/form-data">
-                    <div class="space-y-8">
+                    <div class="summary-list flex flex-col gap-6 mb-8">
                         <?php foreach ($cart as $id => $item): ?>
-                        <div class="border rounded-xl p-6 bg-white shadow-sm">
-                            <div class="flex gap-4 mb-6 border-b pb-4">
+                        <div class="flex gap-4 group">
+                            <div class="w-16 h-16 bg-white border border-gray-100 rounded-lg p-1.5 shrink-0 overflow-hidden flex items-center justify-center">
                                 <?php if($item['image']): ?>
-                                    <img src="assets/uploads/<?= $item['image'] ?>" class="w-20 h-20 object-cover rounded-lg border">
+                                    <img src="assets/uploads/<?= $item['image'] ?>" class="w-full h-full object-contain">
                                 <?php endif; ?>
-                                <div>
-                                    <h4 class="font-bold text-lg"><?= htmlspecialchars($item['name']) ?></h4>
-                                    <p class="text-sm text-gray-500">Quantity: <?= $item['quantity'] ?></p>
-                                </div>
                             </div>
-
-                            <div class="flex flex-col gap-6">
-                                <?php for($idx=0; $idx < $item['quantity']; $idx++): ?>
-                                <div class="unit-prescription-block border-b border-gray-100 last:border-0 pb-6 last:pb-0" data-item-id="<?= $id ?>" data-unit-idx="<?= $idx ?>">
-                                    <div class="flex justify-between items-center mb-4">
-                                        <h5 class="text-xs font-black uppercase tracking-widest text-primary">
-                                            <?= $item['quantity'] > 1 ? "Unit " . ($idx + 1) : "Refine your order" ?>
-                                        </h5>
-                                        
-                                        <?php if($item['quantity'] > 1 || count($cart) > 1): ?>
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-[10px] font-bold text-gray-400 uppercase">Duplicate from:</span>
-                                            <select class="text-[10px] font-bold border rounded px-2 py-1 bg-gray-50 focus:outline-none focus:border-primary copy-prescription-select" data-to-item="<?= $id ?>" data-to-idx="<?= $idx ?>">
-                                                <option value="">Select...</option>
-                                                <?php foreach($cart as $cid => $citem): 
-                                                    for($cidx=0; $cidx < $citem['quantity']; $cidx++): 
-                                                        if($cid == $id && $cidx == $idx) continue;
-                                                ?>
-                                                    <option value="<?= $cid ?>-<?= $cidx ?>">
-                                                        <?= htmlspecialchars($citem['name']) ?> (Unit <?= $cidx+1 ?>)
-                                                    </option>
-                                                <?php endfor; endforeach; ?>
-                                            </select>
-                                        </div>
-                                        <?php endif; ?>
-                                    </div>
-
-                                    <!-- Lens Selection (Visual Grid) -->
-                                    <div class="mb-6">
-                                        <label class="block text-sm font-bold mb-3 uppercase tracking-wide text-gray-400">Select Lens Package</label>
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                            <label class="cursor-pointer relative">
-                                                <input type="radio" name="lens_option[<?= $id ?>][<?= $idx ?>]" value="" class="peer sr-only lens-select" data-item-id="<?= $id ?>" data-unit-idx="<?= $idx ?>" data-price="0" onchange="handleLensChange(this)" checked>
-                                                <div class="p-4 rounded-xl border-2 border-gray-200 hover:border-gray-300 peer-checked:border-primary peer-checked:bg-primary/5 transition-all h-full flex flex-col justify-between">
-                                                    <div>
-                                                        <div class="font-bold text-gray-900">Frame Only</div>
-                                                        <div class="text-[10px] text-gray-500 mt-1">No special lenses</div>
-                                                    </div>
-                                                    <div class="font-bold text-lg mt-2">₹0</div>
-                                                </div>
-                                                <div class="absolute top-4 right-4 text-primary opacity-0 peer-checked:opacity-100 transition-opacity">
-                                                    <i class="fa-solid fa-circle-check fa-lg"></i>
-                                                </div>
-                                            </label>
-
-                                            <?php foreach ($lens_options as $lens): ?>
-                                            <label class="cursor-pointer relative">
-                                                <input type="radio" name="lens_option[<?= $id ?>][<?= $idx ?>]" value="<?= $lens['id'] ?>" class="peer sr-only lens-select" data-item-id="<?= $id ?>" data-unit-idx="<?= $idx ?>" data-price="<?= $lens['price'] ?>" onchange="handleLensChange(this)">
-                                                <div class="p-4 rounded-xl border-2 border-gray-200 hover:border-gray-300 peer-checked:border-primary peer-checked:bg-primary/5 transition-all h-full flex flex-col justify-between">
-                                                    <div>
-                                                        <div class="font-bold text-gray-900"><?= htmlspecialchars($lens['name']) ?></div>
-                                                        <div class="text-[10px] text-gray-500 mt-1 line-clamp-1"><?= htmlspecialchars($lens['description']) ?></div>
-                                                    </div>
-                                                    <div class="font-bold text-lg text-primary mt-2">+₹<?= number_format($lens['price'], 0) ?></div>
-                                                </div>
-                                                <div class="absolute top-4 right-4 text-primary opacity-0 peer-checked:opacity-100 transition-opacity">
-                                                    <i class="fa-solid fa-circle-check fa-lg"></i>
-                                                </div>
-                                            </label>
-                                            <?php endforeach; ?>
-                                        </div>
-                                    </div>
-
-                                    <!-- Prescription Entry (Toggleable) -->
-                                    <div id="prescription_container_<?= $id ?>_<?= $idx ?>" class="hidden border-t border-gray-100 pt-6">
-                                        <div class="flex gap-4 mb-4 border-b border-gray-100">
-                                            <button type="button" class="pb-2 text-sm font-bold border-b-2 border-primary text-primary px-2 rx-tab-btn" data-target="rx_manual_<?= $id ?>_<?= $idx ?>" onclick="switchRxTab(this, '<?= $id ?>', '<?= $idx ?>')">
-                                                <i class="fa-solid fa-keyboard mr-1"></i> Enter Manually
-                                            </button>
-                                            <button type="button" class="pb-2 text-sm font-bold border-b-2 border-transparent text-gray-500 hover:text-gray-700 px-2 rx-tab-btn" data-target="rx_upload_<?= $id ?>_<?= $idx ?>" onclick="switchRxTab(this, '<?= $id ?>', '<?= $idx ?>')">
-                                                <i class="fa-solid fa-upload mr-1"></i> Upload Image
-                                            </button>
-                                        </div>
-                                        <input type="hidden" name="rx_method[<?= $id ?>][<?= $idx ?>]" id="rx_method_<?= $id ?>_<?= $idx ?>" value="manual">
-
-                                        <!-- Manual Entry -->
-                                        <div id="rx_manual_<?= $id ?>_<?= $idx ?>" class="rx-content block">
-                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">
-                                                    <div class="text-[9px] font-black text-center mb-3 text-primary tracking-[0.2em] border-b border-gray-200 pb-2">RIGHT EYE (OD)</div>
-                                                    <div class="grid grid-cols-2 gap-3">
-                                                        <div><label class="text-[9px] text-gray-400 uppercase font-black tracking-wider mb-1 block">SPH</label><input type="text" name="od_sph[<?= $id ?>][<?= $idx ?>]" data-rx-field="od_sph" class="form-input h-10 text-sm text-center font-bold" placeholder="+0.00"></div>
-                                                        <div><label class="text-[9px] text-gray-400 uppercase font-black tracking-wider mb-1 block">CYL</label><input type="text" name="od_cyl[<?= $id ?>][<?= $idx ?>]" data-rx-field="od_cyl" class="form-input h-10 text-sm text-center font-bold" placeholder="-0.00"></div>
-                                                        <div><label class="text-[9px] text-gray-400 uppercase font-black tracking-wider mb-1 block">AXIS</label><input type="text" name="od_axis[<?= $id ?>][<?= $idx ?>]" data-rx-field="od_axis" class="form-input h-10 text-sm text-center font-bold" placeholder="180"></div>
-                                                        <div><label class="text-[9px] text-gray-400 uppercase font-black tracking-wider mb-1 block">ADD</label><input type="text" name="od_add[<?= $id ?>][<?= $idx ?>]" data-rx-field="od_add" class="form-input h-10 text-sm text-center font-bold" placeholder="+2.00"></div>
-                                                    </div>
-                                                </div>
-                                                <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">
-                                                    <div class="text-[9px] font-black text-center mb-3 text-primary tracking-[0.2em] border-b border-gray-200 pb-2">LEFT EYE (OS)</div>
-                                                    <div class="grid grid-cols-2 gap-3">
-                                                        <div><label class="text-[9px] text-gray-400 uppercase font-black tracking-wider mb-1 block">SPH</label><input type="text" name="os_sph[<?= $id ?>][<?= $idx ?>]" data-rx-field="os_sph" class="form-input h-10 text-sm text-center font-bold" placeholder="+0.00"></div>
-                                                        <div><label class="text-[9px] text-gray-400 uppercase font-black tracking-wider mb-1 block">CYL</label><input type="text" name="os_cyl[<?= $id ?>][<?= $idx ?>]" data-rx-field="os_cyl" class="form-input h-10 text-sm text-center font-bold" placeholder="-0.00"></div>
-                                                        <div><label class="text-[9px] text-gray-400 uppercase font-black tracking-wider mb-1 block">AXIS</label><input type="text" name="os_axis[<?= $id ?>][<?= $idx ?>]" data-rx-field="os_axis" class="form-input h-10 text-sm text-center font-bold" placeholder="180"></div>
-                                                        <div><label class="text-[9px] text-gray-400 uppercase font-black tracking-wider mb-1 block">ADD</label><input type="text" name="os_add[<?= $id ?>][<?= $idx ?>]" data-rx-field="os_add" class="form-input h-10 text-sm text-center font-bold" placeholder="+2.00"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="mt-4 w-full md:w-1/3">
-                                                <label class="text-[9px] text-gray-400 uppercase font-black tracking-wider mb-1 block">Pupillary Distance (PD)</label>
-                                                <input type="text" name="pd[<?= $id ?>][<?= $idx ?>]" data-rx-field="pd" class="form-input h-10 text-sm font-bold" placeholder="e.g. 62mm">
-                                            </div>
-                                        </div>
-
-                                        <!-- Upload Entry -->
-                                        <div id="rx_upload_<?= $id ?>_<?= $idx ?>" class="rx-content hidden">
-                                            <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center bg-gray-50 hover:bg-white transition-colors cursor-pointer" onclick="this.querySelector('input').click()">
-                                                <i class="fa-solid fa-cloud-arrow-up text-3xl text-gray-300 mb-2"></i>
-                                                <p class="text-[11px] font-black text-gray-700 mb-1 uppercase tracking-wider">Upload Prescription</p>
-                                                <p class="text-[10px] text-gray-400 mb-4 font-bold">JPG, PNG, PDF (Max 5MB)</p>
-                                                <input type="file" name="rx_file[<?= $id ?>][<?= $idx ?>]" class="hidden" onchange="updateFileName(this)">
-                                                <div class="file-name-display text-[11px] text-primary font-bold hidden mt-2"></div>
-                                            </div>
-                                        </div>
-                                    </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex justify-between items-start gap-2">
+                                    <h5 class="font-extrabold text-sm text-accent truncate"><?= htmlspecialchars($item['name']) ?></h5>
+                                    <span class="font-black text-accent text-sm whitespace-nowrap">₹<?= number_format($item['price'] * $item['quantity'], 2) ?></span>
                                 </div>
-                                <?php endfor; ?>
+                                <div class="flex justify-between items-center mt-2">
+                                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest"><?= __('quantity') ?>: <?= $item['quantity'] ?></span>
+                                    <button type="button" onclick="removeFromCheckout('<?= $id ?>')" class="btn-remove-clean">
+                                        <i class="fa-solid fa-trash-can"></i> <?= __('remove') ?>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         <?php endforeach; ?>
                     </div>
-                </div>
 
-                <script>
-                function handleLensChange(radio) {
-                    const itemId = radio.dataset.itemId;
-                    const unitIdx = radio.dataset.unitIdx;
-                    const price = parseFloat(radio.dataset.price) || 0;
-                    const container = document.getElementById(`prescription_container_${itemId}_${unitIdx}`);
-                    
-                    if (price > 0) {
-                        container.classList.remove('hidden');
-                    } else {
-                        container.classList.add('hidden');
-                    }
-                    updateTotal();
-                }
-
-                function updateTotal() {
-                    let lensTotal = 0;
-                    document.querySelectorAll('.lens-select:checked').forEach(radio => {
-                        lensTotal += parseFloat(radio.dataset.price) || 0;
-                    });
-                    
-                    const lensSpan = document.getElementById('lensAmount');
-                    const lensRow = document.getElementById('lensRow');
-                    const finalTotalSpan = document.getElementById('finalTotal');
-                    const baseTotal = <?= $total ?>; 
-                    const discount = parseFloat(document.getElementById('discountAmount')?.innerText.replace(/,/g, '') || 0);
-                    
-                    if (lensSpan) lensSpan.innerText = lensTotal.toLocaleString('en-IN', {minimumFractionDigits: 2});
-                    if (lensRow) {
-                         if(lensTotal > 0) lensRow.classList.remove('hidden');
-                         else lensRow.classList.add('hidden');
-                    }
-                    
-                    const finalTotal = Math.max(0, baseTotal + lensTotal - discount);
-                    if (finalTotalSpan) finalTotalSpan.innerText = finalTotal.toLocaleString('en-IN', {minimumFractionDigits: 2});
-                }
-
-                function switchRxTab(btn, id, idx) {
-                    const parent = btn.parentElement;
-                    parent.querySelectorAll('.rx-tab-btn').forEach(b => {
-                        b.classList.remove('border-primary', 'text-primary');
-                        b.classList.add('border-transparent', 'text-gray-500');
-                    });
-                    btn.classList.add('border-primary', 'text-primary');
-                    btn.classList.remove('border-transparent', 'text-gray-500');
-                    
-                    const container = document.getElementById(`prescription_container_${id}_${idx}`);
-                    container.querySelectorAll('.rx-content').forEach(c => c.classList.add('hidden'));
-                    document.getElementById(btn.dataset.target).classList.remove('hidden');
-                    
-                    document.getElementById(`rx_method_${id}_${idx}`).value = btn.dataset.target.includes('manual') ? 'manual' : 'upload';
-                }
-
-                function updateFileName(input) {
-                    const display = input.parentElement.querySelector('.file-name-display');
-                    if (input.files && input.files[0]) {
-                        display.innerText = input.files[0].name;
-                        display.classList.remove('hidden');
-                    } else {
-                        display.classList.add('hidden');
-                    }
-                }
-
-                // Copy Logic
-                document.querySelectorAll('.copy-prescription-select').forEach(select => {
-                    select.addEventListener('change', function() {
-                        const val = this.value; // "cid-cidx"
-                        if (!val) return;
+                    <div class="coupon-section pt-10 border-t border-dashed border-gray-100 mb-8">
+                        <label class="checkout-section-header">Redeem a Discount Coupon</label>
+                        <span class="checkout-section-desc">Have a promo code? Enter it below to unlock exclusive savings.</span>
                         
-                        const [fromId, fromIdx] = val.split('-');
-                        const toId = this.dataset.toItem;
-                        const toIdx = this.dataset.toIdx;
-                        
-                        // Copy Lens Option
-                        const selectedLens = document.querySelector(`input[name="lens_option[${fromId}][${fromIdx}]"]:checked`);
-                        if (selectedLens) {
-                            const newRadio = document.querySelector(`input[name="lens_option[${toId}][${toIdx}]"][value="${selectedLens.value}"]`);
-                            if (newRadio) {
-                                newRadio.checked = true;
-                                handleLensChange(newRadio);
-                            }
-                        }
-                        
-                        // Copy Manual Fields
-                        const fields = ['od_sph', 'od_cyl', 'od_axis', 'od_add', 'os_sph', 'os_cyl', 'os_axis', 'os_add', 'pd'];
-                        fields.forEach(f => {
-                            const fromInput = document.querySelector(`input[name="${f}[${fromId}][${fromIdx}]"]`);
-                            const toInput = document.querySelector(`input[name="${f}[${toId}][${toIdx}]"]`);
-                            if (fromInput && toInput) toInput.value = fromInput.value;
-                        });
-
-                        // Copy Method
-                        const fromMethod = document.getElementById(`rx_method_${fromId}_${fromIdx}`).value;
-                        const toTabBtn = document.querySelector(`.rx-tab-btn[data-target="rx_${fromMethod}_${toId}_${toIdx}"]`);
-                        if(toTabBtn) toTabBtn.click();
-
-                        // Reset select
-                        this.value = "";
-                        alert("Prescription copied!");
-                    });
-                });
-                </script>
-
-                <!-- Shipping Details Card -->
-                <div class="checkout-card card">
-                    <h3 class="checkout-card-title text-xl font-bold mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-truck-fast text-primary"></i> <?= __('shipping_details') ?>
-                    </h3>
-                    
-                    <!-- (Form content continues...) -->
-                    <div class="form-group mb-4">
-                        <label class="form-label"><?= __('full_name') ?></label>
-                        <input type="text" name="customer_name" class="form-input" value="<?= htmlspecialchars($_SESSION['user_name'] ?? '') ?>" required placeholder="<?= __('full_name') ?>">
-                    </div>
-                    
-                    <div class="form-group mb-4">
-                        <label class="form-label"><?= __('contact_number') ?></label>
-                        <input type="text" name="phone" class="form-input" required placeholder="<?= __('contact_number') ?>">
-                    </div>
-
-                    <!-- Address Section -->
-                    <div class="address-header-wrapper flex flex-col md:flex-row justify-between items-start md:items-center mb-2 mt-6 gap-3">
-                        <label class="font-bold"><?= __('detailed_address') ?></label>
-                        <button type="button" onclick="detectCheckoutLocation()" class="btn btn-outline btn-sm flex items-center gap-2 btn-detect w-full md:w-auto justify-center">
-                            <i class="fa-solid fa-location-crosshairs"></i> <?= __('detect_location') ?>
-                        </button>
-                    </div>
-
-                    <div class="form-group mb-4 relative">
-                        <label class="form-label text-sm text-muted"><?= __('address_placeholder_detailed') ?></label>
-                        <input type="text" name="address_line1" id="autocomplete_address" class="form-input" required placeholder="<?= __('search_area') ?>" autocomplete="off">
-                        <div id="address_suggestions" class="suggestions-dropdown absolute w-full bg-white border rounded-md shadow-lg z-50 hidden"></div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div class="form-group">
-                            <label class="form-label text-sm text-muted"><?= __('city') ?></label>
-                            <input type="text" name="city" id="checkout_city" class="form-input" required placeholder="<?= __('city') ?>">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label text-sm text-muted"><?= __('pincode') ?></label>
-                            <input type="text" name="pincode" id="checkout_pincode" class="form-input" required placeholder="<?= __('pincode') ?>">
-                        </div>
-                    </div>
-
-                    <div class="form-group mb-6">
-                        <label class="form-label text-sm text-muted"><?= __('state') ?></label>
-                        <input type="text" name="state" id="checkout_state" class="form-input" required placeholder="<?= __('state') ?>">
-                    </div>
-
-                    <button type="submit" class="btn btn-primary w-full md:w-auto flex items-center justify-center gap-2 py-3 px-6 text-lg">
-                        <?= __('continue') ?> <i class="fa-solid fa-arrow-right"></i>
-                    </button>
-                    <!-- Close form tag is now handled by the outer form wrapper initiated above -->
-                </div>
-            </div> <!-- End of col-span-2 space-y-6 -->
-
-            <!-- Summary Section -->
-            <div class="checkout-card card h-fit sticky top-4">
-                <h3 class="checkout-card-title text-xl font-bold mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-receipt text-primary"></i> <?= __('order_summary') ?>
-                </h3>
-                
-                <div class="summary-list flex flex-col gap-4 mb-6">
-                    <?php foreach ($cart as $id => $item): ?>
-                    <div class="summary-item group flex justify-between items-center pb-4 border-b border-gray-100 last:border-0 relative">
-                        <div class="flex gap-3 items-center">
-                            <?php if($item['image']): ?>
-                                <img src="assets/uploads/<?= $item['image'] ?>" class="w-16 h-16 object-cover rounded-md flex-shrink-0 border border-gray-200">
+                        <div id="couponInteractions">
+                            <?php if (!empty($available_coupons)): ?>
+                            <div class="offers-grid mt-6">
+                                <?php foreach ($available_coupons as $coupon): 
+                                    $is_applied = ($coupon_id == $coupon['id']);
+                                ?>
+                                <div class="offer-card <?= $is_applied ? 'active-offer' : '' ?>" 
+                                     onclick="handleCouponClick('<?= htmlspecialchars($coupon['code']) ?>', <?= $is_applied ? 'true' : 'false' ?>)">
+                                    
+                                    <?php if ($is_applied): ?>
+                                        <span class="offer-badge bg-success"><i class="fa-solid fa-check"></i> Applied</span>
+                                    <?php else: ?>
+                                        <span class="offer-badge">Click to apply</span>
+                                    <?php endif; ?>
+                                    
+                                    <div class="offer-code"><?= htmlspecialchars($coupon['code']) ?></div>
+                                    <div class="offer-desc"><?= htmlspecialchars($coupon['description'] ?: 'Special offer for you!') ?></div>
+                                    <?php if ($coupon['is_prepaid_only']): ?>
+                                        <div class="offer-tag">
+                                            <i class="fa-solid fa-bolt"></i> Prepaid Only
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
                             <?php endif; ?>
-                            <div>
-                                <div class="font-bold text-sm"><?= htmlspecialchars($item['name']) ?></div>
-                                <div class="text-[10px] text-gray-400 font-bold uppercase tracking-wider"><?= __('quantity') ?>: <?= $item['quantity'] ?></div>
+
+                            <div class="flex gap-2 items-center">
+                                <input type="text" id="couponCode" placeholder="Enter code" value="<?= htmlspecialchars($coupon_code) ?>" class="form-input text-sm font-black uppercase flex-1 h-11" <?= $coupon_id ? 'disabled' : '' ?>>
+                                
+                                <?php if ($coupon_id): ?>
+                                    <button type="button" id="removeCouponBtn" onclick="removeCoupon()" class="btn btn-outline text-red-500 border-red-200 px-4 h-11">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                <?php else: ?>
+                                    <button type="button" id="applyCoupon" class="btn btn-outline px-6 h-11"><?= __('apply') ?></button>
+                                <?php endif; ?>
                             </div>
                         </div>
-                        <div class="text-right">
-                             <div class="font-black text-primary mb-1">₹<?= number_format($item['price'] * $item['quantity'], 2) ?></div>
-                             <button type="button" onclick="removeFromCheckout('<?= $id ?>')" class="text-[10px] text-gray-400 hover:text-red-500 font-bold uppercase transition-colors">
-                                <i class="fa-solid fa-trash-can mr-1"></i> <?= __('remove') ?>
-                             </button>
+                        <div id="couponMessage" class="text-[10px] mt-2 font-bold"></div>
+                        
+                        <!-- Confirmation Modal (Hidden by default) -->
+                        <div id="couponConfirmModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center">
+                            <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full mx-4">
+                                <h3 class="text-lg font-bold mb-2">Switch Promo Code?</h3>
+                                <p class="text-sm text-gray-600 mb-6">Replace current promo code <strong id="currentPromoCode" class="text-primary"></strong> with <strong id="newPromoCode" class="text-success"></strong>?</p>
+                                <div class="flex justify-end gap-3">
+                                    <button onclick="closeCouponModal()" class="btn btn-ghost text-gray-500">Cancel</button>
+                                    <button id="confirmSwitchBtn" class="btn btn-primary">Replace</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <?php endforeach; ?>
-                </div>
 
-                <script>
-                function removeFromCheckout(id) {
-                    if (confirm('Are you sure you want to remove this item?')) {
-                        window.location.href = 'cart.php?remove=' + id + '&redirect=checkout.php';
-                    }
-                }
-                </script>
-                </div>
+                    <div class="total-wrapper border-none pt-0 space-y-3">
+                        <div class="flex justify-between text-sm font-bold text-gray-500 uppercase tracking-wider">
+                            <span>Subtotal</span>
+                            <span class="text-accent">₹<?= number_format($total, 2) ?></span>
+                        </div>
+                        <div id="discountRow" class="flex justify-between text-sm font-extrabold text-success uppercase tracking-wider <?= $coupon_discount > 0 ? '' : 'hidden' ?> transition-all">
+                            <span>Discount</span>
+                            <span>-₹<span id="discountAmount"><?= number_format($coupon_discount, 2) ?></span></span>
+                        </div>
+                        <div class="flex justify-between text-sm font-bold text-gray-500 uppercase tracking-wider">
+                            <span>Shipping</span>
+                            <span class="text-success font-black">FREE</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-baseline pt-6 mt-4 border-t border-gray-100">
+                            <span class="text-xl font-black text-accent uppercase tracking-tighter italic">Total Pay</span>
+                            <?php $final_total = max(0, $total - $coupon_discount); ?>
+                            <span class="text-3xl font-black text-primary tracking-tighter">₹<span id="finalTotal"><?= number_format($final_total, 2) ?></span></span>
+                        </div>
+                    </div>
 
-                <!-- Coupon Section -->
-                <div class="coupon-section pt-4 border-t border-dashed border-gray-300 mb-6">
-                    <label class="text-xs font-bold text-muted mb-2 block"><?= __('have_coupon') ?></label>
-                    <div class="flex flex-col md:flex-row gap-2">
-                        <input type="text" id="couponCode" placeholder="<?= __('enter_code') ?>" class="form-input text-sm uppercase w-full md:flex-1 h-10 md:h-auto">
-                        <button type="button" id="applyCoupon" class="btn btn-outline text-xs font-bold px-4 py-2 w-fit md:w-auto self-end md:self-auto h-10 md:h-auto"><?= __('apply') ?></button>
+                    <div class="mt-8 bg-red-50/50 p-5 rounded-2xl border border-red-100 flex gap-4 items-start">
+                        <i class="fa-solid fa-shield-halved text-primary text-lg mt-1"></i>
+                        <p class="text-[10px] text-red-900 leading-normal font-medium">
+                            <strong class="uppercase tracking-widest block mb-1">Secure Checkout Guaranteed</strong>
+                            Your details are protected with enterprise-grade encryption.
+                        </p>
                     </div>
-                    <div id="couponMessage" class="text-xs mt-2 font-semibold"></div>
-                </div>
-
-
-                <div class="total-wrapper space-y-2">
-                    <div class="flex justify-between text-sm">
-                        <span><?= __('subtotal') ?></span>
-                        <span class="font-bold">₹<?= number_format($total, 2) ?></span>
-                    </div>
-                    <div id="lensRow" class="flex justify-between text-sm hidden text-primary">
-                        <span>Lens Extra</span>
-                        <span>+₹<span id="lensAmount">0.00</span></span>
-                    </div>
-                    <div id="discountRow" class="flex justify-between text-sm hidden text-success">
-                        <span><?= __('discount') ?></span>
-                        <span>-₹<span id="discountAmount">0.00</span></span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span><?= __('shipping') ?></span>
-                        <span class="text-success font-bold"><?= __('free') ?></span>
-                    </div>
-                    <div class="flex justify-between text-lg font-bold border-t pt-2 mt-2">
-                        <span><?= __('total_pay') ?></span>
-                        <span class="text-primary">₹<span id="finalTotal"><?= number_format($total, 2) ?></span></span>
-                    </div>
-                </div>
-
-
-                <div class="mt-6 bg-red-50 p-4 rounded-lg border border-red-100 flex gap-3 items-start">
-                    <i class="fa-solid fa-shield-halved text-primary mt-1"></i>
-                    <p class="text-xs text-red-800 leading-snug">
-                        <strong><?= __('secure_checkout') ?></strong><br>
-                        <?= __('secure_checkout_desc') ?>
-                    </p>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<script>
+
+
+function handleLensChange(radio) {
+    updatePageTotal();
+}
+
+function updatePageTotal() {
+    const displayFinalTotal = document.getElementById('finalTotal');
+    const baseAmount = <?= $total ?>; 
+    
+    // 3. Get current discount
+    let discountVal = 0;
+    if (typeof currentDiscount !== 'undefined') {
+        discountVal = currentDiscount;
+    } else {
+        const discountEl = document.getElementById('discountAmount');
+        if(discountEl) {
+             discountVal = parseFloat(discountEl.innerText.replace(/[^\d.]/g, '')) || 0;
+        }
+    }
+    
+    const finalCalculated = Math.max(0, baseAmount - discountVal);
+    if (displayFinalTotal) displayFinalTotal.innerText = finalCalculated.toLocaleString('en-IN', {minimumFractionDigits: 2});
+}
+
+function switchRxTab(btn, id, idx) {
+    // Tab switching rolled back
+}
+
+function validateCheckoutForm() {
+    let isValid = true;
+    const errorMsg = (msg) => {
+        // You could implement a toast here, or just alert for now as per "Improve error messages"
+        alert(msg);
+        return false;
+    };
+
+    const name = document.querySelector('input[name="customer_name"]').value.trim();
+    if (name.length < 3) return errorMsg("Please enter a valid full name.");
+
+    const phone = document.querySelector('input[name="phone"]').value.trim();
+    if (!/^[0-9]{10}$/.test(phone)) return errorMsg("Please enter a valid 10-digit phone number.");
+
+    const address = document.querySelector('input[name="address_line1"]').value.trim();
+    if (address.length < 5) return errorMsg("Please enter a valid address.");
+
+    const pincode = document.querySelector('input[name="pincode"]').value.trim();
+    if (!/^[0-9]{6}$/.test(pincode)) return errorMsg("Please enter a valid 6-digit pincode.");
+
+    const city = document.querySelector('input[name="city"]').value.trim();
+    if (!city) return errorMsg("City is required.");
+
+    const state = document.querySelector('input[name="state"]').value.trim();
+    if (!state) return errorMsg("State is required.");
+
+    return true;
+}
+
+// Power range modifiers rolled back
+window.lensData = [];
+window.priceModifiers = [];
+
+function handleSyncToggle(checkbox) {
+    // Sync rolled back
+}
+
+function copyFromFirstUnit(id) {
+    // Copy unit rolled back
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Prescription cleanup
+});
+
 </script>
+        </div>
+    </div>
+</div>
 
 <script>
 // Coupon Logic
-document.getElementById('applyCoupon').addEventListener('click', function() {
-    const code = document.getElementById('couponCode').value;
-    const msg = document.getElementById('couponMessage');
-    const btn = this;
+let currentAppliedCoupon = '<?= $coupon_code ?>'; 
+let currentDiscount = <?= $coupon_discount ?>;
 
-    if (!code) {
-        msg.classList.add('text-error');
-        msg.innerText = 'Please enter a code.';
-        return;
+function handleCouponClick(code, isApplied) {
+    if (isApplied) return;
+    applyPromoCode(code);
+}
+
+function removeCoupon() {
+    const btn = document.getElementById('removeCouponBtn');
+    if(btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+    fetch('api/remove_coupon.php', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                currentAppliedCoupon = '';
+                currentDiscount = 0;
+                updateCouponUI(false, null);
+                updatePageTotal();
+                
+                // Reset Input
+                const input = document.getElementById('couponCode');
+                if(input) {
+                    input.value = '';
+                    input.disabled = false;
+                }
+            }
+        });
+}
+
+function applyPromoCode(code) {
+    const input = document.getElementById('couponCode');
+    if(input) input.value = code;
+    
+    // UI Loading
+    const applyBtn = document.getElementById('applyCoupon');
+    const removeBtn = document.getElementById('removeCouponBtn');
+    
+    if(applyBtn) {
+        applyBtn.disabled = true;
+        applyBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+    } else if(removeBtn) {
+        removeBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
     }
 
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+    submitCoupon(code);
+}
+
+function submitCoupon(code) {
+    const msg = document.getElementById('couponMessage');
+    if(msg) {
+        msg.className = 'text-[10px] mt-2 font-bold';
+        msg.innerText = ''; 
+    }
 
     const formData = new FormData();
     formData.append('code', code);
@@ -517,39 +452,141 @@ document.getElementById('applyCoupon').addEventListener('click', function() {
     })
     .then(response => response.json())
     .then(data => {
-        btn.disabled = false;
-        btn.innerText = 'Apply';
+        const applyBtn = document.getElementById('applyCoupon');
+        if(applyBtn) {
+            applyBtn.disabled = false;
+            applyBtn.innerText = 'APPLY';
+        }
 
         if (data.success) {
-            msg.classList.add('text-success');
-            msg.innerText = data.message;
+            currentAppliedCoupon = code;
+            currentDiscount = data.discount;
+            updateCouponUI(true, code);
+            updatePageTotal();
             
-            // Update Totals
-            document.getElementById('discountRow').classList.remove('hidden');
-            document.getElementById('discountAmount').innerText = data.discount.toFixed(2);
-            document.getElementById('finalTotal').innerText = data.new_total.toLocaleString('en-IN', {minimumFractionDigits: 2});
-            
-            if (data.coupon_details.is_prepaid_only) {
-                msg.innerHTML += `<br><span class="note-prepaid">* <?= __('prepaid_only_note') ?></span>`;
+            // Show Success Message
+            if(msg) {
+                msg.className = 'mt-2 coupon-success-msg';
+                msg.innerHTML = `
+                    <div class="success-title"><i class="fa-solid fa-circle-check"></i> <span>${data.message}</span></div>
+                `;
+                if (data.coupon_details && data.coupon_details.is_prepaid_only) {
+                    msg.innerHTML += `<div class="success-subtitle"><i class="fa-solid fa-circle-info"></i> <span>Applicable on Prepaid only</span></div>`;
+                }
             }
+            
+            // Disable Input
+            const input = document.getElementById('couponCode');
+            if(input) input.disabled = true;
+
         } else {
-            msg.classList.add('text-error');
-            msg.innerText = data.message;
+            // Restore Remove Button if it was a switch attempt
+            const removeBtn = document.getElementById('removeCouponBtn');
+            if(removeBtn) removeBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
+
+            if(msg) {
+                msg.className = 'text-[10px] mt-2 font-bold text-red-500';
+                msg.innerText = data.message;
+            }
         }
     })
     .catch(error => {
-        btn.disabled = false;
-        btn.innerText = 'Apply';
-        console.error('Error:', error);
+         const applyBtn = document.getElementById('applyCoupon');
+         if(applyBtn) {
+            applyBtn.disabled = false;
+            applyBtn.innerText = 'APPLY';
+         }
+         const removeBtn = document.getElementById('removeCouponBtn');
+         if(removeBtn) removeBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
+         
+         console.error(error);
+         if(msg) msg.innerText = 'System Error';
     });
-});
+}
+
+function updateCouponUI(isApplied, code) {
+    // 1. Update Offer Cards
+    document.querySelectorAll('.offer-card').forEach(card => {
+        const cardCode = card.querySelector('.offer-code').innerText;
+        const badge = card.querySelector('.offer-badge');
+        
+        if (isApplied && cardCode === code) {
+            card.classList.add('active-offer');
+            card.setAttribute('onclick', `handleCouponClick('${cardCode}', true)`);
+            if(badge) {
+                badge.className = 'offer-badge bg-success';
+                badge.innerHTML = '<i class="fa-solid fa-check"></i> Applied';
+            }
+        } else {
+            card.classList.remove('active-offer');
+            card.setAttribute('onclick', `handleCouponClick('${cardCode}', false)`);
+            if(badge) {
+                badge.className = 'offer-badge';
+                badge.innerText = 'Click to apply';
+            }
+        }
+    });
+
+    // 2. Update Input Area Buttons (Swap Apply/Remove)
+    // We need to rebuild the button html or toggle visibility. 
+    // Since we don't have a container for just buttons, let's assume we might need to reload if structure changes too much
+    // BUT for better UX, let's swap them manually if they exist, or reload if complex. 
+    // Actually, simply reloading purely for button swap state is easiest if we don't want complex DOM manips, 
+    // but user wants NO RELOAD. So we utilize a container replacement.
+    
+    // Easier approach: If applied, show remove button. If not, show apply.
+    // We can interact with parent of applyCoupon/removeCouponBtn
+    
+    const inputContainer = document.getElementById('couponCode').parentNode; // The flex container
+    const existingRemove = document.getElementById('removeCouponBtn');
+    const existingApply = document.getElementById('applyCoupon');
+    
+    if (isApplied) {
+        if(existingApply) existingApply.remove();
+        if(!existingRemove) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.id = 'removeCouponBtn';
+            btn.onclick = removeCoupon;
+            btn.className = 'btn btn-outline text-red-500 border-red-200 hover:bg-red-50 text-[10px] font-black uppercase px-4 h-11 tracking-widest';
+            btn.innerHTML = '<i class="fa-solid fa-trash"></i>';
+            inputContainer.appendChild(btn);
+        }
+    } else {
+        if(existingRemove) existingRemove.remove();
+        if(!existingApply) {
+             const btn = document.createElement('button');
+             btn.type = 'button';
+             btn.id = 'applyCoupon';
+             btn.className = 'btn btn-outline text-[10px] font-black uppercase px-6 h-11 tracking-widest';
+             btn.innerText = 'APPLY';
+             
+             // Re-attach listener mechanism or just use onclick inline
+             // Since we use addEventListener below, we need to be careful. 
+             // Let's use inline for simplicity OR re-bind. 
+             // Updating HTML is risky for listeners. 
+             // Let's just create element and bind.
+             btn.addEventListener('click', function() {
+                const code = document.getElementById('couponCode').value;
+                if (!code) {
+                    const msg = document.getElementById('couponMessage');
+                    if(msg) msg.innerText = 'Please enter a code';
+                    return;
+                }
+                submitCoupon(code);
+             });
+             
+             inputContainer.appendChild(btn);
+        }
+    }
+}
 
 // Autocomplete Logic (Nominatim)
 const addressInput = document.getElementById('autocomplete_address');
 const suggestionsBox = document.getElementById('address_suggestions');
 let debounceTimer;
 
-addressInput.addEventListener('input', function() {
+addressInput?.addEventListener('input', function() {
     clearTimeout(debounceTimer);
     const query = this.value;
     
@@ -567,18 +604,16 @@ addressInput.addEventListener('input', function() {
                     suggestionsBox.classList.remove('hidden');
                     data.forEach(place => {
                         const div = document.createElement('div');
-                        div.className = 'suggestion-item';
+                        div.className = 'p-3 hover:bg-gray-50 cursor-pointer text-sm border-b last:border-0 font-medium';
                         div.textContent = place.display_name;
                         div.onclick = () => {
-                            addressInput.value = place.display_name.split(',')[0]; // First part as line 1
-                            
-                            // Try to parse basic details
+                            addressInput.value = place.display_name.split(',')[0]; 
                             const parts = place.display_name.split(',');
                             const len = parts.length;
-                            if (len > 1) document.getElementById('checkout_city').value = parts[len - 4]?.trim() || ''; 
-                            if (len > 1) document.getElementById('checkout_state').value = parts[len - 2]?.trim() || '';
-                            // Pincode usually isn't in display_name clearly, leave manually
-                             
+                            if (len > 1) {
+                                document.getElementById('checkout_city').value = parts[len - 4]?.trim() || ''; 
+                                document.getElementById('checkout_state').value = parts[len - 2]?.trim() || '';
+                            }
                             suggestionsBox.classList.add('hidden');
                         };
                         suggestionsBox.appendChild(div);
@@ -590,80 +625,41 @@ addressInput.addEventListener('input', function() {
     }, 500);
 });
 
-// Close suggestions on click outside
-document.addEventListener('click', function(e) {
+document.addEventListener('click', (e) => {
     if (e.target !== addressInput && e.target !== suggestionsBox) {
-        suggestionsBox.classList.add('hidden');
+        suggestionsBox?.classList.add('hidden');
     }
 });
 
-// Geolocation Logic (BigDataCloud)
+// Geolocation
 function detectCheckoutLocation() {
-    // ... (existing code logic kept same, just ensuring placement) ...
     const btn = document.querySelector('.btn-detect');
-    // ...
-    // (Abbreviated to focus on new code insertion below)
-    if (!navigator.geolocation) { alert("Geolocation is not supported"); return; }
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <?= __('locating') ?>';
+    if (!navigator.geolocation) { alert("Geolocation not supported"); return; }
+    
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Locating...';
     btn.disabled = true;
+    
     navigator.geolocation.getCurrentPosition(pos => {
-        // ... fetching logic ...
-        // mocking restart of fetch for brevity in replace
         fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&localityLanguage=en`)
-        .then(r=>r.json()).then(data => {
-             // ... populate fields ...
+        .then(r => r.json())
+        .then(data => {
              document.getElementById('checkout_city').value = data.city || data.locality || "";
              document.getElementById('checkout_pincode').value = data.postcode || "";
              document.getElementById('checkout_state').value = data.principalSubdivision || "";
              document.getElementById('autocomplete_address').value = data.locality || "";
              btn.innerHTML = '<i class="fa-solid fa-check"></i> Found';
              btn.disabled = false;
+        })
+        .catch(() => {
+            btn.innerHTML = 'Error';
+            btn.disabled = false;
         });
-    }, err => { btn.innerHTML = 'Error'; btn.disabled = false; });
-}
-
-// Update Total Price based on Lens Selection
-function updateTotal() {
-    let baseTotal = <?= $total ?>;
-    let lensTotal = 0;
-    
-    document.querySelectorAll('.lens-select').forEach(select => {
-        const price = parseFloat(select.options[select.selectedIndex].dataset.price || 0);
-        lensTotal += price;
-        
-        // Toggle Prescription Form
-        const itemId = select.dataset.itemId;
-        const form = document.getElementById('prescription_form_' + itemId);
-        if (price > 0 || select.value != "") { // Show if any lens selected (even zero price if it is a lens package)
-             // Assuming "No Lenses" has value ""
-             if(select.value !== "") {
-                form.classList.remove('hidden');
-             } else {
-                form.classList.add('hidden');
-             }
-        } else {
-            form.classList.add('hidden');
-        }
+    }, () => { 
+        btn.innerHTML = 'Error'; 
+        btn.disabled = false; 
     });
-    
-    // Update Lens Total in Summary (New Element needed)
-    const lensRow = document.getElementById('lensRow');
-    if(lensRow) {
-        if(lensTotal > 0) {
-            lensRow.classList.remove('hidden');
-            document.getElementById('lensAmount').innerText = lensTotal.toFixed(2);
-        } else {
-            lensRow.classList.add('hidden');
-        }
-    }
-    
-    // Calculate Final Total
-    let discount = parseFloat(document.getElementById('discountAmount').innerText || 0);
-    let finalTotal = baseTotal + lensTotal - discount;
-    
-    document.getElementById('finalTotal').innerText = finalTotal.toLocaleString('en-IN', {minimumFractionDigits: 2});
 }
 </script>
-</form> <!-- Closing the main form we opened earlier -->
+</form>
 <?php require_once 'includes/footer.php'; ?>
 

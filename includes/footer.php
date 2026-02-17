@@ -117,7 +117,7 @@ if (empty($service_links)) {
                                 <a href="<?= $link['url'] ?>" 
                                    class="group flex items-center gap-2.5 text-gray-300 hover:text-white transition-all duration-200 text-sm">
                                     
-                                   <i class="fa-solid fa-shield-halved text-primary/50 text-xs"></i>
+                                   <i class="fa-solid fa-chevron-right text-primary/50 text-xs"></i>
                                     <span class="group-hover:translate-x-0.5 transition-transform"><?= htmlspecialchars($link['label']) ?></span>
                                 </a>
                             </li>

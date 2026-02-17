@@ -14,7 +14,12 @@ if (!$email || !$user_id) {
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $code = $_POST['otp'];
+    if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
+        $error = "Invalid form submission";
+    } elseif (!checkOTPAttempts()) {
+        $error = "Too many failed attempts. Please request a new code.";
+    } else {
+        $code = $_POST['otp'];
 
     // Check code
     $stmt = $pdo->prepare("SELECT * FROM verification_codes WHERE user_id = ? AND code = ? AND expires_at > NOW() ORDER BY created_at DESC LIMIT 1");
@@ -55,6 +60,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // To be precise: We updated `is_verified` blindly. 
         // Let's assume valid login.
         
+        // Valid OTP
+        resetOTPAttempts();
+        session_regenerate_id(true); // Fix session fixation
+        
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_name'] = $user['name'];
         $_SESSION['user_email'] = $user['email'];
@@ -68,22 +77,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect('index.php');
         exit;
     } else {
+        recordOTPAttempt();
         $error = "Invalid or expired verification code.";
+    }
     }
 }
 
-// Resend Logic
-if (isset($_GET['resend'])) {
-    $otp = sprintf("%06d", mt_rand(1, 999999));
-    $expires_at = date('Y-m-d H:i:s', strtotime('+10 minutes'));
-    
-    $stmt = $pdo->prepare("INSERT INTO verification_codes (user_id, code, expires_at) VALUES (?, ?, ?)");
-    $stmt->execute([$user_id, $otp, $expires_at]);
+// Resend Logic (POST request for security)
+if (isset($_POST['resend'])) {
+    if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
+        setFlash('error', 'Invalid request');
+    } elseif (!checkOTPResendCooldown()) {
+         setFlash('error', 'Please wait 60 seconds before resending.');
+    } else {
+        $otp = sprintf("%06d", random_int(0, 999999));
+        $expires_at = date('Y-m-d H:i:s', strtotime('+10 minutes'));
+        
+        $stmt = $pdo->prepare("INSERT INTO verification_codes (user_id, code, expires_at) VALUES (?, ?, ?)");
+        $stmt->execute([$user_id, $otp, $expires_at]);
 
-    require_once 'includes/order_templates.php';
-    sendEmail($email, "New Verification Code - Super Optical", getOTPEmailTemplate($otp));
-    
-    setFlash('success', 'A new code has been sent to your email.');
+        require_once 'includes/order_templates.php';
+        sendEmail($email, "New Verification Code - Super Optical", getOTPEmailTemplate($otp));
+        
+        recordOTPResend();
+        resetOTPAttempts(); // Reset attempts on new code
+        setFlash('success', 'A new code has been sent to your email.');
+    }
     redirect('verify-otp.php');
     exit;
 }
@@ -107,25 +126,86 @@ if (isset($_GET['resend'])) {
         <?php if ($error): ?>
             <div class="bg-red-50 text-red-700 p-4 rounded-lg flex items-center gap-3 border border-red-100">
                 <i class="fa-solid fa-circle-exclamation text-xl"></i> 
-                <span class="font-medium"><?= $error ?></span>
+                <span class="font-medium"><?= htmlspecialchars($error) ?></span>
             </div>
         <?php endif; ?>
 
-        <form method="POST" class="space-y-6">
-            <div>
-                <input type="text" name="otp" required maxlength="6" placeholder="000000" class="form-input text-center text-3xl tracking-[1em] font-mono w-full border-gray-300 rounded-lg focus:ring-primary focus:border-primary px-4 py-4 placeholder:tracking-normal placeholder:text-gray-300">
+        <form method="POST" class="space-y-6" id="otpForm">
+            <?= csrfField() ?>
+            <input type="hidden" name="otp" id="final_otp">
+            
+            <div class="otp-input-container">
+                <input type="text" class="otp-box" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');" autofocus>
+                <input type="text" class="otp-box" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+                <input type="text" class="otp-box" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+                <input type="text" class="otp-box" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+                <input type="text" class="otp-box" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+                <input type="text" class="otp-box" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
             </div>
 
-            <button type="submit" class="btn btn-primary w-full py-4 text-lg font-bold shadow-lg shadow-primary/30 hover:-translate-y-1 transition-transform">
+            <button type="submit" class="btn btn-primary w-full py-4 shadow-lg shadow-primary/30 hover:-translate-y-1 transition-transform mt-4 no-margin">
                 Verify & Activate Account <i class="fa-solid fa-arrow-right ml-2"></i>
             </button>
         </form>
 
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const boxes = document.querySelectorAll('.otp-box');
+            const hiddenInput = document.getElementById('final_otp');
+            const form = document.getElementById('otpForm');
+
+            boxes.forEach((box, index) => {
+                // Focus movement
+                box.addEventListener('keyup', (e) => {
+                    if (e.key >= 0 && e.key <= 9) {
+                        if (index < boxes.length - 1) boxes[index + 1].focus();
+                    } else if (e.key === 'Backspace') {
+                        if (index > 0) boxes[index - 1].focus();
+                    }
+                    updateHiddenInput();
+                });
+
+                // Paste handling
+                box.addEventListener('paste', (e) => {
+                    e.preventDefault();
+                    const data = e.clipboardData.getData('text').trim();
+                    if (data.length === 6 && /^\d+$/.test(data)) {
+                        data.split('').forEach((digit, i) => {
+                            boxes[i].value = digit;
+                        });
+                        boxes[5].focus();
+                        updateHiddenInput();
+                    }
+                });
+            });
+
+            function updateHiddenInput() {
+                let code = '';
+                boxes.forEach(box => code += box.value);
+                hiddenInput.value = code;
+            }
+
+            form.addEventListener('submit', function(e) {
+                updateHiddenInput();
+                if (hiddenInput.value.length !== 6) {
+                    e.preventDefault();
+                    alert('Please enter a 6-digit verification code.');
+                }
+            });
+        });
+        </script>
+
         <div class="mt-8 pt-6 border-t border-gray-100 text-center space-y-4">
-            <p class="text-gray-600">
-                Didn't receive the code? <br>
-                <a href="?resend=1" class="text-primary font-bold hover:underline">Resend Code</a>
-            </p>
+            <div>
+                <p class="text-gray-500 text-sm mb-3">Didn't receive the code?</p>
+                <form method="POST" class="inline-block">
+                    <?= csrfField() ?>
+                    <input type="hidden" name="resend" value="1">
+                    <button type="submit" class="btn btn-sm btn-secondary" style="margin-bottom: 0.6em;">
+                        <i class="fa-solid fa-rotate-right mr-1"></i> Resend Code
+                    </button>
+                </form>
+            </div>
             <a href="register.php" class="inline-block text-gray-400 hover:text-gray-600 font-bold text-sm transition-colors">
                 <i class="fa-solid fa-chevron-left mr-1"></i> Back to Registration
             </a>

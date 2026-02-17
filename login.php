@@ -13,7 +13,10 @@ if (isLoggedIn()) {
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = $_POST['email'];
+    if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
+        $error = "Invalid form submission (CSRF check failed)";
+    } else {
+        $email = $_POST['email'];
     // $password = $_POST['password']; // No longer using password
 
     $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ? OR phone = ?");
@@ -25,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['verify_email'] = $user['email'];
         $_SESSION['verify_user_id'] = $user['id'];
         
-        $otp = sprintf("%06d", mt_rand(1, 999999));
+        $otp = sprintf("%06d", random_int(0, 999999));
         $expires_at = date('Y-m-d H:i:s', strtotime('+10 minutes'));
         
         $pdo->prepare("INSERT INTO verification_codes (user_id, code, expires_at) VALUES (?, ?, ?)")->execute([$user['id'], $otp, $expires_at]);
@@ -40,6 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     } else {
         $error = __('account_not_found');
+    }
     }
 }
 ?>
@@ -59,13 +63,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php if (!empty($error)): ?>
             <div class="bg-red-50 text-red-700 p-4 rounded-lg flex items-center gap-3 border border-red-100">
                 <i class="fa-solid fa-circle-exclamation text-xl"></i> 
-                <span class="font-medium"><?= $error ?></span>
+                <span class="font-medium"><?= htmlspecialchars($error) ?></span>
             </div>
         <?php endif; ?>
 
 
 
         <form method="POST" class="space-y-6">
+            <?= csrfField() ?>
             <div>
                 <label class="form-label text-gray-700 font-bold mb-2"><?= __('email_mobile') ?></label>
                 <div class="relative">
@@ -79,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <!-- Password Field Removed -->
 
             <div>
-                <button type="submit" class="btn btn-primary w-full py-3 text-lg font-bold shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all">
+                <button type="submit" class="btn btn-primary w-full py-3 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all mt-4 no-margin">
                     <?= __('get_verification_code') ?> <i class="fa-solid fa-arrow-right ml-2"></i>
                 </button>
             </div>

@@ -208,9 +208,6 @@ $unread_count = $unread_count_stmt->fetchColumn();
                 <a href="appointments.php" class="sidebar-link <?= isActive('appointments.php', $current_page) ?>" title="<?= __('appointments') ?>">
                     <i class="fa-solid fa-calendar-check"></i> <span><?= __('appointments') ?></span>
                 </a>
-                <a href="lens_options.php" class="sidebar-link <?= isActive('lens_options.php', $current_page) ?>" title="Lens Options">
-                    <i class="fa-solid fa-eye"></i> <span>Lens Options</span>
-                </a>
 
                 <!-- Content Management -->
                 <div class="sidebar-group-label"><?= __('content_management') ?></div>
@@ -278,6 +275,7 @@ $unread_count = $unread_count_stmt->fetchColumn();
                     // Mobile Behavior: Overlay
                     sidebar.classList.toggle('active');
                     overlay.classList.toggle('active');
+                    body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
                 }
             });
         }
@@ -292,6 +290,7 @@ $unread_count = $unread_count_stmt->fetchColumn();
             overlay.addEventListener('click', function() {
                 document.getElementById('adminSidebar').classList.remove('active');
                 overlay.classList.remove('active');
+                body.style.overflow = '';
             });
         }
 

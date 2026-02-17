@@ -198,14 +198,16 @@ $allGateways = $integrationManager->getIntegrationsByType('payment');
 }
 </style>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h1 class="admin-title">Payment Gateway Configuration</h1>
-        <p style="color: var(--admin-text-light); margin: var(--space-2) 0 0 0;">Configure and manage payment processing services</p>
+<div class="page-header">
+    <div class="page-header-info">
+        <h1 class="page-title">Payment Gateway Configuration</h1>
+        <p class="page-subtitle">Configure and manage payment processing services</p>
     </div>
-    <a href="integrations.php" class="btn btn-secondary">
-        <i class="fa-solid fa-arrow-left"></i> Back to Integrations
-    </a>
+    <div class="page-header-actions">
+        <a href="integrations.php" class="btn btn-secondary">
+            <i class="fa-solid fa-arrow-left"></i> Back to Integrations
+        </a>
+    </div>
 </div>
 
 <div class="admin-grid" style="grid-template-columns: 300px 1fr; gap: var(--space-8);">

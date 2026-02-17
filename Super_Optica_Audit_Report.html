@@ -1,0 +1,1241 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Super Optica — Professional Audit Report</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --bg: #0f172a;
+        --card: #1e293b;
+        --card2: #334155;
+        --border: #475569;
+        --text: #e2e8f0;
+        --muted: #94a3b8;
+        --accent: #3b82f6;
+        --accent2: #8b5cf6;
+        --red: #ef4444;
+        --orange: #f97316;
+        --yellow: #eab308;
+        --green: #22c55e;
+        --cyan: #06b6d4;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.7;
+        padding: 2rem;
+      }
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+      h1 {
+        font-size: 2rem;
+        font-weight: 900;
+        background: linear-gradient(135deg, var(--accent), var(--accent2));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+      }
+      h2 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--cyan);
+        margin: 2.5rem 0 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--border);
+      }
+      h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--accent);
+        margin: 1.5rem 0 0.75rem;
+      }
+      h4 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--yellow);
+        margin: 1rem 0 0.5rem;
+      }
+      p,
+      li {
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      .header {
+        text-align: center;
+        padding: 3rem 2rem;
+        background: linear-gradient(
+          135deg,
+          rgba(59, 130, 246, 0.1),
+          rgba(139, 92, 246, 0.1)
+        );
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        margin-bottom: 2rem;
+      }
+      .header .meta {
+        display: flex;
+        gap: 2rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+      .header .meta span {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+      .badge {
+        display: inline-block;
+        padding: 0.2rem 0.6rem;
+        border-radius: 6px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+      .badge.critical {
+        background: rgba(239, 68, 68, 0.2);
+        color: var(--red);
+        border: 1px solid var(--red);
+      }
+      .badge.high {
+        background: rgba(249, 115, 22, 0.2);
+        color: var(--orange);
+        border: 1px solid var(--orange);
+      }
+      .badge.medium {
+        background: rgba(234, 179, 8, 0.2);
+        color: var(--yellow);
+        border: 1px solid var(--yellow);
+      }
+      .badge.low {
+        background: rgba(34, 197, 94, 0.2);
+        color: var(--green);
+        border: 1px solid var(--green);
+      }
+      .badge.ok {
+        background: rgba(6, 182, 212, 0.15);
+        color: var(--cyan);
+        border: 1px solid var(--cyan);
+      }
+      .alert {
+        padding: 1rem 1.25rem;
+        border-radius: 10px;
+        margin: 1rem 0;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+      .alert.danger {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: #fca5a5;
+      }
+      .alert.warning {
+        background: rgba(234, 179, 8, 0.1);
+        border: 1px solid rgba(234, 179, 8, 0.3);
+        color: #fde68a;
+      }
+      .alert.info {
+        background: rgba(59, 130, 246, 0.1);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        color: #93c5fd;
+      }
+      .alert i {
+        font-size: 1.1rem;
+        margin-top: 2px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+        font-size: 0.85rem;
+      }
+      th {
+        background: var(--card2);
+        color: var(--text);
+        padding: 0.6rem 0.8rem;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      td {
+        padding: 0.6rem 0.8rem;
+        border-bottom: 1px solid rgba(71, 85, 105, 0.4);
+        color: var(--muted);
+        vertical-align: top;
+      }
+      tr:hover td {
+        background: rgba(59, 130, 246, 0.05);
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+      }
+      .issue-card {
+        background: var(--card);
+        border-radius: 12px;
+        padding: 1.25rem;
+        margin: 0.75rem 0;
+        border-left: 4px solid var(--border);
+      }
+      .issue-card.critical {
+        border-left-color: var(--red);
+      }
+      .issue-card.high {
+        border-left-color: var(--orange);
+      }
+      .issue-card.medium {
+        border-left-color: var(--yellow);
+      }
+      .issue-card .issue-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+      }
+      .issue-card .issue-id {
+        font-weight: 800;
+        font-size: 0.85rem;
+        color: var(--text);
+      }
+      .issue-card .issue-title {
+        font-weight: 600;
+        color: var(--text);
+        font-size: 0.9rem;
+      }
+      .issue-card p {
+        margin: 0.4rem 0;
+      }
+      .issue-card .label {
+        font-weight: 600;
+        color: var(--text);
+        min-width: 80px;
+        display: inline-block;
+      }
+      code {
+        background: rgba(59, 130, 246, 0.15);
+        color: var(--cyan);
+        padding: 0.15rem 0.4rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-family: "Fira Code", monospace;
+      }
+      pre {
+        background: #0c1222;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1rem;
+        overflow-x: auto;
+        font-size: 0.8rem;
+        line-height: 1.6;
+        color: #a5f3fc;
+        margin: 1rem 0;
+      }
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+      .stat-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1rem;
+        text-align: center;
+      }
+      .stat-card .number {
+        font-size: 2rem;
+        font-weight: 900;
+      }
+      .stat-card .label {
+        font-size: 0.75rem;
+        color: var(--muted);
+        text-transform: uppercase;
+      }
+      .rating {
+        font-size: 1.1rem;
+        font-weight: 800;
+      }
+      .toc {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.5rem 2rem;
+        margin: 1.5rem 0;
+      }
+      .toc a {
+        display: block;
+        padding: 0.3rem 0;
+        color: var(--muted);
+        font-size: 0.88rem;
+        transition: color 0.2s;
+      }
+      .toc a:hover {
+        color: var(--accent);
+      }
+      .toc a i {
+        margin-right: 0.5rem;
+        font-size: 0.7rem;
+        color: var(--accent);
+      }
+      .check {
+        color: var(--green);
+      }
+      .cross {
+        color: var(--red);
+      }
+      .warn {
+        color: var(--yellow);
+      }
+      .phase-tag {
+        display: inline-block;
+        background: linear-gradient(135deg, var(--accent), var(--accent2));
+        color: #fff;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 0.5rem;
+      }
+      @media (max-width: 768px) {
+        body {
+          padding: 1rem;
+        }
+        .grid-2 {
+          grid-template-columns: 1fr;
+        }
+        .header .meta {
+          flex-direction: column;
+          align-items: center;
+        }
+      }
+      .progress-bar {
+        height: 6px;
+        background: var(--card2);
+        border-radius: 3px;
+        overflow: hidden;
+        margin: 0.5rem 0;
+      }
+      .progress-bar .fill {
+        height: 100%;
+        border-radius: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- HEADER -->
+      <div class="header">
+        <h1>
+          <i class="fa-solid fa-magnifying-glass-chart"></i> Super Optica —
+          Professional Audit Report
+        </h1>
+        <p style="color: var(--muted); font-size: 1rem">
+          Comprehensive 8-Phase E-Commerce Application Audit
+        </p>
+        <div class="meta">
+          <span><i class="fa-regular fa-calendar"></i> Feb 17, 2026</span>
+          <span
+            ><i class="fa-solid fa-user-shield"></i> Senior Architect / QA /
+            Security / DevOps</span
+          >
+          <span
+            ><i class="fa-solid fa-code-branch"></i> Super Optical
+            E-Commerce</span
+          >
+        </div>
+      </div>
+
+      <div class="alert danger">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <div>
+          <strong>LIVE-DATA PROJECT</strong> — All recommendations are
+          non-destructive. Database changes include backup + migration +
+          rollback procedures. No data will be lost.
+        </div>
+      </div>
+
+      <!-- TABLE OF CONTENTS -->
+      <div class="toc">
+        <h3 style="margin-top: 0">
+          <i class="fa-solid fa-list"></i> Table of Contents
+        </h3>
+        <a href="#phase1"
+          ><i class="fa-solid fa-chevron-right"></i> Phase 1 — Project Analysis
+          & Architecture</a
+        >
+        <a href="#phase2"
+          ><i class="fa-solid fa-chevron-right"></i> Phase 2 — Functional Audit
+          (12 Issues)</a
+        >
+        <a href="#phase3"
+          ><i class="fa-solid fa-chevron-right"></i> Phase 3 — Database Safety
+          Review</a
+        >
+        <a href="#phase4"
+          ><i class="fa-solid fa-chevron-right"></i> Phase 4 — UX/UI Audit</a
+        >
+        <a href="#phase5"
+          ><i class="fa-solid fa-chevron-right"></i> Phase 5 — Security Audit
+          (10 Vulnerabilities)</a
+        >
+        <a href="#phase6"
+          ><i class="fa-solid fa-chevron-right"></i> Phase 6 — Performance
+          Audit</a
+        >
+        <a href="#phase7"
+          ><i class="fa-solid fa-chevron-right"></i> Phase 7 — Test Case
+          Generation (21 Tests)</a
+        >
+        <a href="#phase8"
+          ><i class="fa-solid fa-chevron-right"></i> Phase 8 — Production
+          Readiness</a
+        >
+        <a href="#master"
+          ><i class="fa-solid fa-chevron-right"></i> Master Issue List &
+          Roadmap</a
+        >
+      </div>
+
+      <!-- SUMMARY STATS -->
+      <div
+        class="grid-2"
+        style="grid-template-columns: repeat(4, 1fr); margin: 1.5rem 0"
+      >
+        <div class="stat-card">
+          <div class="number" style="color: var(--red)">4</div>
+          <div class="label">Critical</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" style="color: var(--orange)">7</div>
+          <div class="label">High</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" style="color: var(--yellow)">8</div>
+          <div class="label">Medium</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" style="color: var(--green)">1</div>
+          <div class="label">Low</div>
+        </div>
+      </div>
+
+      <!-- ====== PHASE 1 ====== -->
+      <div id="phase1">
+        <span class="phase-tag">Phase 1</span>
+        <h2>
+          <i class="fa-solid fa-sitemap"></i> Project Analysis & Architecture
+        </h2>
+
+        <h3>1.1 Technology Stack</h3>
+        <table>
+          <tr>
+            <th>Layer</th>
+            <th>Technology</th>
+          </tr>
+          <tr>
+            <td>Language</td>
+            <td>PHP 8.x (procedural + some OOP)</td>
+          </tr>
+          <tr>
+            <td>Database</td>
+            <td>MySQL via PDO (utf8mb4)</td>
+          </tr>
+          <tr>
+            <td>Server</td>
+            <td>XAMPP (Apache) — local dev</td>
+          </tr>
+          <tr>
+            <td>Payment</td>
+            <td>Razorpay (test + live keys)</td>
+          </tr>
+          <tr>
+            <td>Shipping</td>
+            <td>Shiprocket API</td>
+          </tr>
+          <tr>
+            <td>Email</td>
+            <td>PHPMailer via SMTP</td>
+          </tr>
+          <tr>
+            <td>Frontend</td>
+            <td>Vanilla HTML/CSS/JS + Font Awesome + Summernote</td>
+          </tr>
+          <tr>
+            <td>Auth</td>
+            <td>OTP-based (customers), Password (admins)</td>
+          </tr>
+          <tr>
+            <td>i18n</td>
+            <td>JSON-based (EN, HI)</td>
+          </tr>
+          <tr>
+            <td>Images</td>
+            <td>GD Library (resize, WebP, srcset)</td>
+          </tr>
+        </table>
+
+        <h3>
+          1.2 Architecture Rating:
+          <span class="rating" style="color: var(--orange)">4/10</span>
+        </h3>
+        <p>
+          Monolithic page-based PHP. No MVC framework, no routing layer, no
+          service layer, no dependency injection. Each PHP file independently
+          loads config and includes.
+        </p>
+
+        <h3>1.3 Code Quality Issues</h3>
+        <table>
+          <tr>
+            <th>Issue</th>
+            <th>Severity</th>
+            <th>Description</th>
+          </tr>
+          <tr>
+            <td>No MVC/Routing</td>
+            <td><span class="badge medium">Medium</span></td>
+            <td>
+              Each page = standalone script. Tight coupling of DB, logic, and
+              view
+            </td>
+          </tr>
+          <tr>
+            <td>Duplicate Order Logic</td>
+            <td><span class="badge high">High</span></td>
+            <td>
+              Order insertion in both <code>checkout_payment.php</code> (COD)
+              and <code>verify_payment.php</code> (Razorpay)
+            </td>
+          </tr>
+          <tr>
+            <td>Global $pdo</td>
+            <td><span class="badge medium">Medium</span></td>
+            <td>
+              All functions use <code>global $pdo</code> — no dependency
+              injection
+            </td>
+          </tr>
+          <tr>
+            <td>Dead Code</td>
+            <td><span class="badge low">Low</span></td>
+            <td>Rolled-back functions, debug files left in production</td>
+          </tr>
+          <tr>
+            <td>Magic Strings</td>
+            <td><span class="badge low">Low</span></td>
+            <td>
+              Status values like <code>'pending'</code>,
+              <code>'completed'</code> as raw strings
+            </td>
+          </tr>
+        </table>
+
+        <h3>1.4 Scalability Concerns</h3>
+        <div class="card">
+          <ul style="list-style: none; padding: 0">
+            <li style="padding: 0.3rem 0">
+              <i class="fa-solid fa-xmark cross"></i> Single-server monolith —
+              no horizontal scaling
+            </li>
+            <li style="padding: 0.3rem 0">
+              <i class="fa-solid fa-xmark cross"></i> Session-based cart — not
+              portable across load balancers
+            </li>
+            <li style="padding: 0.3rem 0">
+              <i class="fa-solid fa-xmark cross"></i> No job queue — emails sent
+              synchronously during checkout
+            </li>
+            <li style="padding: 0.3rem 0">
+              <i class="fa-solid fa-xmark cross"></i> All assets on same server
+              — no CDN/S3
+            </li>
+            <li style="padding: 0.3rem 0">
+              <i class="fa-solid fa-xmark cross"></i> No automated tests, no
+              CI/CD pipeline
+            </li>
+            <li style="padding: 0.3rem 0">
+              <i class="fa-solid fa-xmark cross"></i> <code>.bak</code> files
+              and debug scripts committed to web root
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ====== PHASE 2 ====== -->
+      <div id="phase2">
+        <span class="phase-tag">Phase 2</span>
+        <h2><i class="fa-solid fa-clipboard-check"></i> Functional Audit</h2>
+
+        <h3>Customer Side Issues</h3>
+
+        <div class="issue-card critical">
+          <div class="issue-header">
+            <span class="badge critical">Critical</span
+            ><span class="issue-id">ISS-001</span
+            ><span class="issue-title"
+              >Cart prices NOT re-validated from database</span
+            >
+          </div>
+          <p>
+            <span class="label">File:</span> <code>functions.php:L89</code> →
+            <code>checkout_payment.php</code>
+          </p>
+          <p>
+            <span class="label">Impact:</span> Users can manipulate session data
+            to pay less — financial loss
+          </p>
+          <p>
+            <span class="label">Fix:</span> Re-fetch product prices from DB at
+            checkout time before order creation
+          </p>
+        </div>
+
+        <div class="issue-card critical">
+          <div class="issue-header">
+            <span class="badge critical">Critical</span
+            ><span class="issue-id">ISS-002</span
+            ><span class="issue-title"
+              >Razorpay amount from session-stored cart prices</span
+            >
+          </div>
+          <p>
+            <span class="label">File:</span>
+            <code>api/create_razorpay_order.php:L46-48</code>
+          </p>
+          <p>
+            <span class="label">Impact:</span> Payment amount manipulable —
+            customer pays less than actual price
+          </p>
+          <p>
+            <span class="label">Fix:</span> Recalculate total from DB prices in
+            the API endpoint
+          </p>
+        </div>
+
+        <div class="issue-card high">
+          <div class="issue-header">
+            <span class="badge high">High</span
+            ><span class="issue-id">ISS-003</span
+            ><span class="issue-title"
+              >Hardcoded fake ratings on all product cards</span
+            >
+          </div>
+          <p>
+            <span class="label">File:</span>
+            <code>functions.php:L844-845</code> —
+            <code>$rating_score = '4.8'; $rating_count = '2.4k';</code>
+          </p>
+          <p>
+            <span class="label">Impact:</span> Misleading/deceptive — potential
+            legal issues
+          </p>
+          <p>
+            <span class="label">Fix:</span> Query actual reviews from
+            <code>reviews</code> table or remove rating display
+          </p>
+        </div>
+
+        <div class="issue-card medium">
+          <div class="issue-header">
+            <span class="badge medium">Medium</span
+            ><span class="issue-id">ISS-004</span
+            ><span class="issue-title"
+              >Hardcoded fallback offer "Flat 10% Off — SUPER10"</span
+            >
+          </div>
+          <p>
+            <span class="label">File:</span> <code>product.php:L193-199</code>
+          </p>
+          <p>
+            <span class="label">Impact:</span> Shows an offer that may not
+            actually work — trust loss
+          </p>
+          <p>
+            <span class="label">Fix:</span> Remove hardcoded fallback or create
+            a real coupon matching the code
+          </p>
+        </div>
+
+        <div class="issue-card high">
+          <div class="issue-header">
+            <span class="badge high">High</span
+            ><span class="issue-id">ISS-005</span
+            ><span class="issue-title"
+              >No server-side validation on checkout form</span
+            >
+          </div>
+          <p>
+            <span class="label">File:</span> <code>checkout.php:L44-53</code>
+          </p>
+          <p>
+            <span class="label">Impact:</span> Invalid orders, shipping
+            failures, data quality issues
+          </p>
+          <p>
+            <span class="label">Fix:</span> Add PHP-side validation: phone
+            format, pincode regex, non-empty fields
+          </p>
+        </div>
+
+        <div class="issue-card medium">
+          <div class="issue-header">
+            <span class="badge medium">Medium</span
+            ><span class="issue-id">ISS-006</span
+            ><span class="issue-title"
+              >Email field not required in registration</span
+            >
+          </div>
+          <p><span class="label">File:</span> <code>register.php:L122</code></p>
+          <p>
+            <span class="label">Fix:</span> Add <code>required</code> attribute
+            + server-side validation
+          </p>
+        </div>
+
+        <div class="issue-card medium">
+          <div class="issue-header">
+            <span class="badge medium">Medium</span
+            ><span class="issue-id">ISS-007</span
+            ><span class="issue-title"
+              >Duplicate order creation code in COD vs Razorpay paths</span
+            >
+          </div>
+          <p>
+            <span class="label">Fix:</span> Extract into shared
+            <code>createOrder()</code> function in <code>functions.php</code>
+          </p>
+        </div>
+
+        <div class="issue-card high">
+          <div class="issue-header">
+            <span class="badge high">High</span
+            ><span class="issue-id">ISS-008</span
+            ><span class="issue-title"
+              >Race condition on stock reduction — no row-level locking</span
+            >
+          </div>
+          <p>
+            <span class="label">File:</span>
+            <code>checkout_payment.php:L94-105</code>
+          </p>
+          <p>
+            <span class="label">Impact:</span> Overselling with concurrent
+            checkouts
+          </p>
+          <p>
+            <span class="label">Fix:</span> Use
+            <code>UPDATE SET stock = stock - ? WHERE stock >= ?</code> (atomic)
+          </p>
+        </div>
+
+        <h3>Admin Panel Issues</h3>
+
+        <div class="issue-card high">
+          <div class="issue-header">
+            <span class="badge high">High</span
+            ><span class="issue-id">ISS-009</span
+            ><span class="issue-title"
+              >No brute-force protection on admin login</span
+            >
+          </div>
+          <p>
+            <span class="label">File:</span> <code>admin/login.php:L9-24</code>
+          </p>
+          <p>
+            <span class="label">Fix:</span> Lock account after 5 failed attempts
+            for 15 minutes
+          </p>
+        </div>
+
+        <div class="issue-card medium">
+          <div class="issue-header">
+            <span class="badge medium">Medium</span
+            ><span class="issue-id">ISS-010</span
+            ><span class="issue-title"
+              >Dashboard queries have no date filtering</span
+            >
+          </div>
+          <p>
+            <span class="label">Impact:</span> Full table scans as data grows
+          </p>
+          <p>
+            <span class="label">Fix:</span> Add time-range filters and indexes
+          </p>
+        </div>
+
+        <div class="issue-card medium">
+          <div class="issue-header">
+            <span class="badge medium">Medium</span
+            ><span class="issue-id">ISS-012</span
+            ><span class="issue-title"
+              >Summernote allows &lt;script&gt; tag injection (Stored XSS)</span
+            >
+          </div>
+          <p>
+            <span class="label">Fix:</span> Sanitize Summernote output
+            server-side before DB insert
+          </p>
+        </div>
+      </div>
+
+      <!-- ====== PHASE 3 ====== -->
+      <div id="phase3">
+        <span class="phase-tag">Phase 3</span>
+        <h2><i class="fa-solid fa-database"></i> Database Safety Review</h2>
+
+        <h3>3.1 Schema Analysis</h3>
+        <table>
+          <tr>
+            <th>Concern</th>
+            <th>Status</th>
+            <th>Details</th>
+          </tr>
+          <tr>
+            <td>Foreign Keys</td>
+            <td>
+              <span class="warn"
+                ><i class="fa-solid fa-triangle-exclamation"></i
+              ></span>
+            </td>
+            <td>Partial — some FK constraints commented out (orders→users)</td>
+          </tr>
+          <tr>
+            <td>Indexes</td>
+            <td>
+              <span class="cross"><i class="fa-solid fa-xmark"></i></span>
+            </td>
+            <td>
+              No explicit indexes on FK columns (<code>user_id</code>,
+              <code>product_id</code>)
+            </td>
+          </tr>
+          <tr>
+            <td>Orphan Risk</td>
+            <td>
+              <span class="warn"
+                ><i class="fa-solid fa-triangle-exclamation"></i
+              ></span>
+            </td>
+            <td>No cascade on user→orders; deleting users leaves orphans</td>
+          </tr>
+          <tr>
+            <td>Soft Deletes</td>
+            <td>
+              <span class="cross"><i class="fa-solid fa-xmark"></i></span>
+            </td>
+            <td>No <code>deleted_at</code> — hard deletes lose data</td>
+          </tr>
+          <tr>
+            <td>Audit Trail</td>
+            <td>
+              <span class="cross"><i class="fa-solid fa-xmark"></i></span>
+            </td>
+            <td>No <code>updated_at</code> tracking, no change logs</td>
+          </tr>
+          <tr>
+            <td>Data Types</td>
+            <td>
+              <span class="check"><i class="fa-solid fa-check"></i></span>
+            </td>
+            <td>Using VARCHAR, DECIMAL, INT appropriately</td>
+          </tr>
+        </table>
+
+        <h3>3.2 Missing Indexes (Safe to Add)</h3>
+        <pre>
+-- Non-destructive — add without data loss
+ALTER TABLE orders ADD INDEX idx_orders_user_id (user_id);
+ALTER TABLE orders ADD INDEX idx_orders_status (status);
+ALTER TABLE orders ADD INDEX idx_orders_created_at (created_at);
+ALTER TABLE order_items ADD INDEX idx_order_items_order_id (order_id);
+ALTER TABLE order_items ADD INDEX idx_order_items_product_id (product_id);
+ALTER TABLE products ADD INDEX idx_products_category_id (category_id);
+ALTER TABLE products ADD INDEX idx_products_slug (slug);
+ALTER TABLE reviews ADD INDEX idx_reviews_product_id (product_id);
+ALTER TABLE verification_codes ADD INDEX idx_vc_user_expires (user_id, expires_at);
+ALTER TABLE coupons ADD INDEX idx_coupons_code (code);</pre
+        >
+
+        <h3>3.3 Safe Migration Procedure</h3>
+        <div class="card">
+          <h4>Step 1 — Backup (ALWAYS do this first)</h4>
+          <pre>
+mysqldump -u root -p --single-transaction super_optical > backup_YYYYMMDD.sql</pre
+          >
+          <h4>Step 2 — Apply Indexes (non-blocking)</h4>
+          <pre>-- Run index commands from 3.2 above</pre>
+          <h4>Step 3 — Add Columns (safe — ADD with DEFAULT)</h4>
+          <pre>
+ALTER TABLE orders ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+ALTER TABLE products ADD COLUMN deleted_at TIMESTAMP NULL DEFAULT NULL;</pre
+          >
+          <h4>Step 4 — Rollback if needed</h4>
+          <pre>
+-- Drop indexes: ALTER TABLE orders DROP INDEX idx_orders_user_id;
+-- Nuclear: mysql -u root -p super_optical < backup_YYYYMMDD.sql</pre
+          >
+        </div>
+      </div>
+
+      <!-- ====== PHASE 4 ====== -->
+      <div id="phase4">
+        <span class="phase-tag">Phase 4</span>
+        <h2><i class="fa-solid fa-mobile-screen-button"></i> UX/UI Audit</h2>
+
+        <div class="grid-2">
+          <div class="stat-card">
+            <div class="number" style="color: var(--green)">7/10</div>
+            <div class="label">Navigation</div>
+          </div>
+          <div class="stat-card">
+            <div class="number" style="color: var(--yellow)">6/10</div>
+            <div class="label">Checkout Flow</div>
+          </div>
+          <div class="stat-card">
+            <div class="number" style="color: var(--orange)">5/10</div>
+            <div class="label">Prescription UX</div>
+          </div>
+          <div class="stat-card">
+            <div class="number" style="color: var(--green)">7/10</div>
+            <div class="label">Mobile</div>
+          </div>
+        </div>
+
+        <h3>Conversion Blockers (by Impact)</h3>
+        <table>
+          <tr>
+            <th>#</th>
+            <th>Issue</th>
+            <th>Impact</th>
+            <th>Fix</th>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>No search on shop page</td>
+            <td><span class="badge high">High</span></td>
+            <td>Add search with autocomplete</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>No saved addresses</td>
+            <td><span class="badge high">High</span></td>
+            <td>Store addresses per user</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>No wishlist-to-cart</td>
+            <td><span class="badge medium">Medium</span></td>
+            <td>Add "Move to Cart" button</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>Prescription upload missing</td>
+            <td><span class="badge high">High</span></td>
+            <td>Implement upload flow at checkout</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>No guest checkout</td>
+            <td><span class="badge medium">Medium</span></td>
+            <td>Allow guest checkout option</td>
+          </tr>
+        </table>
+
+        <h3>Accessibility Issues</h3>
+        <div class="card">
+          <ul style="list-style: none; padding: 0">
+            <li>
+              <i class="fa-solid fa-xmark cross"></i> No
+              <code>aria-label</code> on icon-only buttons
+            </li>
+            <li>
+              <i class="fa-solid fa-xmark cross"></i> Color contrast not tested
+              (WCAG 2.1)
+            </li>
+            <li>
+              <i class="fa-solid fa-xmark cross"></i> No visible focus states on
+              custom form elements
+            </li>
+            <li>
+              <i class="fa-solid fa-xmark cross"></i> No skip-to-content link
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ====== PHASE 5 ====== -->
+      <div id="phase5">
+        <span class="phase-tag">Phase 5</span>
+        <h2><i class="fa-solid fa-shield-halved"></i> Security Audit — 10 Vulnerabilities</h2>
+
+        <div class="issue-card critical">
+          <div class="issue-header"><span class="badge critical">Critical</span><span class="issue-id">SEC-001</span><span class="issue-title">No CSRF Protection on ANY Form</span></div>
+          <p><span class="label">Affected:</span> ALL forms — login, register, checkout, admin</p>
+          <p><span class="label">Attack:</span> External form submits to your site — victim browser sends cookies</p>
+          <p><span class="label">Fix:</span> Generate token in session, embed in hidden field, validate on POST</p>
+<pre>// functions.php — add:
+function generateCSRFToken() {
+    if (empty($_SESSION['csrf_token']))
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    return $_SESSION['csrf_token'];
+}
+// Forms: &lt;input type="hidden" name="csrf_token" value="&lt;?= generateCSRFToken() ?&gt;"&gt;</pre>
+        </div>
+
+        <div class="issue-card high">
+          <div class="issue-header"><span class="badge high">High</span><span class="issue-id">SEC-002</span><span class="issue-title">XSS via Unescaped Error Output</span></div>
+          <p><span class="label">File:</span> <code>register.php:L97</code> — <code>&lt;?= $error ?&gt;</code></p>
+          <p><span class="label">Fix:</span> Use <code>htmlspecialchars($error)</code> everywhere</p>
+        </div>
+
+        <div class="issue-card high">
+          <div class="issue-header"><span class="badge high">High</span><span class="issue-id">SEC-003</span><span class="issue-title">OTP Brute-Force — No Attempt Limit</span></div>
+          <p><span class="label">File:</span> <code>verify-otp.php</code> — 6-digit OTP = 1M combos, easily brute-forced</p>
+          <p><span class="label">Fix:</span> Limit to 5 attempts per code, cooldown, invalidate after 3 fails</p>
+        </div>
+
+        <div class="issue-card high">
+          <div class="issue-header"><span class="badge high">High</span><span class="issue-id">SEC-004</span><span class="issue-title">OTP Resend via GET — No Rate Limiting</span></div>
+          <p><span class="label">File:</span> <code>verify-otp.php:L76</code> — <code>if (isset($_GET['resend']))</code></p>
+          <p><span class="label">Fix:</span> Use POST, rate-limit 1 per 60s, track count per session</p>
+        </div>
+
+        <div class="issue-card medium">
+          <div class="issue-header"><span class="badge medium">Medium</span><span class="issue-id">SEC-005</span><span class="issue-title">Session Fixation — session_regenerate_id missing</span></div>
+          <p><span class="label">Fix:</span> Add <code>session_regenerate_id(true)</code> after successful login</p>
+        </div>
+
+        <div class="issue-card critical">
+          <div class="issue-header"><span class="badge critical">Critical</span><span class="issue-id">SEC-006</span><span class="issue-title">Cart Price Manipulation via Session</span></div>
+          <p><span class="label">File:</span> <code>functions.php:L89</code>, <code>create_razorpay_order.php:L46</code></p>
+          <p><span class="label">Fix:</span> ALWAYS re-fetch prices from DB before creating order</p>
+        </div>
+
+        <div class="issue-card medium">
+          <div class="issue-header"><span class="badge medium">Medium</span><span class="issue-id">SEC-007</span><span class="issue-title">File Upload — Extension from User Input</span></div>
+          <p><span class="label">Status:</span> <span class="check">✓</span> MIME check works, but extension from <code>$file['name']</code></p>
+          <p><span class="label">Fix:</span> Map MIME → extension server-side</p>
+        </div>
+
+        <div class="issue-card medium">
+          <div class="issue-header"><span class="badge medium">Medium</span><span class="issue-id">SEC-008</span><span class="issue-title">Debug/Test Files Exposed in Web Root</span></div>
+          <p><span class="label">Files:</span> <code>debug_variants.php</code>, <code>debug_500.php</code>, <code>check_schema.php</code>, <code>test_variants.php</code></p>
+          <p><span class="label">Fix:</span> DELETE all debug/test scripts before deployment</p>
+        </div>
+
+        <div class="issue-card medium">
+          <div class="issue-header"><span class="badge medium">Medium</span><span class="issue-id">SEC-009</span><span class="issue-title">SSL Verification Disabled for SMTP</span></div>
+          <p><span class="label">Fix:</span> Enable peer verification in production; disable only for local dev</p>
+        </div>
+
+        <div class="issue-card high">
+          <div class="issue-header"><span class="badge high">High</span><span class="issue-id">SEC-010</span><span class="issue-title">Payment Keys — Ensure Secret Never Leaks</span></div>
+          <p><span class="label">Status:</span> <span class="check">✓</span> Debug responses gated by <code>IS_PRODUCTION</code></p>
+          <p><span class="label">Fix:</span> Verify no error response exposes <code>key_secret</code> or paths</p>
+        </div>
+      </div>
+
+      <!-- ====== PHASE 6 ====== -->
+      <div id="phase6">
+        <span class="phase-tag">Phase 6</span>
+        <h2><i class="fa-solid fa-gauge-high"></i> Performance Audit</h2>
+
+        <h3>6.1 Page Load Issues</h3>
+        <table>
+          <tr><th>Issue</th><th>Impact</th><th>Solution</th></tr>
+          <tr><td>No HTTP caching headers</td><td><span class="badge high">High</span></td><td>Add Cache-Control, ETag for static assets</td></tr>
+          <tr><td>No gzip/brotli compression</td><td><span class="badge high">High</span></td><td>Enable <code>mod_deflate</code> in Apache</td></tr>
+          <tr><td>Font Awesome full library (~300KB)</td><td><span class="badge medium">Medium</span></td><td>Use subset with only needed icons</td></tr>
+          <tr><td>Multiple CSS files per page</td><td><span class="badge medium">Medium</span></td><td>Concatenate for production</td></tr>
+        </table>
+
+        <h3>6.2 Image Optimization — <span class="rating" style="color:var(--green)">8/10</span></h3>
+        <div class="card">
+          <ul style="list-style:none;padding:0">
+            <li><span class="check"><i class="fa-solid fa-check"></i></span> WebP conversion implemented</li>
+            <li><span class="check"><i class="fa-solid fa-check"></i></span> Multiple size variants (thumb/medium/large)</li>
+            <li><span class="check"><i class="fa-solid fa-check"></i></span> <code>srcset</code> generation function exists</li>
+            <li><span class="warn"><i class="fa-solid fa-triangle-exclamation"></i></span> <code>srcset</code> NOT used in product cards</li>
+            <li><span class="cross"><i class="fa-solid fa-xmark"></i></span> No lazy loading on product listings</li>
+          </ul>
+        </div>
+
+        <h3>6.3 N+1 Query Issues</h3>
+        <table>
+          <tr><th>Location</th><th>Problem</th><th>Fix</th></tr>
+          <tr><td><code>product.php:L43-47</code></td><td>Variant images fetched per-variant</td><td>Single JOIN or batch fetch</td></tr>
+          <tr><td><code>admin/index.php:L5-8</code></td><td>4 separate COUNT queries</td><td>Single query with subqueries</td></tr>
+          <tr><td><code>functions.php:L337</code></td><td>Recursive breadcrumb queries</td><td>CTE or path materialization</td></tr>
+        </table>
+      </div>
+
+      <!-- ====== PHASE 7 ====== -->
+      <div id="phase7">
+        <span class="phase-tag">Phase 7</span>
+        <h2><i class="fa-solid fa-vial"></i> Test Case Generation — 21 Tests</h2>
+        <h3>Functional Tests</h3>
+        <table>
+          <tr><th>ID</th><th>Feature</th><th>Scenario</th><th>Expected</th><th>Priority</th></tr>
+          <tr><td>TC-001</td><td>Register</td><td>Valid registration</td><td>OTP sent, redirect</td><td><span class="badge critical">Critical</span></td></tr>
+          <tr><td>TC-002</td><td>Register</td><td>Duplicate email</td><td>"Already registered"</td><td><span class="badge high">High</span></td></tr>
+          <tr><td>TC-003</td><td>Register</td><td>Missing email</td><td>Server error shown</td><td><span class="badge high">High</span></td></tr>
+          <tr><td>TC-004</td><td>Login</td><td>Valid OTP</td><td>Logged in, redirect home</td><td><span class="badge critical">Critical</span></td></tr>
+          <tr><td>TC-005</td><td>Login</td><td>Invalid OTP</td><td>"Invalid or expired"</td><td><span class="badge high">High</span></td></tr>
+          <tr><td>TC-006</td><td>Login</td><td>Expired OTP</td><td>"Invalid or expired"</td><td><span class="badge medium">Medium</span></td></tr>
+          <tr><td>TC-007</td><td>Cart</td><td>Add product</td><td>Cart count updates</td><td><span class="badge critical">Critical</span></td></tr>
+          <tr><td>TC-008</td><td>Cart</td><td>Update qty</td><td>Total recalculates</td><td><span class="badge high">High</span></td></tr>
+          <tr><td>TC-009</td><td>Checkout</td><td>Valid COD order</td><td>Order created</td><td><span class="badge critical">Critical</span></td></tr>
+          <tr><td>TC-010</td><td>Checkout</td><td>Empty cart</td><td>Redirect to shop</td><td><span class="badge high">High</span></td></tr>
+          <tr><td>TC-011</td><td>Payment</td><td>Razorpay success</td><td>Order + stock reduced</td><td><span class="badge critical">Critical</span></td></tr>
+          <tr><td>TC-012</td><td>Payment</td><td>Razorpay cancel</td><td>No order, btn re-enabled</td><td><span class="badge high">High</span></td></tr>
+          <tr><td>TC-013</td><td>Coupon</td><td>Valid coupon</td><td>Discount applied</td><td><span class="badge high">High</span></td></tr>
+          <tr><td>TC-014</td><td>Coupon</td><td>Expired coupon</td><td>"Coupon expired"</td><td><span class="badge medium">Medium</span></td></tr>
+          <tr><td>TC-015</td><td>Coupon</td><td>Prepaid-only on COD</td><td>Discount NOT applied</td><td><span class="badge high">High</span></td></tr>
+        </table>
+        <h3>Security Tests</h3>
+        <table>
+          <tr><th>ID</th><th>Scenario</th><th>Expected</th><th>Current Status</th></tr>
+          <tr><td>TC-S01</td><td>CSRF — external form to checkout</td><td>Rejected</td><td><span class="badge critical">FAILS ✗</span></td></tr>
+          <tr><td>TC-S02</td><td>XSS — script in error msg</td><td>Encoded output</td><td><span class="badge critical">FAILS ✗</span></td></tr>
+          <tr><td>TC-S03</td><td>Tamper cart session price</td><td>Uses DB price</td><td><span class="badge critical">FAILS ✗</span></td></tr>
+          <tr><td>TC-S04</td><td>100 rapid admin logins</td><td>Locked after 5</td><td><span class="badge high">FAILS ✗</span></td></tr>
+          <tr><td>TC-S05</td><td>Automated OTP guessing</td><td>Blocked after 5</td><td><span class="badge high">FAILS ✗</span></td></tr>
+          <tr><td>TC-S06</td><td>Upload PHP as image</td><td>Rejected</td><td><span class="badge ok">PASSES ✓</span></td></tr>
+        </table>
+      </div>
+
+      <!-- ====== PHASE 8 ====== -->
+      <div id="phase8">
+        <span class="phase-tag">Phase 8</span>
+        <h2><i class="fa-solid fa-rocket"></i> Production Readiness</h2>
+        <div class="grid-2" style="grid-template-columns:repeat(5,1fr)">
+          <div class="stat-card"><div class="number" style="color:var(--green)">7/10</div><div class="label">Env Config</div></div>
+          <div class="stat-card"><div class="number" style="color:var(--orange)">5/10</div><div class="label">Error Handling</div></div>
+          <div class="stat-card"><div class="number" style="color:var(--red)">3/10</div><div class="label">Logging</div></div>
+          <div class="stat-card"><div class="number" style="color:var(--red)">1/10</div><div class="label">Monitoring</div></div>
+          <div class="stat-card"><div class="number" style="color:var(--red)">2/10</div><div class="label">Backups</div></div>
+        </div>
+        <h3>Deployment Checklist</h3>
+        <table>
+          <tr><th>Item</th><th>Status</th><th>Action</th></tr>
+          <tr><td>Remove debug files</td><td><span class="cross"><i class="fa-solid fa-xmark"></i></span></td><td>Delete <code>debug_*.php</code>, <code>test_*.php</code>, <code>trace_*.php</code></td></tr>
+          <tr><td>Remove backup artifacts</td><td><span class="cross"><i class="fa-solid fa-xmark"></i></span></td><td>Delete <code>check.zip</code> (464MB!), <code>*.bak</code> files</td></tr>
+          <tr><td>Remove migration scripts</td><td><span class="cross"><i class="fa-solid fa-xmark"></i></span></td><td>Move <code>migrate_*.php</code>, <code>fix_*.php</code> out of web root</td></tr>
+          <tr><td>Razorpay to live mode</td><td><span class="cross"><i class="fa-solid fa-xmark"></i></span></td><td>Update <code>config/payment.php</code></td></tr>
+          <tr><td>Enable HTTPS</td><td><span class="cross"><i class="fa-solid fa-xmark"></i></span></td><td>SSL cert + force redirect</td></tr>
+          <tr><td>Secure session cookies</td><td><span class="cross"><i class="fa-solid fa-xmark"></i></span></td><td><code>cookie_secure=1, cookie_httponly=1</code></td></tr>
+          <tr><td>Error logging path</td><td><span class="cross"><i class="fa-solid fa-xmark"></i></span></td><td>Log to file outside web root</td></tr>
+          <tr><td>Automated DB backups</td><td><span class="cross"><i class="fa-solid fa-xmark"></i></span></td><td>Cron job for daily <code>mysqldump</code></td></tr>
+          <tr><td>.htaccess security</td><td><span class="cross"><i class="fa-solid fa-xmark"></i></span></td><td>Deny access to config/, includes/, sql/</td></tr>
+          <tr><td>Remove orphan files</td><td><span class="cross"><i class="fa-solid fa-xmark"></i></span></td><td>Delete <code>tatus</code> file (stray git output)</td></tr>
+        </table>
+      </div>
+
+      <!-- ====== MASTER ISSUE LIST ====== -->
+      <div id="master">
+        <span class="phase-tag">Final Output</span>
+        <h2><i class="fa-solid fa-list-check"></i> Master Issue List — All 20 Issues Prioritized</h2>
+        <table>
+          <tr><th>#</th><th>ID</th><th>Severity</th><th>Module</th><th>Issue</th></tr>
+          <tr><td>1</td><td>SEC-001</td><td><span class="badge critical">Critical</span></td><td>All Forms</td><td>No CSRF protection</td></tr>
+          <tr><td>2</td><td>ISS-001</td><td><span class="badge critical">Critical</span></td><td>Checkout</td><td>Cart prices not re-validated from DB</td></tr>
+          <tr><td>3</td><td>ISS-002</td><td><span class="badge critical">Critical</span></td><td>Payment</td><td>Razorpay amount from session</td></tr>
+          <tr><td>4</td><td>SEC-006</td><td><span class="badge critical">Critical</span></td><td>Payment</td><td>Cart price manipulation possible</td></tr>
+          <tr><td>5</td><td>SEC-003</td><td><span class="badge high">High</span></td><td>Auth</td><td>OTP brute-force (no limit)</td></tr>
+          <tr><td>6</td><td>SEC-004</td><td><span class="badge high">High</span></td><td>Auth</td><td>OTP resend not rate-limited</td></tr>
+          <tr><td>7</td><td>ISS-009</td><td><span class="badge high">High</span></td><td>Admin</td><td>No brute-force protection</td></tr>
+          <tr><td>8</td><td>ISS-008</td><td><span class="badge high">High</span></td><td>Stock</td><td>Race condition on stock</td></tr>
+          <tr><td>9</td><td>ISS-005</td><td><span class="badge high">High</span></td><td>Checkout</td><td>No server-side validation</td></tr>
+          <tr><td>10</td><td>SEC-002</td><td><span class="badge high">High</span></td><td>Auth</td><td>XSS via unescaped error</td></tr>
+          <tr><td>11</td><td>ISS-003</td><td><span class="badge high">High</span></td><td>Products</td><td>Fake hardcoded ratings</td></tr>
+          <tr><td>12</td><td>SEC-008</td><td><span class="badge medium">Medium</span></td><td>Deploy</td><td>Debug files exposed</td></tr>
+          <tr><td>13</td><td>ISS-007</td><td><span class="badge medium">Medium</span></td><td>Orders</td><td>Duplicate order creation</td></tr>
+          <tr><td>14</td><td>ISS-006</td><td><span class="badge medium">Medium</span></td><td>Register</td><td>Email field not required</td></tr>
+          <tr><td>15</td><td>ISS-004</td><td><span class="badge medium">Medium</span></td><td>Products</td><td>Hardcoded fallback coupon</td></tr>
+          <tr><td>16</td><td>SEC-005</td><td><span class="badge medium">Medium</span></td><td>Auth</td><td>Session fixation risk</td></tr>
+          <tr><td>17</td><td>SEC-009</td><td><span class="badge medium">Medium</span></td><td>Email</td><td>SSL verification disabled</td></tr>
+          <tr><td>18</td><td>ISS-012</td><td><span class="badge medium">Medium</span></td><td>CMS</td><td>Summernote script injection</td></tr>
+          <tr><td>19</td><td>ISS-010</td><td><span class="badge medium">Medium</span></td><td>Admin</td><td>Dashboard queries unfiltered</td></tr>
+          <tr><td>20</td><td>ISS-011</td><td><span class="badge low">Low</span></td><td>Admin</td><td>Unescaped session email</td></tr>
+        </table>
+
+        <h2><i class="fa-solid fa-bolt"></i> Quick Fixes (Under 1 Hour Total)</h2>
+        <table>
+          <tr><th>Fix</th><th>Time</th><th>Impact</th></tr>
+          <tr><td>Add <code>htmlspecialchars()</code> to all error outputs</td><td>30 min</td><td>Eliminates XSS</td></tr>
+          <tr><td>Delete debug/test/migration files</td><td>15 min</td><td>Eliminates info leak</td></tr>
+          <tr><td>Remove hardcoded fake ratings</td><td>10 min</td><td>Eliminates deception</td></tr>
+          <tr><td>Remove <code>check.zip</code> (464MB)</td><td>1 min</td><td>Recovers disk, removes leak</td></tr>
+          <tr><td>Add <code>session_regenerate_id(true)</code></td><td>5 min</td><td>Fixes session fixation</td></tr>
+          <tr><td>Delete <code>tatus</code> and <code>.bak</code> files</td><td>5 min</td><td>Clean deployment</td></tr>
+          <tr><td>Add <code>required</code> to email in register</td><td>1 min</td><td>Prevents broken signup</td></tr>
+        </table>
+
+        <h2><i class="fa-solid fa-fire"></i> Critical Fixes (Must Do Before Launch)</h2>
+        <table>
+          <tr><th>Fix</th><th>Effort</th><th>Details</th></tr>
+          <tr><td>CSRF tokens on all forms</td><td>2-3 hrs</td><td>Token generation + embed + validate</td></tr>
+          <tr><td>Re-validate cart prices from DB</td><td>1-2 hrs</td><td>Fetch real prices at checkout</td></tr>
+          <tr><td>OTP attempt limiting</td><td>1-2 hrs</td><td>Block after 5 failures</td></tr>
+          <tr><td>Admin login rate limiting</td><td>1-2 hrs</td><td>Lockout 15 min after 5 fails</td></tr>
+          <tr><td>Enable HTTPS</td><td>1 hr</td><td>SSL + redirect + secure cookies</td></tr>
+          <tr><td>Stock locking</td><td>30 min</td><td>Atomic UPDATE or SELECT FOR UPDATE</td></tr>
+          <tr><td>Server-side checkout validation</td><td>1 hr</td><td>Phone, pincode, address format</td></tr>
+          <tr><td>.htaccess to protect dirs</td><td>30 min</td><td>Deny config/, includes/, sql/</td></tr>
+        </table>
+
+        <h2><i class="fa-solid fa-road"></i> 4-Week Implementation Roadmap</h2>
+        <div class="card">
+          <h4 style="color:var(--red)">🔴 Week 1 — Security Hardening</h4>
+          <ul style="padding-left:1.2rem"><li>Quick fixes (XSS, debug files, fake ratings, check.zip)</li><li>CSRF protection on all forms</li><li>OTP rate limiting &amp; attempt tracking</li><li>Admin brute-force protection</li></ul>
+          <h4 style="color:var(--orange)">🟠 Week 2 — Payment &amp; Data Safety</h4>
+          <ul style="padding-left:1.2rem"><li>Cart price re-validation from DB</li><li>Stock race condition fix (atomic UPDATE)</li><li>Checkout server-side validation</li><li>Session security (secure cookies, regenerate ID)</li></ul>
+          <h4 style="color:var(--yellow)">🟡 Week 3 — Production Setup</h4>
+          <ul style="padding-left:1.2rem"><li>Database indexes &amp; safe migrations</li><li>HTTPS + SSL configuration</li><li>.htaccess security rules</li><li>File cleanup &amp; deployment prep</li></ul>
+          <h4 style="color:var(--green)">🟢 Week 4+ — Improvements</h4>
+          <ul style="padding-left:1.2rem"><li>Extract shared <code>createOrder()</code></li><li>Search implementation</li><li>Performance optimization (caching, lazy loading)</li><li>Monitoring &amp; logging setup</li></ul>
+        </div>
+
+        <div class="alert info" style="margin-top:2rem"><i class="fa-solid fa-circle-info"></i><div><strong>Important:</strong> Always backup the database before applying any changes. Test on staging first.</div></div>
+
+        <div style="text-align:center;padding:3rem 0;color:var(--muted);font-size:.8rem;border-top:1px solid var(--border);margin-top:3rem">
+          <p><strong>Super Optica Professional Audit Report</strong></p>
+          <p>Generated: February 17, 2026 &bull; 8 Phases &bull; 20 Issues &bull; 21 Test Cases</p>
+          <p style="margin-top:.5rem">⚡ Powered by Comprehensive Code Analysis</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

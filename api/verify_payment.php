@@ -103,15 +103,18 @@ try {
         $product = $p_stmt->fetch();
         
         $stmt = $pdo->prepare("INSERT INTO order_items (order_id, product_id, product_name, sku, quantity, price) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$orderId, $item['id'], $product['name'] ?? $item['name'], $product['sku'] ?? '', $item['quantity'], $item['price']]);
+        $stmt->execute([$orderId, $item['id'], $product['name'], $product['sku'] ?? '', $item['quantity'], $product['price']]);
         
         // Reduce stock
+        // Reduce stock (Atomic)
         if (isset($product['stock_quantity']) && $product['stock_quantity'] !== null) {
-            $new_stock = max(0, $product['stock_quantity'] - $item['quantity']);
-            $update_stock = $pdo->prepare("UPDATE products SET stock_quantity = ? WHERE id = ?");
-            $update_stock->execute([$new_stock, $item['id']]);
+            $update_stock = $pdo->prepare("UPDATE products SET stock_quantity = stock_quantity - ? WHERE id = ? AND stock_quantity >= ?");
+            $result = $update_stock->execute([$item['quantity'], $item['id'], $item['quantity']]);
             
-            checkStockAndNotify($item['id']);
+            if ($update_stock->rowCount() === 0) {
+                 // Log critical error: Overselling occurred or stock mismatch
+                 error_log("CRITICAL: Stock mismatch during payment verification for Order #$orderNumber, Item ID: {$item['id']}");
+            }
         }
     }
     

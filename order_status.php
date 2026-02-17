@@ -20,22 +20,21 @@ if (!$order) redirect('index.php');
 <div class="checkout-container section-padding bg-gray-50 min-h-[80vh] flex items-center justify-center">
     <div class="container mx-auto px-4 max-w-2xl">
         <!-- Stepper -->
-        <div class="checkout-stepper flex justify-between items-center mb-10">
-            <div class="step completed text-success flex flex-col items-center gap-2">
-                <span class="step-number bg-success text-white w-8 h-8 rounded-full flex items-center justify-center"><i class="fa-solid fa-check"></i></span>
-                <span class="text-sm font-bold text-gray-500"><?= __('shipping') ?></span>
+        <!-- Stepper -->
+        <div class="checkout-stepper">
+            <div class="step completed">
+                <span class="step-number"><i class="fa-solid fa-check"></i></span>
+                <span class="step-label"><?= __('shipping') ?></span>
             </div>
-            <div class="step-line flex-1 h-1 bg-success mx-2 rounded-full"></div>
-            <div class="step completed text-success flex flex-col items-center gap-2">
-                <span class="step-number bg-success text-white w-8 h-8 rounded-full flex items-center justify-center"><i class="fa-solid fa-check"></i></span>
-                <span class="text-sm font-bold text-gray-500"><?= __('payment') ?></span>
+            <div class="step completed">
+                <span class="step-number"><i class="fa-solid fa-check"></i></span>
+                <span class="step-label"><?= __('payment') ?></span>
             </div>
-            <div class="step-line flex-1 h-1 bg-success mx-2 rounded-full"></div>
-            <div class="step active <?= $status === 'success' ? 'completed text-success' : 'text-primary' ?> flex flex-col items-center gap-2">
-                <span class="step-number <?= $status === 'success' ? 'bg-success text-white' : 'bg-primary text-white' ?> w-8 h-8 rounded-full flex items-center justify-center font-bold">
+            <div class="step <?= $status === 'success' ? 'completed' : 'active' ?>">
+                <span class="step-number">
                     <?= $status === 'success' ? '<i class="fa-solid fa-check"></i>' : '03' ?>
                 </span>
-                <span class="text-sm font-bold <?= $status === 'success' ? 'text-gray-500' : 'text-primary' ?>"><?= $status === 'success' ? __('confirmed') : __('status') ?></span>
+                <span class="step-label"><?= $status === 'success' ? __('confirmed') : __('status') ?></span>
             </div>
         </div>
 
@@ -81,10 +80,10 @@ if (!$order) redirect('index.php');
                 </div>
 
                 <div class="flex flex-col md:flex-row gap-4 justify-center">
-                    <a href="shop.php" class="btn btn-outline px-8 py-3 rounded-xl font-bold border-2 hover:bg-gray-50 transition-colors">
+                    <a href="shop.php" class="btn btn-outline px-8 rounded-xl border-2 transition-colors">
                         <i class="fa-solid fa-bag-shopping mr-2"></i> <?= __('shop_more') ?>
                     </a>
-                    <a href="view-order.php?id=<?= $order_id ?>" class="btn btn-primary px-8 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all">
+                    <a href="view-order.php?id=<?= $order_id ?>" class="btn btn-primary px-8 rounded-xl shadow-lg transition-all">
                         <?= __('view_order') ?> <i class="fa-solid fa-arrow-right ml-2 text-xs"></i>
                     </a>
                 </div>
@@ -102,10 +101,10 @@ if (!$order) redirect('index.php');
                 </p>
 
                 <div class="flex gap-4 justify-center">
-                    <a href="checkout.php" class="btn btn-primary px-8 py-3 rounded-xl font-bold shadow-lg">
+                    <a href="checkout.php" class="btn btn-primary px-8 rounded-xl shadow-lg">
                         <i class="fa-solid fa-rotate-right mr-2"></i> Try Again
                     </a>
-                    <a href="contact.php" class="btn btn-outline px-8 py-3 rounded-xl font-bold border-2">
+                    <a href="contact.php" class="btn btn-outline px-8 rounded-xl border-2">
                         Contact Support
                     </a>
                 </div>

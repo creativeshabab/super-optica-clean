@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Optica - Comprehensive Test Suite</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --border: #e5e7eb;
+            --bg: #f9fafb;
+            --text: #1f2937;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            line-height: 1.5;
+            color: var(--text);
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: var(--bg);
+        }
+        header {
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 1rem;
+        }
+        h1 { margin: 0; color: var(--primary); }
+        .meta { color: #6b7280; font-size: 0.9rem; margin-top: 0.5rem; }
+        
+        section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        h2 { margin-top: 0; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+        th, td {
+            text-align: left;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+        th {
+            background: #f3f4f6;
+            font-weight: 600;
+        }
+        tr:hover { background: #f9fafb; }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25em 0.5em;
+            font-size: 0.75em;
+            font-weight: 700;
+            border-radius: 4px;
+            color: white;
+        }
+        .p0 { background-color: #dc2626; } /* Critical */
+        .p1 { background-color: #ea580c; } /* High */
+        .p2 { background-color: #d97706; } /* Medium */
+        .p3 { background-color: #6b7280; } /* Low */
+
+        .status-checkbox {
+            width: 1.25rem;
+            height: 1.25rem;
+            cursor: pointer;
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            section { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Super Optica - QA Test Suite</h1>
+    <div class="meta">
+        <strong>Date:</strong> 2026-02-17 &bull; 
+        <strong>Scope:</strong> Full Regression &bull; 
+        <strong>Version:</strong> 1.0
+    </div>
+</header>
+
+<section>
+    <h2>🏗️ Module 1: Authentication & User Accounts</h2>
+    <table>
+        <thead>
+            <tr>
+                <th width="50">Status</th>
+                <th width="80">ID</th>
+                <th width="150">Feature</th>
+                <th>Scenario & Steps</th>
+                <th>Expected Result</th>
+                <th width="60">Pri</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input type="checkbox" class="status-checkbox"></td>
+                <td>AUTH-01</td>
+                <td>Register</td>
+                <td><strong>New User Valid</strong><br>1. /register.php -> Valid details.<br>2. Submit.</td>
+                <td>1. User in DB.<br>2. OTP Sent.<br>3. Redirect verify logic.</td>
+                <td><span class="badge p0">P0</span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" class="status-checkbox"></td>
+                <td>AUTH-02</td>
+                <td>Register</td>
+                <td><strong>Existing User</strong><br>1. Enter existing email.</td>
+                <td>Error: "Email already registered".</td>
+                <td><span class="badge p1">P1</span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" class="status-checkbox"></td>
+                <td>AUTH-03</td>
+                <td>Login</td>
+                <td><strong>Valid OTP</strong><br>1. Login -> Enter OTP.</td>
+                <td>Login success -> Dashboard.</td>
+                <td><span class="badge p0">P0</span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" class="status-checkbox"></td>
+                <td>AUTH-04</td>
+                <td>Login</td>
+                <td><strong>Invalid OTP</strong><br>1. Enter wrong OTP 3x.</td>
+                <td>Error: "Invalid OTP".</td>
+                <td><span class="badge p1">P1</span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" class="status-checkbox"></td>
+                <td>USR-01</td>
+                <td>Profile</td>
+                <td><strong>Edit Details</strong><br>1. My Account -> Edit.<br>2. Change Name/Phone -> Save.</td>
+                <td>Success msg. DB updated.</td>
+                <td><span class="badge p2">P2</span></td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+<section>
+    <h2>🛒 Module 2: Catalog & Shopping</h2>
+    <table>
+        <thead>
+            <tr>
+                <th width="50">Status</th>
+                <th width="80">ID</th>
+                <th width="150">Feature</th>
+                <th>Scenario & Steps</th>
+                <th>Expected Result</th>
+                <th width="60">Pri</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input type="checkbox" class="status-checkbox"></td>
+                <td>CAT-01</td>
+                <td>Homepage</td>
+                <td><strong>Load Perf</strong><br>1. Load /index.php (Ctrl+F5).</td>
+                <td>Load < 2s. Sliders appear. New Arrivals populated.</td>
+                <td><span class="badge p1">P1</span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" class="status-checkbox"></td>
+                <td>CAT-02</td>
+                <td>Search</td>
+                <td><strong>Keyword Search</strong><br>1. Search "Rayban".</td>
+                <td>Results show matches only.</td>
+                <td><span class="badge p1">P1</span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" class="status-checkbox"></td>
+                <td>CAT-04</td>
+                <td>Product</td>
+                <td><strong>Variant Select</strong><br>1. Select 'Blue'.</td>
+                <td>Image, Price, Stock update immediately.</td>
+                <td><span class="badge p0">P0</span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" class="status-checkbox"></td>
+                <td>CAT-05</td>
+                <td>Cart</td>
+                <td><strong>Add Item</strong><br>1. "Add to Cart".</td>
+                <td>Toast Success. Cart Count +1.</td>
+                <td><span class="badge p0">P0</span></td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+<section>
+    <h2>💳 Module 3: Checkout & Payments</h2>
+    <table>
+        <thead>
+            <tr>
+                <th width="50">Status</th>
+                <th width="80">ID</th>
+                <th width="150">Feature</th>
+                <th>Scenario & Steps</th>
+                <th>Expected Result</th>
+                <th width="60">Pri</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input type="checkbox" class="status-checkbox"></td>
+                <td>CHK-01</td>
+                <td>Checkout</td>
+                <td><strong>Validation</strong><br>1. Empty form -> Continue.</td>
+                <td>JS Error alerts (Name/Phone required).</td>
+                <td><span class="badge p1">P1</span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" class="status-checkbox"></td>
+                <td>CHK-02</td>
+                <td>Coupons</td>
+                <td><strong>Apply Valid</strong><br>1. Enter Code -> Apply.</td>
+                <td>Discount applied. Total reduced.</td>
+                <td><span class="badge p1">P1</span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" class="status-checkbox"></td>
+                <td>CHK-05</td>
+                <td>Payment</td>
+                <td><strong>Razorpay</strong><br>1. Online -> Pay Now.</td>
+                <td>Razorpay Modal opens with CORRECT amount.</td>
+                <td><span class="badge p0">P0</span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" class="status-checkbox"></td>
+                <td>CHK-06</td>
+                <td>Stock</td>
+                <td><strong>Overselling</strong><br>1. Buy > Stock count.</td>
+                <td>Error: "Insufficient Stock".</td>
+                <td><span class="badge p0">P0</span></td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+<section>
+    <h2>🔧 Module 4: Admin Panel</h2>
+    <table>
+        <thead>
+            <tr>
+                <th width="50">Status</th>
+                <th width="80">ID</th>
+                <th width="150">Feature</th>
+                <th>Scenario & Steps</th>
+                <th>Expected Result</th>
+                <th width="60">Pri</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input type="checkbox" class="status-checkbox"></td>
+                <td>ADM-01</td>
+                <td>Auth</td>
+                <td><strong>Login</strong><br>1. Valid Creds.</td>
+                <td>Access Granted.</td>
+                <td><span class="badge p0">P0</span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" class="status-checkbox"></td>
+                <td>ADM-02</td>
+                <td>Products</td>
+                <td><strong>Add Product</strong><br>1. Fill & Save.</td>
+                <td>Product appears on Frontend.</td>
+                <td><span class="badge p0">P0</span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" class="status-checkbox"></td>
+                <td>ADM-05</td>
+                <td>Orders</td>
+                <td><strong>Status Change</strong><br>1. Set "Shipped".</td>
+                <td>DB Updated. Customer Emailed (if configured).</td>
+                <td><span class="badge p1">P1</span></td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+<section>
+    <h2>🛡️ Module 5: Security & System</h2>
+    <table>
+        <thead>
+            <tr>
+                <th width="50">Status</th>
+                <th width="80">ID</th>
+                <th width="150">Feature</th>
+                <th>Scenario & Steps</th>
+                <th>Expected Result</th>
+                <th width="60">Pri</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input type="checkbox" class="status-checkbox"></td>
+                <td>SEC-01</td>
+                <td>Forms</td>
+                <td><strong>CSRF Check</strong><br>1. Replay POST without token.</td>
+                <td>403 Forbidden / Error.</td>
+                <td><span class="badge p0">P0</span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" class="status-checkbox"></td>
+                <td>SEC-02</td>
+                <td>Uploads</td>
+                <td><strong>Malicious File</strong><br>1. Upload `shell.php.jpg`.</td>
+                <td>Rejected (MIME mismatch).</td>
+                <td><span class="badge p0">P0</span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" class="status-checkbox"></td>
+                <td>SEC-03</td>
+                <td>XSS</td>
+                <td><strong>Input Sanity</strong><br>1. Input `<script>`.</td>
+                <td>Saved as text. No execution.</td>
+                <td><span class="badge p0">P0</span></td>
+            </tr>
+             <tr>
+                <td><input type="checkbox" class="status-checkbox"></td>
+                <td>SYS-01</td>
+                <td>404</td>
+                <td><strong>Bad URL</strong><br>1. Visit /invalid-page.</td>
+                <td>Graceful Error Page.</td>
+                <td><span class="badge p3">P3</span></td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+</body>
+</html>
